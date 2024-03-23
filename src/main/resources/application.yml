@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: safeGuard
+  datasource:
+    url: jdbc:mysql://localhost/capstone
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
