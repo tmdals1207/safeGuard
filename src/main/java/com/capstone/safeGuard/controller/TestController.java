@@ -4,6 +4,7 @@ import com.capstone.safeGuard.dto.TestDTO;
 import com.capstone.safeGuard.service.TestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,4 +28,13 @@ public class TestController {
 
         return name;
     }
+
+    @PostMapping("/save-data")
+    public String saveData(@RequestParam String name, @RequestParam int age) {
+        TestDTO dto = new TestDTO(name, age);
+        testService.dbConnectionTest(dto);
+
+        return name + " 추가 완료";
+    }
+
 }

@@ -25,4 +25,11 @@ public class TestDomain {
         return domain;
     }
 
+    public int getAge() {
+        return this.age;
+    }
+
+    public String getName() {
+        return this.name;
+    }
 }

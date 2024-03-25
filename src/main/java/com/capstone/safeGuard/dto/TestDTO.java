@@ -17,4 +17,12 @@ public class TestDTO {
 
         return dto;
     }
+
+    public int getAge() {
+        return this.age;
+    }
+
+    public String getName() {
+        return this.name;
+    }
 }
