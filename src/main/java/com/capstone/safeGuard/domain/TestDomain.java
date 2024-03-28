@@ -17,10 +17,14 @@ public class TestDomain {
     @Column
     private int age;
 
+    @Column
+    private String relationship;
+
     public static TestDomain toDomain(TestDTO dto){
         TestDomain domain = new TestDomain();
         domain.name = dto.getName();
         domain.age = dto.getAge();
+        domain.relationship = dto.getRelationship();
 
         return domain;
     }
@@ -31,5 +35,9 @@ public class TestDomain {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getRelationship() {
+        return this.relationship;
     }
 }

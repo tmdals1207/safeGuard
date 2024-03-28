@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 public class TestDTO {
     private String name;
     private int age;
+    private String relationship;
 
     public static TestDTO toDTO(TestDomain domain){
         TestDTO dto = new TestDTO();
         dto.name = domain.getName();
         dto.age = domain.getAge();
+        dto.relationship = domain.getRelationship();
 
         return dto;
     }
@@ -24,5 +26,8 @@ public class TestDTO {
 
     public String getName() {
         return this.name;
+    }
+    public String getRelationship() {
+        return this.relationship;
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +7,15 @@
 </head>
 <body>
 <form action="/save-data" method="post">
-    <label for="name">Name:</label>
+    <label for="name">이름:</label>
     <input type="text" id="name" name="name"><br><br>
-    <label for="age">Age:</label>
+    <label for="age">나이:</label>
     <input type="text" id="age" name="age"><br><br>
+
+    <input type="radio" id="parent" name="relationship" value="parent">
+    <label for="parent">부모</label><br>
+    <input type="radio" id="child" name="relationship" value="child">
+    <label for="child">아이</label><br>
     <input type="submit" value="Submit">
 </form>
 </body>

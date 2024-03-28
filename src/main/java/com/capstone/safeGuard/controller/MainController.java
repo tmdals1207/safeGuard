@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller
 @RequiredArgsConstructor
 public class MainController {
-    private final TestService testService;
 
     @GetMapping("/login")
     public String showLoginForm() {
