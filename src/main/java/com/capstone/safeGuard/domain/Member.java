@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name="member")
 public class Member {
     @Id
-    private String memberId;
+    private Long memberId;
     private String name;
     private String password;
     private String email;
