@@ -49,7 +49,7 @@ public class MemberController {
             return "signup";
         }
 
-        Boolean signUpSuccess = memberService.signup();
+        Boolean signUpSuccess = memberService.signup(dto);
         if(! signUpSuccess){
             return "signup";
         }
