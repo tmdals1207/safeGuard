@@ -1,7 +1,10 @@
 package com.capstone.safeGuard.controller;
 
+import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
+import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +35,14 @@ public class MemberController {
             return "login";
         }
 
-        log.info("dto.getLoginType() = {}", dto.getLoginType());
-
-        Boolean loginSuccess = memberService.login(dto);
-        if(! loginSuccess){
-            return "login";
+        if(dto.getLoginType().equals(LoginType.Member.toString())){
+            Member memberLogin = memberService.memberLogin(dto);
+            if(memberLogin.getName().isBlank())
+                return "login";
+        }else{
+            Child childLogin = memberService.childLogin(dto);
+            if(childLogin.getChild_name().isBlank())
+                return "login";
         }
 
         return "redirect:/";    //메인페이지로 리다이렉트
