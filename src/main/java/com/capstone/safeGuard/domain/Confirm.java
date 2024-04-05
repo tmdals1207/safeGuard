@@ -18,20 +18,11 @@ public class Confirm {
     private String title;
     private String content;
 
-    public enum cLevel{
-        ARRIVED, DEPART, UNCONFIRMED
-    }
-    @Column(name="level")
-    private cLevel clevel;
+    @Column(name="type")
+    private ConfirmType confirmType;
 
     @ManyToOne
     private  Child child;
 
-    @ManyToOne
-    private Coordinate coordinate;
-
     private LocalDateTime createdAt;
-
-
-
 }

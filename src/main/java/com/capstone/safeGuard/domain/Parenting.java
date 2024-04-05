@@ -13,10 +13,10 @@ import lombok.Setter;
 public class Parenting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long parentingId;
+    private long parentingId;
 
     @ManyToOne
-    private Parent parent;
+    private Member parent;
 
     @ManyToOne
     private Child child;

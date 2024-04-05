@@ -1,18 +1,15 @@
 package com.capstone.safeGuard.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class MainController {
 
-    @GetMapping("/signUp")
-    public String signUp() {
-        return "signUp";
+    public String home(){
+        return "home";
     }
 
-    @GetMapping("logIn")
-    public String login() {
-        return "login";
-    }
+
 }

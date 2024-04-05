@@ -7,13 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-
+@Entity
 @Getter
 @Setter
 @RequiredArgsConstructor
-@MappedSuperclass
-@DiscriminatorColumn
-
+@Table(name="member")
 public class Member {
     @Id
     private String memberId;
@@ -21,12 +19,15 @@ public class Member {
     private String password;
     private String email;
 
-    @OneToOne(mappedBy = "member")
+    @OneToMany(mappedBy = "parent")
     @JsonIgnore
-    private Parent parent;
+    private List<Parenting> parentingList;
 
-    @OneToOne(mappedBy = "member")
+    @OneToMany(mappedBy = "helper")
     @JsonIgnore
-    private Helper helper;
+    private  List<Helping> helpingList;
 
+    @OneToMany(mappedBy = "comment")
+    @JsonIgnore
+    private  List<Comment> commented;
 }

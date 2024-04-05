@@ -1,40 +1,59 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.dto.MemberDto;
+import com.capstone.safeGuard.dto.request.LoginRequestDTO;
+import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
 import com.capstone.safeGuard.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
-@RestController
+@Controller
+@RequiredArgsConstructor
 public class MemberController {
+    private final MemberService memberService;
 
-    @Autowired
-    private MemberService memberService;
-
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody MemberDto memberDto) {
-
-        Member member = memberService.logIn(memberDto).getBody();
-
-        if (member == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok().build();
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login";
     }
 
 
+    @PostMapping("/login")
+    public String login(@Validated @ModelAttribute LoginRequestDTO dto,
+                        BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            return "login";
+        }
 
-    @PostMapping("/signUp")
-    public ResponseEntity<?> signUp(@RequestParam String type, @RequestParam String memberId,@RequestParam String name,@RequestParam String email,@RequestParam String password) {
-        MemberDto memberDto = new MemberDto(type, memberId, name, email, password);
+        Boolean loginSuccess = memberService.login(dto);
+        if(! loginSuccess){
+            return "login";
+        }
 
-        memberService.signUp(memberDto);
+        return "redirect:/";    //메인페이지로 리다이렉트
+    }
 
-        return ResponseEntity.ok().build();
+    @GetMapping("/signup")
+    public String showSignUpForm() {
+        return "signup";
+    }
+
+    @PostMapping("/signup")
+    public String signUp(@Validated @ModelAttribute SignUpRequestDTO dto,
+                         BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            return "signup";
+        }
+
+        Boolean signUpSuccess = memberService.signup();
+        if(! signUpSuccess){
+            return "signup";
+        }
+
+        return "redirect:/login";   //로그인 페이지로 리다이렉트
     }
 }

@@ -16,15 +16,13 @@ import java.util.List;
 @Table(name="notice")
 public class Notice {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long notice_id;
     private String title;
     private String content;
 
-    public enum nLevel{
-        INFO, WARN, FATAL, CALL
-    }
     @Column(name="level")
-    private nLevel nlevel;
+    private NoticeLevel noticeLevel;
 
     @ManyToOne
     private Child child;

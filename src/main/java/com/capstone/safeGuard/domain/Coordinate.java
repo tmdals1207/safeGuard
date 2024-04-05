@@ -18,6 +18,6 @@ public class Coordinate {
     private Child child;
 
     private boolean is_living_area;
-     private double x;
-     private  double y;
+    private double x;
+    private double y;
 }
