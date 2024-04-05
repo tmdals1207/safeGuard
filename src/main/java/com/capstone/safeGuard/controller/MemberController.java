@@ -32,6 +32,8 @@ public class MemberController {
             return "login";
         }
 
+        log.info("dto.getLoginType() = {}", dto.getLoginType());
+
         Boolean loginSuccess = memberService.login(dto);
         if(! loginSuccess){
             return "login";

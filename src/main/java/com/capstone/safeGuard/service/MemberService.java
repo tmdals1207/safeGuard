@@ -15,7 +15,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public Boolean login(LoginRequestDTO dto) {
-        if(dto.getLoginType().equals(LoginType.Member)){
+        if(dto.getLoginType().equals(LoginType.Member.toString())){
             return memberLogin(dto);
         }else{
             return childLogin(dto);
