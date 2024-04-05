@@ -23,14 +23,14 @@ public class MemberService {
     }
 
     private boolean memberLogin(LoginRequestDTO dto) {
-        Optional<Member> findMember = memberRepository.findById(dto.getLoginId());
+        Optional<Member> findMember = memberRepository.findById(dto.getEditTextID());
         if(findMember.isEmpty()){
             return true;
         }
 
         return findMember.get()
                 .getPassword()
-                .equals(dto.getPassword());
+                .equals(dto.getEditTextPW());
     }
 
     private Boolean childLogin(LoginRequestDTO dto) {
@@ -38,16 +38,16 @@ public class MemberService {
     }
 
     public Boolean signup(SignUpRequestDTO dto){
-        Optional<Member> findMember = memberRepository.findById(dto.getSignupId());
+        Optional<Member> findMember = memberRepository.findById(dto.getInputId());
         if(findMember.isPresent()){
             return false;
         }
 
         Member member = new Member();
-        member.setMemberId(dto.getSignupId());
-        member.setEmail(dto.getEmail());
-        member.setName(dto.getName());
-        member.setPassword(dto.getPassword());
+        member.setMemberId(dto.getInputId());
+        member.setEmail(dto.getInputEmail());
+        member.setName(dto.getInputName());
+        member.setPassword(dto.getInputPW());
         memberRepository.save(member);
 
         return true;
