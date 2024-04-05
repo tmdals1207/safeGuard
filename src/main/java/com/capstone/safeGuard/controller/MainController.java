@@ -1,26 +1,15 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.dto.TestDTO;
-import com.capstone.safeGuard.service.TestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @RequiredArgsConstructor
 public class MainController {
-    private final TestService testService;
 
-    @GetMapping("/login")
-    public String showLoginForm() {
-        return "login";
+    public String home(){
+        return "home";
     }
 
-    @GetMapping("/signup")
-    public String showSignUpForm() {
-        return "signup";
-    }
+
 }

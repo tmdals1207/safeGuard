@@ -15,9 +15,14 @@ import java.util.List;
 @Table(name="child")
 public class Child {
     @Id
-    private String child_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long child_id;
     private String child_name;
     private String child_password;
+
+    @OneToMany(mappedBy = "child")
+    @JsonIgnore
+    private List<Parenting> parentingList;
 
     @OneToMany(mappedBy = "child")
     @JsonIgnore
@@ -25,21 +30,10 @@ public class Child {
 
     @OneToMany(mappedBy = "child")
     @JsonIgnore
-    private List<Coordinate> coordinateList;
+    private List<Coordinate> livingAreas;
 
     @OneToMany(mappedBy = "child")
     @JsonIgnore
-    private List<Confirm> confirmList;
-
-    @OneToMany(mappedBy = "child")
-    @JsonIgnore
-    private List<Notice> noticeList;
-
-
-
-
-
-
-
+    private List<Coordinate> forbiddenAreas;
 
 }

@@ -19,14 +19,6 @@ public class Member {
     private String password;
     private String email;
 
-    @OneToOne(mappedBy = "member")
-    @JsonIgnore
-    private Parent parent;
-
-    @OneToOne(mappedBy = "member")
-    @JsonIgnore
-    private Helper helper;
-
     @OneToMany(mappedBy = "parent")
     @JsonIgnore
     private List<Parenting> parentingList;
@@ -34,4 +26,8 @@ public class Member {
     @OneToMany(mappedBy = "helper")
     @JsonIgnore
     private  List<Helping> helpingList;
+
+    @OneToMany(mappedBy = "comment")
+    @JsonIgnore
+    private  List<Comment> commented;
 }
