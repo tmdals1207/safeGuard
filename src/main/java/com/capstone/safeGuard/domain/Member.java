@@ -29,5 +29,5 @@ public class Member {
 
     @OneToMany(mappedBy = "comment")
     @JsonIgnore
-    private  List<Helping> commented;
+    private  List<Comment> commented;
 }

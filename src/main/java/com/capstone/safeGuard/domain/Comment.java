@@ -16,7 +16,7 @@ public class Comment {
     @Id
     private Long comment_id;
 
-    @ManyToOne()
+    @ManyToOne
     private Notice notice;
 
     @ManyToOne
