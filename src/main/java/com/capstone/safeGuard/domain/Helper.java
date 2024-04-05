@@ -12,16 +12,13 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
 @Table(name="helper")
 
-public class Helper {
+public class Helper extends Member{
     @Id
     private String helperId;
-
-    @OneToOne
-    @MapsId
-    @JsonIgnore
-    private Member member;
 
     @OneToMany(mappedBy = "helper")
     @JsonIgnore

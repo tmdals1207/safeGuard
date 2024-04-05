@@ -12,14 +12,12 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
 @Table(name="parent")
-public class Parent {
+public class Parent extends Member {
     @Id
     private String parentId;
-    @OneToOne
-    @MapsId
-    @JsonIgnore
-    private Member member;
 
     @OneToMany(mappedBy = "parent")
     @JsonIgnore

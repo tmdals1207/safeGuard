@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>로그인</title>
+</head>
+<body>
+<h1>Login</h1>
+<form action="/login" method="post">
+    <input type="radio" id="parent" name="type" value="parent">
+    <label for="parent">부모</label><br>
+    <input type="radio" id="helper" name="type" value="helper">
+    <label for="helper">조력자</label><br>
+    <input type="text" name="id" placeholder="아이디" required>
+    <input type="password" name="password" placeholder="비밀번호" required>
+    <button type="submit">Login</button>
+</form>
+</body>
+</html>
