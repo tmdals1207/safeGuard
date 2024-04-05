@@ -23,7 +23,7 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute LoginRequestDTO dto,
+    public String login(@Validated @ModelAttribute("member") LoginRequestDTO dto,
                         BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             return "login";
@@ -43,7 +43,7 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public String signUp(@Validated @ModelAttribute SignUpRequestDTO dto,
+    public String signUp(@Validated @ModelAttribute("member") SignUpRequestDTO dto,
                          BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             return "signup";
