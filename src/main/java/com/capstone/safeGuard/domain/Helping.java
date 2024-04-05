@@ -16,7 +16,7 @@ public class Helping {
     private long helpingId;
 
     @ManyToOne
-    private Helper helper;
+    private Member helper;
 
     @ManyToOne
     private Child child;

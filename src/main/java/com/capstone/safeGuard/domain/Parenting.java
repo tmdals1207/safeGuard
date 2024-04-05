@@ -16,7 +16,7 @@ public class Parenting {
     private  long parentingId;
 
     @ManyToOne
-    private Parent parent;
+    private Member parent;
 
     @ManyToOne
     private Child child;

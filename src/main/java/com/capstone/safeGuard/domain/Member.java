@@ -14,18 +14,10 @@ import java.util.List;
 @Table(name="member")
 public class Member {
     @Id
-    private Long memberId;
+    private String memberId;
     private String name;
     private String password;
     private String email;
-
-    @OneToOne(mappedBy = "member")
-    @JsonIgnore
-    private Parent parent;
-
-    @OneToOne(mappedBy = "member")
-    @JsonIgnore
-    private Helper helper;
 
     @OneToMany(mappedBy = "parent")
     @JsonIgnore
@@ -34,4 +26,8 @@ public class Member {
     @OneToMany(mappedBy = "helper")
     @JsonIgnore
     private  List<Helping> helpingList;
+
+    @OneToMany(mappedBy = "comment")
+    @JsonIgnore
+    private  List<Helping> commented;
 }

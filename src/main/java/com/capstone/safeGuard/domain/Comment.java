@@ -1,9 +1,6 @@
 package com.capstone.safeGuard.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -17,13 +14,14 @@ import java.time.LocalDateTime;
 @Table(name = "comment")
 public class Comment {
     @Id
-    private long comment_id;
-    private long notice_id;
-    private String commentator_id;
-    private String comment;
-    private LocalDateTime createdAt;
+    private Long comment_id;
 
-    @ManyToOne
+    @ManyToOne()
     private Notice notice;
 
+    @ManyToOne
+    private Member commentator;
+
+    private String comment;
+    private LocalDateTime createdAt;
 }

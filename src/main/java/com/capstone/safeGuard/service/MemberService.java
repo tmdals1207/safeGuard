@@ -1,6 +1,5 @@
 package com.capstone.safeGuard.service;
 
-import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MainService {
+public class MemberService {
     private final MemberRepository memberRepository;
 
     public Boolean login(LoginRequestDTO dto) {

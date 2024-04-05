@@ -20,11 +20,8 @@ public class Notice {
     private String title;
     private String content;
 
-    public enum nLevel{
-        INFO, WARN, FATAL, CALL
-    }
     @Column(name="level")
-    private nLevel nlevel;
+    private NoticeLevel noticeLevel;
 
     @ManyToOne
     private Child child;
