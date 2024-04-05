@@ -4,7 +4,9 @@ import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
 import com.capstone.safeGuard.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
 
@@ -28,6 +31,8 @@ public class MemberController {
         if (bindingResult.hasErrors()){
             return "login";
         }
+
+        log.info("dto.getLoginType() = {}", dto.getLoginType());
 
         Boolean loginSuccess = memberService.login(dto);
         if(! loginSuccess){
@@ -45,6 +50,7 @@ public class MemberController {
     @PostMapping("/signup")
     public String signUp(@Validated @ModelAttribute("member") SignUpRequestDTO dto,
                          BindingResult bindingResult){
+        log.info("dto = {}", dto.getInputId());
         if(bindingResult.hasErrors()){
             return "signup";
         }
