@@ -17,7 +17,7 @@ public class Child {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long child_id;
-    private String child_name;
+    private String childName;
     private String child_password;
 
     @OneToMany(mappedBy = "child")
