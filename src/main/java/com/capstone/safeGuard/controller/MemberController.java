@@ -2,6 +2,7 @@ package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
 import com.capstone.safeGuard.service.LoginType;
@@ -41,7 +42,7 @@ public class MemberController {
                 return "login";
         }else{
             Child childLogin = memberService.childLogin(dto);
-            if(childLogin.getChild_name().isBlank())
+            if(childLogin.getChildName().isBlank())
                 return "login";
         }
 
@@ -67,5 +68,21 @@ public class MemberController {
         }
 
         return "redirect:/login";   //로그인 페이지로 리다이렉트
+    }
+    @PostMapping("/childsignup")
+    public String childsignUp(@Validated @ModelAttribute("child") ChildSignUpRequestDTO dto,
+                         BindingResult bindingResult){
+        log.info("name = {}", dto.getChildName());
+
+        if(bindingResult.hasErrors()){
+            return "group";
+        }
+        Boolean signUpSuccess = memberService.childSignUp(dto);
+        if(! signUpSuccess){
+            return "signup";
+        }
+        log.info("child_name = {}", dto.getChildName());
+        log.info("아이 회원가입 성공!");
+        return "redirect:/group";   //그룹관리 페이지로 리다이렉트
     }
 }

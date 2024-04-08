@@ -16,9 +16,9 @@ import java.util.List;
 public class Child {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long child_id;
-    private String child_name;
-    private String child_password;
+    private Long childId;
+    private String childName;
+    private String childPassword;
 
     @OneToMany(mappedBy = "child")
     @JsonIgnore

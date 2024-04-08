@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "comment")
 public class Comment {
     @Id
-    private Long comment_id;
+    private Long commentId;
 
     @ManyToOne
     private Notice notice;
