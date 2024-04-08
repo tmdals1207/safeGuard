@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChildRepository extends JpaRepository<Child, Long> {
-    public abstract Child findBychildName(String name); // child_name 사용
+    public Child findBychildName(String name); // child_name 사용
+
 
 }

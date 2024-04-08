@@ -8,6 +8,7 @@ import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,39 +18,37 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public Boolean login(LoginRequestDTO dto) {
-        if(dto.getLoginType().equals(LoginType.Member.toString())){
-            return memberLogin(dto);
-        }else{
-            return childLogin(dto);
-        }
-    }
-
-    private boolean memberLogin(LoginRequestDTO dto) {
+    public Member memberLogin(LoginRequestDTO dto) {
         Optional<Member> findMember = memberRepository.findById(dto.getEditTextID());
         if(findMember.isEmpty()){
-            return true;
+            return null;
         }
 
-        return findMember.get()
-                .getPassword()
-                .equals(dto.getEditTextPW());
+        return findMemberWithAuthenticate(findMember, dto.getEditTextPW());
+    }
+    private Member findMemberWithAuthenticate(Optional<Member> findMember, String rawPassword){
+        return findMember
+                .filter(member -> passwordEncoder.matches(rawPassword, member.getPassword()))
+                .orElseThrow(IllegalArgumentException::new);
     }
 
-    private Boolean childLogin(LoginRequestDTO dto) {
-        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getEditTextID()));
+    public Child childLogin(LoginRequestDTO dto) {
+        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName (dto.getEditTextID()));
         Child child = findChild.orElse(null);
 
-        if (child != null && child.getChild_password().equals(dto.getEditTextPW())) {
-            // 로그인 성공 처리
-            return true;
-        } else {
-            // 로그인 실패 처리 (아이디 또는 비밀번호 불일치)
-            return false;
+        if(findChild.isEmpty()){
+            return null;
         }
-    }
 
+        return findChildWithAuthenticate(findChild, dto.getEditTextPW());
+    }
+    private Child findChildWithAuthenticate(Optional<Child> findChild, String rawPassword){
+        return findChild
+                .filter(child -> passwordEncoder.matches(rawPassword, child.getChildPassword()))
+                .orElseThrow(IllegalArgumentException::new);
+    }
 
     public Boolean signup(SignUpRequestDTO dto){
         Optional<Member> findMember = memberRepository.findById(dto.getInputId());
@@ -61,20 +60,28 @@ public class MemberService {
         member.setMemberId(dto.getInputId());
         member.setEmail(dto.getInputEmail());
         member.setName(dto.getInputName());
-        member.setPassword(dto.getInputPW());
+        String encodedPassword = passwordEncoder.encode(dto.getInputPW());
+        member.setPassword(encodedPassword);
         memberRepository.save(member);
 
         return true;
     }
 
+
     public Boolean childSignUp(ChildSignUpRequestDTO dto){
+        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
+        if(findChild.isPresent()){
+            return false;
+        }
 
         Child child = new Child();
-        child.setChild_id(dto.getChild_id());
+        child.setChildId(dto.getChild_id());
         child.setChildName(dto.getChildName());
-        child.setChild_password(dto.getChild_password());
+        String encodedPassword = passwordEncoder.encode(dto.getChild_password());
+        child.setChildPassword(encodedPassword);
         childRepository.save(child);
 
         return true;
     }
+
 }

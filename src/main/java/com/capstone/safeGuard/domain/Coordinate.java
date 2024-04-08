@@ -12,12 +12,12 @@ import lombok.Setter;
 @Table(name="coordinate")
 public class Coordinate {
     @Id
-    private long coordinate_id;
+    private long coordinateId;
 
     @ManyToOne
     private Child child;
 
-    private boolean is_living_area;
+    private boolean isLivingArea;
     private double x;
     private double y;
 }

@@ -1,12 +1,16 @@
 package com.capstone.safeGuard.controller;
 
+import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
+import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,13 +36,16 @@ public class MemberController {
             return "login";
         }
 
-        log.info("dto.getLoginType() = {}", dto.getLoginType());
-
-        Boolean loginSuccess = memberService.login(dto);
-        if(! loginSuccess){
-            return "login";
+        if(dto.getLoginType().equals(LoginType.Member.toString())){
+            Member memberLogin = memberService.memberLogin(dto);
+            if(memberLogin.getName().isBlank())
+                return "login";
+        }else{
+            Child childLogin = memberService.childLogin(dto);
+            if(childLogin.getChildName().isBlank())
+                return "login";
         }
-        log.info("로그인 성공!");
+
         return "redirect:/";    //메인페이지로 리다이렉트
     }
 
@@ -59,7 +66,7 @@ public class MemberController {
         if(! signUpSuccess){
             return "signup";
         }
-        log.info("회원가입 성공!");
+
         return "redirect:/login";   //로그인 페이지로 리다이렉트
     }
     @PostMapping("/childsignup")
