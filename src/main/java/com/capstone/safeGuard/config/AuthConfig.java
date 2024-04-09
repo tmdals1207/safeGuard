@@ -1,4 +1,4 @@
-package com.capstone.safeGuard;
+package com.capstone.safeGuard.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
