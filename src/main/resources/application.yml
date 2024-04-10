@@ -12,3 +12,6 @@ spring:
     show_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
+
+jwt:
+  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa

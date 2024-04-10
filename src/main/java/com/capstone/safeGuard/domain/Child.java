@@ -20,6 +20,9 @@ public class Child {
     private String childName;
     private String childPassword;
 
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
+
     @OneToMany(mappedBy = "child")
     @JsonIgnore
     private List<Parenting> parentingList;

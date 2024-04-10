@@ -19,6 +19,11 @@ public class Member {
     private String password;
     private String email;
 
+
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
+
+
     @OneToMany(mappedBy = "parent")
     @JsonIgnore
     private List<Parenting> parentingList;
