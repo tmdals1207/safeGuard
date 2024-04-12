@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class JwtToken {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tokenId;
@@ -14,6 +13,10 @@ public class JwtToken {
     private String refreshToken;
     @Builder.Default
     private boolean isBlackList = false;
+
+    public JwtToken() {
+        this.isBlackList = false;
+    }
 
     @Builder
     public JwtToken(String grantType, String accessToken, String refreshToken) {
