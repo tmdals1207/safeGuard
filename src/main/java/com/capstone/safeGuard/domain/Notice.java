@@ -22,6 +22,7 @@ public class Notice {
     private String content;
 
     @Column(name="level")
+    @Enumerated(EnumType.STRING)
     private NoticeLevel noticeLevel;
 
     @ManyToOne

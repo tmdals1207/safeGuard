@@ -19,6 +19,7 @@ public class Confirm {
     private String content;
 
     @Column(name="type")
+    @Enumerated(EnumType.STRING)
     private ConfirmType confirmType;
 
     @ManyToOne
