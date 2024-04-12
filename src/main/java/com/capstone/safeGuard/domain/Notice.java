@@ -29,8 +29,4 @@ public class Notice {
     private Child child;
 
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "notice")
-    @JsonIgnore
-    private List<Comment> commentList;
 }
