@@ -13,15 +13,15 @@ import com.capstone.safeGuard.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
@@ -31,6 +31,7 @@ import java.util.Collections;
 public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
+//    private final JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider);
 
     @GetMapping("/login")
     public String showLoginForm() {
@@ -38,7 +39,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute("member") LoginRequestDTO dto,
+    public String login(@Validated @RequestBody LoginRequestDTO dto,
                         BindingResult bindingResult,
                         HttpServletResponse response){
         if (bindingResult.hasErrors()){
@@ -75,22 +76,23 @@ public class MemberController {
         return "signup";
     }
 
-    @PostMapping("/signup")
-    public String memberSignUp(@Validated @ModelAttribute("member") SignUpRequestDTO dto,
-                               BindingResult bindingResult){
-        log.info("dto = {}", dto.getInputId());
+    @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
+                                       BindingResult bindingResult){
+        log.info("dto = {}", dto.getInputID());
         if(bindingResult.hasErrors()){
             log.info("bindingResult = {}", bindingResult);
-            return "signup";
+            log.info("실패 binding error ");
+            return ResponseEntity.status(400).build();
         }
 
         Boolean signUpSuccess = memberService.signup(dto);
         if(! signUpSuccess){
             log.info("signupFail = {}", signUpSuccess);
-            return "signup";
+            return ResponseEntity.status(400).build();
         }
         log.info("signup success = {}", signUpSuccess);
-        return "redirect:/login";   //로그인 페이지로 리다이렉트
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/childsignup")
@@ -114,6 +116,14 @@ public class MemberController {
         log.info("아이 회원가입 성공!");
         return "redirect:/group";   //그룹관리 페이지로 리다이렉트
     }
+
+//    @GetMapping("/logout")
+//    public String logout(HttpServletRequest request){
+//        String token = jwtAuthenticationFilter.resolveToken(request);
+//        memberService.logout(token);
+//
+//        return "redirect:/home";
+//    }
 
     public TokenInfo generateTokenOfMember(Member member) {
         Authentication authentication
