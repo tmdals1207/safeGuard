@@ -67,13 +67,13 @@ public class MemberController {
     }
 
     @GetMapping("/signup")
-    public String showSignUpForm() {
+    public String showMemberSignUpForm() {
         return "signup";
     }
 
     @PostMapping("/signup")
-    public String signUp(@Validated @ModelAttribute("member") SignUpRequestDTO dto,
-                         BindingResult bindingResult){
+    public String memberSignUp(@Validated @ModelAttribute("member") SignUpRequestDTO dto,
+                               BindingResult bindingResult){
         log.info("dto = {}", dto.getInputId());
         if(bindingResult.hasErrors()){
             log.info("bindingResult = {}", bindingResult);
@@ -95,8 +95,8 @@ public class MemberController {
     }
 
     @PostMapping("/childsignup")
-    public String childsignUp(@Validated @ModelAttribute("child") ChildSignUpRequestDTO dto,
-                         BindingResult bindingResult){
+    public String childSignUp(@Validated @ModelAttribute("child") ChildSignUpRequestDTO dto,
+                              BindingResult bindingResult){
         log.info("name = {}", dto.getChildName());
 
         if(bindingResult.hasErrors()){
