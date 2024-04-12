@@ -87,3 +87,11 @@ CREATE TABLE comment (
                          FOREIGN KEY (emergency_id) REFERENCES Emergency (emergency_id)
 );
 
+CREATE TABLE jwt_token (
+                           token_id BIGINT NOT NULL AUTO_INCREMENT,
+                           access_token VARCHAR(255) NOT NULL,
+                           grant_type VARCHAR(255) NOT NULL,
+                           refresh_token VARCHAR(255) NOT NULL,
+                           is_black_list TINYINT NOT NULL,
+                           PRIMARY KEY (token_id)
+);
