@@ -1,5 +1,6 @@
 package com.capstone.safeGuard.controller;
 
+import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
@@ -14,12 +15,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Collections;
 
 @Controller
 @RequiredArgsConstructor
@@ -112,13 +116,17 @@ public class MemberController {
     }
 
     public TokenInfo generateTokenOfMember(Member member) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getMemberId(), member.getPassword());
+        Authentication authentication
+                = new UsernamePasswordAuthenticationToken(member.getMemberId(), member.getPassword(),
+                Collections.singleton(new SimpleGrantedAuthority(Authority.ROLE_MEMBER.toString())));
         return jwtTokenProvider.generateToken(authentication);
     }
 
 
     public TokenInfo generateTokenOfChild(Child child) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(child.getChildName(), child.getChildPassword());
+        Authentication authentication
+                = new UsernamePasswordAuthenticationToken(child.getChildName(), child.getChildPassword(),
+                Collections.singleton(new SimpleGrantedAuthority(Authority.ROLE_CHILD.toString())));
         return jwtTokenProvider.generateToken(authentication);
     }
 }
