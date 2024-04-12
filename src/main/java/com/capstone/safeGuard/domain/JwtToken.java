@@ -1,8 +1,11 @@
 package com.capstone.safeGuard.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 public class JwtToken {
@@ -11,7 +14,7 @@ public class JwtToken {
     private String grantType;
     private String accessToken;
     private String refreshToken;
-    @Builder.Default
+    @Builder.Default @Setter
     private boolean isBlackList = false;
 
     public JwtToken() {

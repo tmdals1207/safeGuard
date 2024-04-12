@@ -21,6 +21,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
     public Member memberLogin(LoginRequestDTO dto) {
@@ -89,8 +90,9 @@ public class MemberService {
         return true;
     }
 
-    public void logout(String token){
-
+    public void logout(String accessToken){
+        // TODO logout 가능한지 체크
+        jwtService.toBlackList(accessToken);
     }
 
 }

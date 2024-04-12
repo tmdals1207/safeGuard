@@ -6,6 +6,8 @@ import com.capstone.safeGuard.repository.JwtTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -21,4 +23,12 @@ public class JwtService {
     }
 
 
+    public JwtToken toBlackList(String accessToken) {
+        JwtToken findToken = jwtTokenRepository.findByAccessToken(accessToken)
+                .orElseThrow(() -> new NoSuchElementException());
+
+        findToken.setBlackList(true);
+
+        return findToken;
+    }
 }

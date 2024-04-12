@@ -128,8 +128,8 @@ public class MemberController {
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
-        String token = jwtAuthenticationFilter.resolveToken(request);
-        memberService.logout(token);
+        String accessToken = jwtAuthenticationFilter.resolveToken(request);
+        memberService.logout(accessToken);
 
         return "redirect:/home";
     }
