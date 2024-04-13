@@ -127,11 +127,14 @@ public class MemberController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
+    public ResponseEntity logout(HttpServletRequest request) {
         String accessToken = jwtAuthenticationFilter.resolveToken(request);
-        memberService.logout(accessToken);
+        boolean isLogout = memberService.logout(accessToken);
 
-        return "redirect:/home";
+        if (isLogout) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(401).build();
     }
 
     public TokenInfo generateTokenOfMember(Member member) {

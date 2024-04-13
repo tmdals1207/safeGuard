@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +24,13 @@ public class JwtService {
     }
 
 
-    public JwtToken toBlackList(String accessToken) {
-        JwtToken findToken = jwtTokenRepository.findByAccessToken(accessToken)
-                .orElseThrow(() -> new NoSuchElementException());
+    public void toBlackList(String accessToken) {
+        Optional<JwtToken> findToken = jwtTokenRepository.findByAccessToken(accessToken);
 
-        findToken.setBlackList(true);
+        if(findToken.isEmpty() || findToken.get().isBlackList()){
+            throw new NoSuchElementException("Access token does not exist");
+        }
 
-        return findToken;
+        findToken.get().setBlackList(true);
     }
 }
