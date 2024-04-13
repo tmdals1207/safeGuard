@@ -3,6 +3,7 @@ package com.capstone.safeGuard.controller;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
+import com.capstone.safeGuard.dto.request.ChildRemoveRequestDTO;
 import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
@@ -108,6 +109,28 @@ public class MemberController {
         }
         log.info("child_name = {}", dto.getChildName());
         log.info("아이 회원가입 성공!");
+        return "redirect:/group";   //그룹관리 페이지로 리다이렉트
+    }
+
+    @GetMapping("/childremove")
+    public String showChildRemoveForm() {
+        return "group";
+    }
+
+    @PostMapping("/childremove")
+    public String childRemove(@Validated @ModelAttribute("child") ChildRemoveRequestDTO dto,
+                              BindingResult bindingResult){
+        log.info("name = {}", dto.getChildName());
+
+        if(bindingResult.hasErrors()){
+            return "group";
+        }
+        Boolean RemoveSuccess = memberService.childRemove(dto);
+        if(! RemoveSuccess){
+            return "group";
+        }
+        log.info("child_name = {}", dto.getChildName());
+        log.info("아이 삭제 성공!");
         return "redirect:/group";   //그룹관리 페이지로 리다이렉트
     }
 

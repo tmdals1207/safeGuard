@@ -3,6 +3,7 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.dto.request.ChildRemoveRequestDTO;
 import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
@@ -85,6 +86,17 @@ public class MemberService {
         child.setChildPassword(encodedPassword);
         child.setAuthority(Authority.ROLE_CHILD);
         childRepository.save(child);
+
+        return true;
+    }
+
+    public Boolean childRemove(ChildRemoveRequestDTO dto){
+        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
+        if(findChild.isPresent()){
+            return false;
+        }
+
+        childRepository.delete(findChild);
 
         return true;
     }
