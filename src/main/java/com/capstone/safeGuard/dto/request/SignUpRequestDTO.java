@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class SignUpRequestDTO {
     @NotBlank
-    private String inputId;
+    private String inputID;
     @NotBlank
     private String inputName;
     @NotBlank

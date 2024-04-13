@@ -55,13 +55,13 @@ public class MemberService {
     }
 
     public Boolean signup(SignUpRequestDTO dto){
-        Optional<Member> findMember = memberRepository.findById(dto.getInputId());
+        Optional<Member> findMember = memberRepository.findById(dto.getInputID());
         if(findMember.isPresent()){
             return false;
         }
 
         Member member = new Member();
-        member.setMemberId(dto.getInputId());
+        member.setMemberId(dto.getInputID());
         member.setEmail(dto.getInputEmail());
         member.setName(dto.getInputName());
         String encodedPassword = passwordEncoder.encode(dto.getInputPW());
@@ -99,6 +99,10 @@ public class MemberService {
         childRepository.delete(findChild);
 
         return true;
+    }
+
+    public void logout(String token){
+
     }
 
 }

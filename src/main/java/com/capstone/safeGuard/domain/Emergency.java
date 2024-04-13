@@ -21,7 +21,7 @@ public class Emergency {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "notice")
+    @OneToMany(mappedBy = "comment")
     @JsonIgnore
     private List<Comment> commentList;
 }
