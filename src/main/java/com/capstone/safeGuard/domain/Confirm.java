@@ -23,7 +23,10 @@ public class Confirm {
     private ConfirmType confirmType;
 
     @ManyToOne
-    private  Child child;
+    private Helping helping_id;
+
+    @ManyToOne
+    private Child child;
 
     private LocalDateTime createdAt;
 }

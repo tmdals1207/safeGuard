@@ -7,13 +7,11 @@ CREATE TABLE member (
 );
 
 CREATE TABLE child (
-                       child_id BIGINT NOT NULL,
+                       child_id BIGINT NOT NULL AUTO_INCREMENT,
                        child_name VARCHAR(255) NOT NULL,
                        child_password VARCHAR(255) NOT NULL,
                        PRIMARY KEY (child_id)
 );
-ALTER TABLE child
-    MODIFY child_id BIGINT AUTO_INCREMENT;
 
 CREATE TABLE parenting (
                            parenting_id BIGINT NOT NULL,
@@ -47,10 +45,22 @@ CREATE TABLE notice (
                         notice_id BIGINT NOT NULL AUTO_INCREMENT,
                         title VARCHAR(255) NOT NULL,
                         content TEXT NOT NULL,
-                        level ENUM('INFO', 'WARN', 'FATAL', 'CALL') NOT NULL,
+                        level ENUM('INFO', 'WARN', 'FATAL') NOT NULL,
                         child_id BIGINT NOT NULL,
                         created_at DATETIME NOT NULL,
                         PRIMARY KEY (notice_id),
+                        FOREIGN KEY (child_id) REFERENCES Child (child_id)
+);
+
+CREATE TABLE emergency (
+                        emergency_id BIGINT NOT NULL AUTO_INCREMENT,
+                        title VARCHAR(255) NOT NULL,
+                        content TEXT NOT NULL,
+                        sender_id BIGINT NOT NULL ,
+                        child_id BIGINT NOT NULL,
+                        created_at DATETIME NOT NULL,
+                        PRIMARY KEY (emergency_id),
+                        FOREIGN KEY (sender_id) REFERENCES Member (member_id),
                         FOREIGN KEY (child_id) REFERENCES Child (child_id)
 );
 
@@ -59,19 +69,21 @@ CREATE TABLE confirm (
                          title VARCHAR(255) NOT NULL,
                          content TEXT NOT NULL,
                          type ENUM('ARRIVED', 'DEPART', 'UNCONFIRMED') NOT NULL,
+                         helping_id BIGINT NOT NULL ,
                          child_id BIGINT NOT NULL,
                          created_at DATETIME NOT NULL,
                          PRIMARY KEY (confirm_id),
+                         FOREIGN KEY (helping_id) REFERENCES Helping (helping_id),
                          FOREIGN KEY (child_id) REFERENCES Child (child_id)
 );
 
 CREATE TABLE comment (
                          comment_id BIGINT NOT NULL AUTO_INCREMENT,
-                         notice_id BIGINT NOT NULL,
+                         emergency_id BIGINT NOT NULL,
                          commentator_id VARCHAR(255) NOT NULL,
                          comment TEXT NOT NULL,
                          commented_at DATETIME NOT NULL,
                          PRIMARY KEY (comment_id),
-                         FOREIGN KEY (notice_id) REFERENCES Notice (notice_id)
+                         FOREIGN KEY (emergency_id) REFERENCES Emergency (emergency_id)
 );
 
