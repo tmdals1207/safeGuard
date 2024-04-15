@@ -94,10 +94,10 @@ public class MemberService {
 
     public Boolean childRemove(ChildRemoveRequestDTO dto){
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
-        if(findChild.isPresent()){
+        if(findChild.isEmpty()){
             return false;
         }
-        childRepository.delete(findChild);
+        childRepository.delete(findChild.get());
         return true;
     }
 
