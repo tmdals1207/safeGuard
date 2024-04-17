@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -21,6 +22,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
     public Member memberLogin(LoginRequestDTO dto) {
@@ -89,8 +91,13 @@ public class MemberService {
         return true;
     }
 
-    public void logout(String token){
-
+    public boolean logout(String accessToken){
+        try {
+            jwtService.toBlackList(accessToken);
+        }catch (NoSuchElementException e){
+            return false;
+        }
+        return true;
     }
 
 }
