@@ -58,7 +58,12 @@ public class MemberController {
 
             // member가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfMember(memberLogin);
-            response.setHeader("Authorization", "Bearer" + tokenInfo.getAccessToken());
+            response.setHeader("Authorization",
+                    tokenInfo.getGrantType()
+                    + "," + tokenInfo.getAccessToken() + ",");
+            log.info(tokenInfo.getGrantType());
+            log.info(tokenInfo.getAccessToken());
+            log.info(tokenInfo.getRefreshToken());
 
             // 생성한 토큰을 저장
             jwtService.storeToken(tokenInfo);
