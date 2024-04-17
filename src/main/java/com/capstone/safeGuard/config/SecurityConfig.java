@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests()
                 .requestMatchers("/","/home", "/login", "/signup" , "/childsignup").permitAll()
-                .requestMatchers("/group").hasRole("member")
+                .requestMatchers("/group", "/check-auth").hasRole("member")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
