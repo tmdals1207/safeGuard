@@ -3,12 +3,14 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.domain.Parenting;
 import com.capstone.safeGuard.dto.request.ChildRemoveRequestDTO;
 import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
+import com.capstone.safeGuard.repository.ParentingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
+    private final ParentingRepository parentingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -75,7 +78,7 @@ public class MemberService {
     }
 
 
-    public Boolean childSignUp(ChildSignUpRequestDTO dto){
+    public Boolean childSignUp(ChildSignUpRequestDTO dto, String memberId){
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
         if(findChild.isPresent()){
             return false;
@@ -89,7 +92,21 @@ public class MemberService {
         child.setAuthority(Authority.ROLE_CHILD);
         childRepository.save(child);
 
+        // member child 연결
+        Parenting parenting = new Parenting();
+        Optional<Member> findMember = memberRepository.findById(memberId);
+        if(findMember.isEmpty()){
+            return false;
+        }
+        settingParent(parenting,child, findMember.get());
+        parentingRepository.save(parenting);
+
         return true;
+    }
+
+    public void settingParent (Parenting parenting, Child child, Member findMember) {
+        parenting.setParent(findMember);
+        parenting.setChild(child);
     }
 
     public Boolean childRemove(ChildRemoveRequestDTO dto){

@@ -111,14 +111,17 @@ public class MemberController {
     }
 
     @PostMapping("/childsignup")
-    public String childSignUp(@Validated @ModelAttribute("child") ChildSignUpRequestDTO dto,
+    public String childSignUp(@Validated @ModelAttribute("child") ChildSignUpRequestDTO dto, LoginRequestDTO loginRequestDTO,
                               BindingResult bindingResult) {
         log.info("name = {}", dto.getChildName());
+
+        //로그인 하고 있는 member의 id를 가져옴
+        String memberId = loginRequestDTO.getEditTextID();
 
         if (bindingResult.hasErrors()) {
             return "group";
         }
-        Boolean signUpSuccess = memberService.childSignUp(dto);
+        Boolean signUpSuccess = memberService.childSignUp(dto, memberId);
         if (!signUpSuccess) {
             return "signup";
         }
