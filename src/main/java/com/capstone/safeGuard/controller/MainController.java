@@ -34,7 +34,7 @@ public class MainController {
     public String checkAuth(HttpServletRequest request, HttpServletResponse response) {
         String token = request.getHeader("Authorization");
         log.info("token: {}", token);
-        if(jwtService.findByToken(token)){
+        if(! jwtService.findByToken(token)){
             response.setStatus(401);
             return "group";
         }

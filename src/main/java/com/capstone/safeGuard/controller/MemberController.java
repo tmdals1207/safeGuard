@@ -58,8 +58,7 @@ public class MemberController {
 
             // member가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfMember(memberLogin);
-            response.setHeader("Authorization",
-                     tokenInfo.getAccessToken());
+            response.setHeader("Authorization", tokenInfo.getAccessToken());
             log.info(tokenInfo.getGrantType());
             log.info(tokenInfo.getAccessToken());
             log.info(tokenInfo.getRefreshToken());
