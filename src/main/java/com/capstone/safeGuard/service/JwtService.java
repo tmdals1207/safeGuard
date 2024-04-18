@@ -36,15 +36,26 @@ public class JwtService {
         findToken.get().setBlackList(true);
     }
 
-    public boolean findByToken(String token) {
+//    public boolean findByToken(String token) {
+//        Optional<JwtToken> findToken = jwtTokenRepository.findByAccessToken(token);
+//
+//        log.info("{}", token.equals(findToken.get().getAccessToken()));
+//
+//        if(findToken.isEmpty() || findToken.get().isBlackList()){
+//            return false;
+//        }
+//
+//        return true;
+//    }
+
+    public JwtToken findByToken(String token) {
         Optional<JwtToken> findToken = jwtTokenRepository.findByAccessToken(token);
 
         log.info("{}", token.equals(findToken.get().getAccessToken()));
 
         if(findToken.isEmpty() || findToken.get().isBlackList()){
-            return false;
+            throw new NoSuchElementException();
         }
-
-        return true;
+        return findToken.get();
     }
 }

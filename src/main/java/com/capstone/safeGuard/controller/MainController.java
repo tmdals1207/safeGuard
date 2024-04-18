@@ -2,9 +2,9 @@ package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -31,13 +31,13 @@ public class MainController {
 
 
     @GetMapping("/check-auth")
-    public String checkAuth(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity checkAuth(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         log.info("token: {}", token);
-        if(! jwtService.findByToken(token)){
-            response.setStatus(401);
-            return "group";
+
+        if(jwtService.findByToken(token).isBlackList()){
+            return ResponseEntity.status(403).build();
         }
-        return "group";
+        return ResponseEntity.ok().build();
     }
 }
