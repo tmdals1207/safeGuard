@@ -62,8 +62,7 @@ public class MemberController {
         if (dto.getLoginType().equals(LoginType.Member.toString())) {
             Member memberLogin = memberService.memberLogin(dto);
             if (memberLogin == null) {
-                result.put("status", "400");
-                return ResponseEntity.status(400).body(result);
+                return addErrorStatus(result);
             }
 
             // member가 존재하는 경우 token을 전달
@@ -78,8 +77,7 @@ public class MemberController {
         else {
             Child childLogin = memberService.childLogin(dto);
             if (childLogin == null){
-                result.put("status", "400");
-                return ResponseEntity.status(400).body(result);
+                return addErrorStatus(result);
             }
 
             // child가 존재하는 경우 token을 전달
@@ -149,8 +147,7 @@ public class MemberController {
         try {
             jwtService.findByToken(requestToken);
         }catch (Exception e){
-            result.put("status", "400");
-            return ResponseEntity.status(401).body(result);
+            return addErrorStatus(result);
         }
         boolean isLogoutSuccess = memberService.logout(requestToken);
 
@@ -158,8 +155,12 @@ public class MemberController {
             result.put("status", "200");
             return ResponseEntity.ok().body(result);
         }
+        return addErrorStatus(result);
+    }
+
+    private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
         result.put("status", "400");
-        return ResponseEntity.status(401).body(result);
+        return ResponseEntity.status(400).body(result);
     }
 
     public TokenInfo generateTokenOfMember(Member member) {
