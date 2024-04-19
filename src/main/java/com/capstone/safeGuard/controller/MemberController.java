@@ -4,6 +4,7 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
+import com.capstone.safeGuard.dto.reponse.LoginResponseToken;
 import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +32,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -46,9 +50,9 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@Validated @RequestBody LoginRequestDTO dto,
-                                BindingResult bindingResult,
-                                HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(@Validated @RequestBody LoginRequestDTO dto,
+                                                     BindingResult bindingResult,
+                                                     HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.status(404).build();
         }
@@ -56,18 +60,30 @@ public class MemberController {
         // Member 타입으로 로그인 하는 경우
         if (dto.getLoginType().equals(LoginType.Member.toString())) {
             Member memberLogin = memberService.memberLogin(dto);
-            if (memberLogin.getName().isBlank())
+            if (memberLogin.getName().isBlank()) {
                 return ResponseEntity.status(404).build();
+            }
 
             // member가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfMember(memberLogin);
             response.setHeader("Authorization", tokenInfo.getAccessToken());
+
             log.info(tokenInfo.getGrantType());
             log.info(tokenInfo.getAccessToken());
             log.info(tokenInfo.getRefreshToken());
 
             // 생성한 토큰을 저장
             jwtService.storeToken(tokenInfo);
+
+            LoginResponseToken loginResponseToken = LoginResponseToken
+                            .builder().authorization(tokenInfo.getAccessToken())
+                            .build();
+
+            Map<String, String> result = new HashMap<>();
+            result.put("Authorization", tokenInfo.getAccessToken());
+            result.put("status", "200");
+
+            return ResponseEntity.ok().body(result);
         }
         // Child 타입으로 로그인 하는 경우
         else {
@@ -78,11 +94,16 @@ public class MemberController {
             // child가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfChild(childLogin);
             response.setHeader("Authorization", tokenInfo.getAccessToken());
+
             // 생성한 토큰을 저장
             jwtService.storeToken(tokenInfo);
-        }
 
-        return ResponseEntity.ok().build();
+            Map<String, String> result = new HashMap<>();
+            result.put("Authorization", tokenInfo.getAccessToken());
+            result.put("status", "200");
+
+            return ResponseEntity.ok().body(result);
+        }
     }
 
     @GetMapping("/signup")
