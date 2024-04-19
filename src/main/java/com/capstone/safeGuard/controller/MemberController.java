@@ -54,15 +54,14 @@ public class MemberController {
         Map<String, String> result = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            result.put("status", "404");
-            return ResponseEntity.status(404).body(result);
+            result.put("status", "403");
+            return ResponseEntity.status(403).body(result);
         }
-
 
         // Member 타입으로 로그인 하는 경우
         if (dto.getLoginType().equals(LoginType.Member.toString())) {
             Member memberLogin = memberService.memberLogin(dto);
-            if (memberLogin.getName().isBlank()) {
+            if (memberLogin == null) {
                 result.put("status", "400");
                 return ResponseEntity.status(400).body(result);
             }
@@ -78,7 +77,7 @@ public class MemberController {
         // Child 타입으로 로그인 하는 경우
         else {
             Child childLogin = memberService.childLogin(dto);
-            if (childLogin.getChildName().isBlank()){
+            if (childLogin == null){
                 result.put("status", "400");
                 return ResponseEntity.status(400).body(result);
             }
@@ -106,7 +105,6 @@ public class MemberController {
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
-        log.info("dto = {}", dto.getInputID());
         if (bindingResult.hasErrors()) {
             log.info("bindingResult = {}", bindingResult);
             log.info("실패 binding error ");
@@ -145,19 +143,23 @@ public class MemberController {
     }
 
     @GetMapping("/member-logout")
-    public ResponseEntity logout(HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        Map<String, String> result = new HashMap<>();
         String requestToken = request.getHeader("Authorization");
         try {
             jwtService.findByToken(requestToken);
         }catch (Exception e){
-            return ResponseEntity.status(401).build();
+            result.put("status", "400");
+            return ResponseEntity.status(401).body(result);
         }
         boolean isLogoutSuccess = memberService.logout(requestToken);
 
         if (isLogoutSuccess) {
-            return ResponseEntity.ok().build();
+            result.put("status", "200");
+            return ResponseEntity.ok().body(result);
         }
-        return ResponseEntity.status(401).build();
+        result.put("status", "400");
+        return ResponseEntity.status(401).body(result);
     }
 
     public TokenInfo generateTokenOfMember(Member member) {
