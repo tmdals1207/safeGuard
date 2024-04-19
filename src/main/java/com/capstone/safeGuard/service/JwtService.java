@@ -3,6 +3,7 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.JwtToken;
 import com.capstone.safeGuard.dto.TokenInfo;
 import com.capstone.safeGuard.repository.JwtTokenRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class JwtService {
     }
 
 
+    @Transactional
     public void toBlackList(String accessToken) {
         Optional<JwtToken> findToken = jwtTokenRepository.findByAccessToken(accessToken);
 
