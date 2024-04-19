@@ -54,17 +54,15 @@ public class MemberController {
         Map<String, String> result = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            result.put("status", "404");
-            return ResponseEntity.status(404).body(result);
+            result.put("status", "403");
+            return ResponseEntity.status(403).body(result);
         }
-
 
         // Member 타입으로 로그인 하는 경우
         if (dto.getLoginType().equals(LoginType.Member.toString())) {
             Member memberLogin = memberService.memberLogin(dto);
-            if (memberLogin.getName().isBlank()) {
-                result.put("status", "400");
-                return ResponseEntity.status(400).body(result);
+            if (memberLogin == null) {
+                return addErrorStatus(result);
             }
 
             // member가 존재하는 경우 token을 전달
@@ -78,9 +76,8 @@ public class MemberController {
         // Child 타입으로 로그인 하는 경우
         else {
             Child childLogin = memberService.childLogin(dto);
-            if (childLogin.getChildName().isBlank()){
-                result.put("status", "400");
-                return ResponseEntity.status(400).body(result);
+            if (childLogin == null){
+                return addErrorStatus(result);
             }
 
             // child가 존재하는 경우 token을 전달
@@ -106,7 +103,6 @@ public class MemberController {
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
-        log.info("dto = {}", dto.getInputID());
         if (bindingResult.hasErrors()) {
             log.info("bindingResult = {}", bindingResult);
             log.info("실패 binding error ");
@@ -144,24 +140,27 @@ public class MemberController {
         return "redirect:/group";   //그룹관리 페이지로 리다이렉트
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity logout(HttpServletRequest request) {
-        log.info("logout method");
+    @GetMapping("/member-logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        Map<String, String> result = new HashMap<>();
         String requestToken = request.getHeader("Authorization");
-        log.info(requestToken);
         try {
             jwtService.findByToken(requestToken);
-            log.info("logout step1");
         }catch (Exception e){
-            return ResponseEntity.status(401).build();
+            return addErrorStatus(result);
         }
         boolean isLogoutSuccess = memberService.logout(requestToken);
 
         if (isLogoutSuccess) {
-            log.info("logout step2 success");
-            return ResponseEntity.ok().build();
+            result.put("status", "200");
+            return ResponseEntity.ok().body(result);
         }
-        return ResponseEntity.status(401).build();
+        return addErrorStatus(result);
+    }
+
+    private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
+        result.put("status", "400");
+        return ResponseEntity.status(400).body(result);
     }
 
     public TokenInfo generateTokenOfMember(Member member) {

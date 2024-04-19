@@ -27,32 +27,34 @@ public class MemberService {
 
     public Member memberLogin(LoginRequestDTO dto) {
         Optional<Member> findMember = memberRepository.findById(dto.getEditTextID());
-        if(findMember.isEmpty()){
-            return null;
-        }
-        return findMemberWithAuthenticate(findMember, dto.getEditTextPW());
+        // ID가 없는 경우
+        return findMember
+                .map(member -> findMemberWithAuthenticate(member, dto.getEditTextPW()))
+                .orElse(null);
+
+        // 비밀번호 일치하는지 찾는 부분
     }
 
-    private Member findMemberWithAuthenticate(Optional<Member> findMember, String rawPassword){
-        return findMember
-                .filter(member -> passwordEncoder.matches(rawPassword, member.getPassword()))
-                .orElseThrow(IllegalArgumentException::new);
+    private Member findMemberWithAuthenticate(Member findMember, String rawPassword){
+        if(passwordEncoder.matches(rawPassword, findMember.getPassword())){
+            return findMember;
+        }
+        return null;
     }
 
     public Child childLogin(LoginRequestDTO dto) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName (dto.getEditTextID()));
-        Child child = findChild.orElse(null);
 
-        if(findChild.isEmpty()){
-            return null;
-        }
-
-        return findChildWithAuthenticate(findChild, dto.getEditTextPW());
-    }
-    private Child findChildWithAuthenticate(Optional<Child> findChild, String rawPassword){
         return findChild
-                .filter(child -> passwordEncoder.matches(rawPassword, child.getChildPassword()))
-                .orElseThrow(IllegalArgumentException::new);
+                .map(child -> findChildWithAuthenticate(child, dto.getEditTextPW()))
+                .orElse(null);
+
+    }
+    private Child findChildWithAuthenticate(Child findChild, String rawPassword){
+        if(passwordEncoder.matches(rawPassword, findChild.getChildPassword())){
+            return findChild;
+        }
+        return null;
     }
 
     public Boolean signup(SignUpRequestDTO dto){
