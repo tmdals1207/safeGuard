@@ -144,21 +144,17 @@ public class MemberController {
         return "redirect:/group";   //그룹관리 페이지로 리다이렉트
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/member-logout")
     public ResponseEntity logout(HttpServletRequest request) {
-        log.info("logout method");
         String requestToken = request.getHeader("Authorization");
-        log.info(requestToken);
         try {
             jwtService.findByToken(requestToken);
-            log.info("logout step1");
         }catch (Exception e){
             return ResponseEntity.status(401).build();
         }
         boolean isLogoutSuccess = memberService.logout(requestToken);
 
         if (isLogoutSuccess) {
-            log.info("logout step2 success");
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(401).build();
