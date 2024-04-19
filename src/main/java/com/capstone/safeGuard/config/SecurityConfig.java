@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests()
-                .requestMatchers("/","/home", "/login", "/signup" , "/childsignup").permitAll()
+                .requestMatchers("/","/home", "/login", "/signup" , "/childsignup", "/check-auth").permitAll()
                 .requestMatchers("/group").hasRole("member")
                 .anyRequest().authenticated()
                 .and()
