@@ -24,9 +24,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,41 +48,54 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@Validated @RequestBody LoginRequestDTO dto,
-                                BindingResult bindingResult,
-                                HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(@Validated @RequestBody LoginRequestDTO dto,
+                                                     BindingResult bindingResult,
+                                                     HttpServletResponse response) {
+        Map<String, String> result = new HashMap<>();
+
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(404).build();
+            result.put("status", "404");
+            return ResponseEntity.status(404).body(result);
         }
+
 
         // Member 타입으로 로그인 하는 경우
         if (dto.getLoginType().equals(LoginType.Member.toString())) {
             Member memberLogin = memberService.memberLogin(dto);
-            if (memberLogin.getName().isBlank())
-                return ResponseEntity.status(404).build();
+            if (memberLogin.getName().isBlank()) {
+                result.put("status", "400");
+                return ResponseEntity.status(400).body(result);
+            }
 
             // member가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfMember(memberLogin);
-            response.setHeader("Authorization", "Bearer" + tokenInfo.getAccessToken());
+            log.info(tokenInfo.getGrantType());
+            log.info(tokenInfo.getAccessToken());
+            log.info(tokenInfo.getRefreshToken());
 
-            // 생성한 토큰을 저장
-            jwtService.storeToken(tokenInfo);
+            storeTokenInBody(response, result, tokenInfo);
         }
         // Child 타입으로 로그인 하는 경우
         else {
             Child childLogin = memberService.childLogin(dto);
-            if (childLogin.getChildName().isBlank())
-                return ResponseEntity.status(404).build();
+            if (childLogin.getChildName().isBlank()){
+                result.put("status", "400");
+                return ResponseEntity.status(400).body(result);
+            }
 
             // child가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfChild(childLogin);
-            response.setHeader("Authorization", "Bearer" + tokenInfo.getAccessToken());
-
-            // 생성한 토큰을 저장
-            jwtService.storeToken(tokenInfo);
+            storeTokenInBody(response, result, tokenInfo);
         }
+        return ResponseEntity.ok().body(result);
+    }
 
-        return ResponseEntity.ok().build();
+    private void storeTokenInBody(HttpServletResponse response, Map<String, String> result, TokenInfo tokenInfo) {
+        response.setHeader("Authorization", tokenInfo.getAccessToken());
+        // 생성한 토큰을 저장
+        jwtService.storeToken(tokenInfo);
+        result.put("authorization", tokenInfo.getAccessToken());
+        result.put("status", "200");
     }
 
     @GetMapping("/signup")
@@ -128,10 +146,19 @@ public class MemberController {
 
     @GetMapping("/logout")
     public ResponseEntity logout(HttpServletRequest request) {
-        String accessToken = jwtAuthenticationFilter.resolveToken(request);
-        boolean isLogout = memberService.logout(accessToken);
+        log.info("logout method");
+        String requestToken = request.getHeader("Authorization");
+        log.info(requestToken);
+        try {
+            jwtService.findByToken(requestToken);
+            log.info("logout step1");
+        }catch (Exception e){
+            return ResponseEntity.status(401).build();
+        }
+        boolean isLogoutSuccess = memberService.logout(requestToken);
 
-        if (isLogout) {
+        if (isLogoutSuccess) {
+            log.info("logout step2 success");
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(401).build();
