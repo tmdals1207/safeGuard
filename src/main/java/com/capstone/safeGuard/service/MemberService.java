@@ -9,9 +9,13 @@ import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
 import com.capstone.safeGuard.repository.ParentingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -118,12 +122,12 @@ public class MemberService {
         return true;
     }
 
-    public Boolean childRemove(ChildRemoveRequestDTO dto){
-        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
-        if(findChild.isEmpty()){
+    public Boolean childRemove(String childName){
+        Child selectedChild = childRepository.findBychildName(childName);
+        if (selectedChild == null) {
             return false;
         }
-        childRepository.delete(findChild.get());
+        childRepository.delete(selectedChild);
         return true;
     }
 
@@ -134,5 +138,17 @@ public class MemberService {
             return false;
         }
         return true;
+    }
+
+    public String validateBindingError(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            StringBuilder errorMessage = new StringBuilder();
+            for (FieldError error : errors) {
+                errorMessage.append(error.getDefaultMessage()).append("\n");
+            }
+            return errorMessage.toString();
+        }
+        return null;
     }
 }

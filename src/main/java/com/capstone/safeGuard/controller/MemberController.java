@@ -162,33 +162,33 @@ public class MemberController {
     }
 
     @PostMapping("/childremove")
-    public String childRemove(@Validated @ModelAttribute("child") ChildRemoveRequestDTO dto,
-                              BindingResult bindingResult) {
-        log.info("name = {}", dto.getChildName());
+    public ResponseEntity childRemove(@Validated @RequestBody Map<String, String> requestBody,
+                              HttpServletRequest request, BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
-            return "group";
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
         }
-        Boolean RemoveSuccess = memberService.childRemove(dto);
+
+        String childName = requestBody.get("childName");
+
+        Boolean RemoveSuccess = memberService.childRemove(childName);
         if (!RemoveSuccess) {
-            return "group";
+            return ResponseEntity.status(400).build();
         }
-        log.info("child_name = {}", dto.getChildName());
+
         log.info("아이 삭제 성공!");
-        return "redirect:/group";   //그룹관리 페이지로 리다이렉트
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/addhelper")
     public ResponseEntity addHelper(@Validated @RequestBody Map<String, String> requestBody,
                                     HttpServletRequest request, BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            StringBuilder errorMessage = new StringBuilder();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getDefaultMessage()).append("\n");
-            }
-            return ResponseEntity.badRequest().body(null);
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
         }
 
         String childName = requestBody.get("childName");
