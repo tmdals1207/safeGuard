@@ -15,6 +15,7 @@ import com.capstone.safeGuard.util.JwtAuthenticationFilter;
 import com.capstone.safeGuard.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -24,10 +25,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -46,7 +50,8 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity login(@Validated @RequestBody LoginRequestDTO dto,
                                 BindingResult bindingResult,
-                                HttpServletResponse response) {
+                                HttpServletResponse response,
+                                HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.status(404).build();
         }
@@ -63,6 +68,11 @@ public class MemberController {
 
             // 생성한 토큰을 저장
             jwtService.storeToken(tokenInfo);
+
+            // 세션에 memberid 저장
+            HttpSession session = request.getSession();
+            session.setAttribute("memberid", memberLogin.getMemberId());
+
         }
         // Child 타입으로 로그인 하는 경우
         else {
@@ -110,24 +120,40 @@ public class MemberController {
         return "group";
     }
 
-    @PostMapping("/childsignup")
-    public String childSignUp(@Validated @ModelAttribute("child") ChildSignUpRequestDTO dto, LoginRequestDTO loginRequestDTO,
-                              BindingResult bindingResult) {
-        log.info("name = {}", dto.getChildName());
-
-        //로그인 하고 있는 member의 id를 가져옴
-        String memberId = loginRequestDTO.getEditTextID();
+    @PostMapping(value = "/childsignup", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO dto,
+                                      BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
-            return "group";
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            StringBuilder errorMessage = new StringBuilder();
+            for (FieldError error : errors) {
+                errorMessage.append(error.getDefaultMessage()).append("\n");
+            }
+            return ResponseEntity.badRequest().body(null);
         }
-        Boolean signUpSuccess = memberService.childSignUp(dto, memberId);
+
+        //로그인 하고 있는 member의 id를 가져옴
+        HttpSession session = request.getSession(false); // 새로운 세션을 생성하지 않음
+        Boolean signUpSuccess;
+        if (session != null) {
+            String memberId = (String) session.getAttribute("memberid");
+            if (memberId != null) {
+                signUpSuccess = memberService.childSignUp(dto, memberId);
+            } else {
+                return ResponseEntity.status(400).build();
+            }
+        } else {
+            return ResponseEntity.status(400).build();
+        }
+
+
         if (!signUpSuccess) {
-            return "signup";
+            log.info("signupFail = {}", signUpSuccess);
+            return ResponseEntity.status(400).build();
         }
-        log.info("child_name = {}", dto.getChildName());
-        log.info("아이 회원가입 성공!");
-        return "redirect:/group";   //그룹관리 페이지로 리다이렉트
+        log.info("signup success = {}", signUpSuccess);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/childremove")
@@ -137,14 +163,14 @@ public class MemberController {
 
     @PostMapping("/childremove")
     public String childRemove(@Validated @ModelAttribute("child") ChildRemoveRequestDTO dto,
-                              BindingResult bindingResult){
+                              BindingResult bindingResult) {
         log.info("name = {}", dto.getChildName());
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "group";
         }
         Boolean RemoveSuccess = memberService.childRemove(dto);
-        if(! RemoveSuccess){
+        if (!RemoveSuccess) {
             return "group";
         }
         log.info("child_name = {}", dto.getChildName());
@@ -152,10 +178,56 @@ public class MemberController {
         return "redirect:/group";   //그룹관리 페이지로 리다이렉트
     }
 
+    @PostMapping("/addhelper")
+    public ResponseEntity addHelper(@Validated @RequestBody Map<String, String> requestBody,
+                                    HttpServletRequest request, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            StringBuilder errorMessage = new StringBuilder();
+            for (FieldError error : errors) {
+                errorMessage.append(error.getDefaultMessage()).append("\n");
+            }
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String childName = requestBody.get("childName");
+
+        HttpSession session = request.getSession();
+        session.setAttribute("selectedChildName", childName);
+
+
+        session = request.getSession(false); // 새로운 세션을 생성하지 않음
+        String memberId = (String) session.getAttribute("memberid");
+        Boolean addSuccess;
+        if (session != null) {
+            if (childName != null) {
+                addSuccess = memberService.addHelper(memberId, childName);
+            } else {
+                return ResponseEntity.status(400).build();
+            }
+        } else {
+            return ResponseEntity.status(400).build();
+        }
+
+        if (!addSuccess) {
+            log.info("add Fail = {}", addSuccess);
+            return ResponseEntity.status(400).build();
+        }
+        log.info("add success = {}", addSuccess);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/logout")
     public ResponseEntity logout(HttpServletRequest request) {
         String accessToken = jwtAuthenticationFilter.resolveToken(request);
         boolean isLogout = memberService.logout(accessToken);
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.removeAttribute("memberid"); // 세션에서 memberid 삭제
+            session.invalidate(); // 세션 무효화
+        }
 
         if (isLogout) {
             return ResponseEntity.ok().build();

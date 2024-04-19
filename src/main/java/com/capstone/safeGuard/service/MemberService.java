@@ -1,9 +1,6 @@
 package com.capstone.safeGuard.service;
 
-import com.capstone.safeGuard.domain.Authority;
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.domain.Parenting;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.ChildRemoveRequestDTO;
 import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.LoginRequestDTO;
@@ -78,9 +75,9 @@ public class MemberService {
     }
 
 
-    public Boolean childSignUp(ChildSignUpRequestDTO dto, String memberId){
+    public Boolean childSignUp(ChildSignUpRequestDTO dto, String memberId) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
-        if(findChild.isPresent()){
+        if (findChild.isPresent()) {
             return false;
         }
 
@@ -95,18 +92,30 @@ public class MemberService {
         // member child 연결
         Parenting parenting = new Parenting();
         Optional<Member> findMember = memberRepository.findById(memberId);
-        if(findMember.isEmpty()){
+        if (findMember.isEmpty()) {
             return false;
         }
-        settingParent(parenting,child, findMember.get());
+        parenting.setParent(findMember.get());
+        parenting.setChild(child);
         parentingRepository.save(parenting);
 
         return true;
     }
 
-    public void settingParent (Parenting parenting, Child child, Member findMember) {
-        parenting.setParent(findMember);
-        parenting.setChild(child);
+    public Boolean addHelper(String memberId, String childName) {
+        Helping helping = new Helping();
+        Child selectedChild = childRepository.findBychildName(childName);
+        if (selectedChild == null) {
+            return false;
+        }
+        Optional<Member> findMember = memberRepository.findById(memberId);
+        if (findMember.isEmpty()) {
+            return false;
+        }
+        helping.setHelper(findMember.get());
+        helping.setChild(selectedChild);
+
+        return true;
     }
 
     public Boolean childRemove(ChildRemoveRequestDTO dto){
@@ -126,5 +135,4 @@ public class MemberService {
         }
         return true;
     }
-
 }
