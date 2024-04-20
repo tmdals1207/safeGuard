@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+
 @Entity
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name="member")
+@Table(name = "member")
 public class Member {
     @Id
     private String memberId;
@@ -30,9 +31,9 @@ public class Member {
 
     @OneToMany(mappedBy = "helper")
     @JsonIgnore
-    private  List<Helping> helpingList;
+    private List<Helping> helpingList;
 
     @OneToMany(mappedBy = "comment")
     @JsonIgnore
-    private  List<Comment> commented;
+    private List<Comment> commented;
 }

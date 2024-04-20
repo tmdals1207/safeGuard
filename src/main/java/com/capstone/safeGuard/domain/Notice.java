@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name="notice")
+@Table(name = "notice")
 public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class Notice {
     private String title;
     private String content;
 
-    @Column(name="level")
+    @Column(name = "level")
     @Enumerated(EnumType.STRING)
     private NoticeLevel noticeLevel;
 
