@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name="coordinate")
+@Table(name = "coordinate")
 public class Coordinate {
     @Id
     private long coordinateId;

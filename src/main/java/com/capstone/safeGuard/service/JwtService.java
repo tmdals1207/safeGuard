@@ -31,7 +31,7 @@ public class JwtService {
     public void toBlackList(String accessToken) {
         Optional<JwtToken> findToken = jwtTokenRepository.findByAccessToken(accessToken);
 
-        if(findToken.isEmpty() || findToken.get().isBlackList()){
+        if (findToken.isEmpty() || findToken.get().isBlackList()) {
             throw new NoSuchElementException("Access token does not exist");
         }
 
@@ -55,7 +55,7 @@ public class JwtService {
 
         log.info("{}", token.equals(findToken.get().getAccessToken()));
 
-        if(findToken.isEmpty() || findToken.get().isBlackList()){
+        if (findToken.isEmpty() || findToken.get().isBlackList()) {
             throw new NoSuchElementException();
         }
         return findToken.get();
