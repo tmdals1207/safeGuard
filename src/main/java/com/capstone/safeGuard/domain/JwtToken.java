@@ -11,12 +11,14 @@ import lombok.Setter;
 @Entity
 @Getter
 public class JwtToken {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tokenId;
     private String grantType;
     private String accessToken;
     private String refreshToken;
-    @Builder.Default @Setter
+    @Builder.Default
+    @Setter
     private boolean isBlackList = false;
 
     public JwtToken() {

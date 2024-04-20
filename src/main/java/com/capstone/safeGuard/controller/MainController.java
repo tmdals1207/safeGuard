@@ -18,6 +18,7 @@ public class MainController {
     public String showHome() {
         return "home";
     }
+
     @GetMapping("/group")
     public String showGroup() {
         return "group";
@@ -35,7 +36,7 @@ public class MainController {
         String token = request.getHeader("Authorization");
         log.info("token: {}", token);
 
-        if(jwtService.findByToken(token).isBlackList()){
+        if (jwtService.findByToken(token).isBlackList()) {
             return ResponseEntity.status(403).build();
         }
         return ResponseEntity.ok().build();
