@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name="child")
+@Table(name = "child")
 public class Child {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name="confirm")
+@Table(name = "confirm")
 public class Confirm {
     @Id
     private long confirmId;
     private String title;
     private String content;
 
-    @Column(name="type")
+    @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private ConfirmType confirmType;
 
