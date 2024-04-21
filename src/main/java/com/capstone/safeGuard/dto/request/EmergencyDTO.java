@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class EmergencyDto {
+public class EmergencyDTO {
     private Long emergencyId;
     private String memberId;
     private String childName;

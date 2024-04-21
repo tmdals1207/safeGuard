@@ -2,7 +2,7 @@ package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.dto.request.EmergencyDto;
+import com.capstone.safeGuard.dto.request.EmergencyDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.EmergencyRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
@@ -18,7 +18,7 @@ public class EmergencyService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
 
-    public ArrayList<String> compareCoordinate(EmergencyDto emergencyDto, Map<String, int[]> memberIdCoordinateHashMap, int length) {
+    public ArrayList<String> compareCoordinate(EmergencyDTO emergencyDto, Map<String, int[]> memberIdCoordinateHashMap, int length) {
         ArrayList<String> neighborMemberList = new ArrayList<>();
 
         for (Map.Entry<String, int[]> entry : memberIdCoordinateHashMap.entrySet()) {
@@ -52,7 +52,7 @@ public class EmergencyService {
         return Math.sqrt( (x_km * x_km) + (y_km * y_km) );
     }
 
-    public void saveEmergency(EmergencyDto emergencyDto) {
+    public void saveEmergency(EmergencyDTO emergencyDto) {
         // Emergency table에 저장
         Member member = memberRepository.findById(emergencyDto.getMemberId()).orElseThrow(NoSuchElementException::new);
         // TODO childRepo에서 findByChildName을 optional 객체로 받는것에 대해서 상의

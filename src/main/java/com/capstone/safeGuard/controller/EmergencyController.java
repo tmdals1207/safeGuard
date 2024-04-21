@@ -1,6 +1,6 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.dto.request.EmergencyDto;
+import com.capstone.safeGuard.dto.request.EmergencyDTO;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class EmergencyController {
     private final EmergencyService emergencyService;
 
     @PostMapping("/emergency")
-    public ResponseEntity emergencyCall(@RequestBody EmergencyDto emergencyDto) {
+    public ResponseEntity emergencyCall(@RequestBody EmergencyDTO emergencyDto) {
         // 1. 다른 member들의 위치를 요청 -> 응답으로 받은 위치를 저장
         Map<String, int[]> memberIdCoordinateHashMap = getAllMemberCoordinate();
 
