@@ -1,9 +1,7 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.*;
-import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
-import com.capstone.safeGuard.dto.request.LoginRequestDTO;
-import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
+import com.capstone.safeGuard.dto.request.*;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
 import com.capstone.safeGuard.repository.ParentingRepository;
@@ -152,4 +150,50 @@ public class MemberService {
         }
         return null;
     }
+
+    public String findMemberId(FindMemberIdDTO dto) {
+        Member foundMember = memberRepository.findByEmail(dto.getEmail());
+
+        if (foundMember == null || (! foundMember.getName().equals(dto.getName()) ) ) {
+            return null;
+        }
+
+        return foundMember.getMemberId();
+    }
+
+    public String findChildId(FindChildIdDTO dto) {
+        Optional<Member> foundParent = memberRepository.findById(dto.getParentId());
+        if (foundParent.isEmpty()) {
+            return null;
+        }
+
+        List<Parenting> parentingList = foundParent.get().getParentingList();
+        if(parentingList.isEmpty()){
+            return null;
+        }
+
+        return childIDsBuilder(parentingList);
+    }
+
+    private String childIDsBuilder(List<Parenting> parentingList) {
+        StringBuilder childIds = new StringBuilder();
+        int index = 0;
+
+        childIds.append("{");
+        for (Parenting parenting : parentingList) {
+            childIds.append("\"ChildID")
+                    .append(index+1)
+                    .append("\" : \"")
+                    .append(parenting.getChild().getChildName())
+                    .append("\"");
+
+            if(index < parentingList.size() - 1){
+                childIds.append(",");
+            }
+        }
+        childIds.append("}");
+
+        return childIds.toString();
+    }
+
 }
