@@ -71,8 +71,6 @@ public class MemberController {
             log.info(tokenInfo.getRefreshToken());
 
             storeTokenInBody(response, result, tokenInfo);
-            // 생성한 토큰을 저장
-            jwtService.storeToken(tokenInfo);
 
             // 세션에 memberid 저장
             HttpSession session = request.getSession();
@@ -276,7 +274,7 @@ public class MemberController {
     @PostMapping("reset-member-password")
     public ResponseEntity resetMemberPassword(@Validated @RequestBody Map<String, String> requestBody,
                                               HttpServletRequest request, BindingResult bindingResult) {
-
+        // TODO
         return ResponseEntity.ok().build();
     }
 
@@ -303,7 +301,7 @@ public class MemberController {
     @PostMapping("reset-child-password")
     public ResponseEntity resetChildPassword(@Validated @RequestBody Map<String, String> requestBody,
                                               HttpServletRequest request, BindingResult bindingResult) {
-
+        // TODO
         return ResponseEntity.ok().build();
     }
 
