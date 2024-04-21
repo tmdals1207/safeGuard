@@ -250,7 +250,7 @@ public class MemberController {
         return addErrorStatus(result);
     }
 
-    @PostMapping("find-member-id")
+    @PostMapping("/find-member-id")
     public ResponseEntity<Map<String, String>> findMemberId(@Validated @RequestBody FindMemberIdDTO dto,
                                        BindingResult bindingResult) {
         Map<String, String> result = new HashMap<>();
@@ -271,14 +271,14 @@ public class MemberController {
     }
 
 
-    @PostMapping("reset-member-password")
+    @PostMapping("/reset-member-password")
     public ResponseEntity resetMemberPassword(@Validated @RequestBody Map<String, String> requestBody,
                                               HttpServletRequest request, BindingResult bindingResult) {
         // TODO
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("find-child-id-list")
+    @PostMapping("/find-child-id-list")
     public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody FindChildIdDTO dto,
                                                                BindingResult bindingResult) {
         Map<String, String> result = new HashMap<>();
@@ -298,7 +298,7 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PostMapping("reset-child-password")
+    @PostMapping("/reset-child-password")
     public ResponseEntity resetChildPassword(@Validated @RequestBody Map<String, String> requestBody,
                                               HttpServletRequest request, BindingResult bindingResult) {
         // TODO
