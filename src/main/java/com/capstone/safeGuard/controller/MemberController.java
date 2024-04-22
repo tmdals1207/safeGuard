@@ -273,11 +273,11 @@ public class MemberController {
     // 비밀번호 확인을 위한 이메일 인증 1
     // 인증번호 전송
     @PostMapping("/verification-email-request")
-    public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody String email) {
+    public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody String id) {
         Map<String, String> result = new HashMap<>();
-        if(! memberService.sendCodeToEmail(email)){
+        if(! memberService.sendCodeToEmail(id)){
+            // 해당 아이디가 존재하지 않음
             return addErrorStatus(result);
-
         }
         result.put("status", "200");
         return ResponseEntity.ok().body(result);
@@ -286,20 +286,22 @@ public class MemberController {
     // 비밀번호 확인을 위한 이메일 인증 2
     // 인증번호 확인
     @PostMapping("/verification-email")
-    public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody String authCode) {
+    public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody VerificationEmailDTO dto) {
         Map<String, String> result = new HashMap<>();
-        boolean isVerified = memberService.verifiedCode(authCode);
+        boolean isVerified = memberService.verifiedCode(dto.getInputId(), dto.getInputCode());
         if (! isVerified){
+            // 코드가 틀렸다는 메시지와 함께 다시 입력하는 곳으로 리다이렉트
             return addErrorStatus(result);
         }
         result.put("status", "200");
+        // 비밀번호 재설정 팝업 or 리다이렉트
         return ResponseEntity.ok().body(result);
     }
 
     // 비밀번호 확인을 위한 이메일 인증 3
-    // 비밀 번호 재설정
     @PostMapping("/reset-member-password")
     public ResponseEntity<Map<String, String>> verificationEmail() {
+        // TODO 비밀 번호 재설정
         return ResponseEntity.ok().build();
     }
 
@@ -323,10 +325,11 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
+    // TODO child 비번 재설정
     @PostMapping("/reset-child-password")
     public ResponseEntity resetChildPassword(@Validated @RequestBody Map<String, String> requestBody,
                                               HttpServletRequest request, BindingResult bindingResult) {
-        // TODO
+
         return ResponseEntity.ok().build();
     }
 

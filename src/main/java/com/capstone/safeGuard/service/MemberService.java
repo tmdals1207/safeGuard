@@ -3,20 +3,26 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.*;
 import com.capstone.safeGuard.repository.ChildRepository;
+import com.capstone.safeGuard.repository.EmailAuthCodeRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
 import com.capstone.safeGuard.repository.ParentingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -24,7 +30,10 @@ public class MemberService {
     private final ParentingRepository parentingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final MailService mailService;
+    private final EmailAuthCodeRepository emailAuthCodeRepository;
 
+    private static final int emailAuthCodeDuration =  1800; // 30 * 60 * 1000 == 30분
 
     public Member memberLogin(LoginRequestDTO dto) {
         Optional<Member> findMember = memberRepository.findById(dto.getEditTextID());
@@ -196,14 +205,53 @@ public class MemberService {
         return childIds.toString();
     }
 
-    public boolean sendCodeToEmail(String email) {
-        // TODO 저장된 이메일로 코드 보내기
-        return false;
+    public boolean sendCodeToEmail(String memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty()){
+            return false;
+        }
+
+        String address = foundMember.get().getEmail();
+        String title = "SafeGuard 이메일 인증 번호";
+        String authCode = createCode();
+
+        mailService.sendEmail(address, title, authCode);
+        Optional<EmailAuthCode> foundCode = emailAuthCodeRepository.findById(memberId);
+        if(foundCode.isPresent()){
+            emailAuthCodeRepository.delete(foundCode.get());
+        }
+        emailAuthCodeRepository.save(new EmailAuthCode(address, authCode, LocalDateTime.now()));
+        return true;
+    }
+
+    private String createCode() {
+        int length = 6;
+        Random random = new Random();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            builder.append(random.nextInt(10));
+        }
+
+        return builder.toString();
     }
 
 
-    public boolean verifiedCode(String authCode) {
-        // TODO 보낸 코드와 받은 코드가 같은지 확인
-        return false;
+    public boolean verifiedCode(String memberId, String authCode) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty()){
+            return false;
+        }
+
+        Optional<EmailAuthCode> foundCode = emailAuthCodeRepository.findById(foundMember.get().getEmail());
+        if (foundCode.isEmpty()){
+            return false;
+        }
+
+        if (Duration.between(foundCode.get().getCreatedAt(), LocalDateTime.now()).getSeconds()
+                > emailAuthCodeDuration){
+            return false;
+        }
+
+        return authCode.equals(foundCode.get().getAuthCode());
     }
 }
