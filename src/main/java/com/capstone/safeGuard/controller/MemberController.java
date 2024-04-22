@@ -300,9 +300,15 @@ public class MemberController {
 
     // 비밀번호 확인을 위한 이메일 인증 3
     @PostMapping("/reset-member-password")
-    public ResponseEntity<Map<String, String>> verificationEmail() {
-        // TODO 비밀 번호 재설정
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody ResetPasswordDTO dto) {
+        Map<String, String> result = new HashMap<>();
+        boolean isSuccess = memberService.resetMemberPassword(dto);
+
+        if(! isSuccess) {
+            return addErrorStatus(result);
+        }
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping("/find-child-id-list")

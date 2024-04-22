@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -253,5 +254,17 @@ public class MemberService {
         }
 
         return authCode.equals(foundCode.get().getAuthCode());
+    }
+
+    @Transactional
+    public boolean resetMemberPassword(ResetPasswordDTO dto){
+        Optional<Member> foundMember = memberRepository.findById(dto.getMemberId());
+
+        if(foundMember.isEmpty()){
+            return false;
+        }
+
+        foundMember.get().setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        return true;
     }
 }
