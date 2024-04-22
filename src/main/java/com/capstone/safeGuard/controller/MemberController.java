@@ -273,7 +273,7 @@ public class MemberController {
     // 비밀번호 확인을 위한 이메일 인증 1
     // 인증번호 전송
     @PostMapping("/verification-email-request")
-    public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody String id) {
+    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody String id) {
         Map<String, String> result = new HashMap<>();
         if(! memberService.sendCodeToEmail(id)){
             // 해당 아이디가 존재하지 않음
@@ -300,7 +300,7 @@ public class MemberController {
 
     // 비밀번호 확인을 위한 이메일 인증 3
     @PostMapping("/reset-member-password")
-    public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody ResetPasswordDTO dto) {
+    public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody ResetPasswordDTO dto) {
         Map<String, String> result = new HashMap<>();
         boolean isSuccess = memberService.resetMemberPassword(dto);
 
@@ -338,6 +338,8 @@ public class MemberController {
 
         return ResponseEntity.ok().build();
     }
+
+
 
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
         result.put("status", "400");
