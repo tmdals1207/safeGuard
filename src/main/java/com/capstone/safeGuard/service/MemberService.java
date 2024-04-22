@@ -196,4 +196,14 @@ public class MemberService {
         return childIds.toString();
     }
 
+    public boolean sendCodeToEmail(String email) {
+        // TODO 저장된 이메일로 코드 보내기
+        return false;
+    }
+
+
+    public boolean verifiedCode(String authCode) {
+        // TODO 보낸 코드와 받은 코드가 같은지 확인
+        return false;
+    }
 }

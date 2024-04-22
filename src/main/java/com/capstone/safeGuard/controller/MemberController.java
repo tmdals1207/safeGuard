@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 
 @Controller
@@ -270,11 +270,36 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
+    // 비밀번호 확인을 위한 이메일 인증 1
+    // 인증번호 전송
+    @PostMapping("/verification-email-request")
+    public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody String email) {
+        Map<String, String> result = new HashMap<>();
+        if(! memberService.sendCodeToEmail(email)){
+            return addErrorStatus(result);
 
+        }
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
+    }
+
+    // 비밀번호 확인을 위한 이메일 인증 2
+    // 인증번호 확인
+    @PostMapping("/verification-email")
+    public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody String authCode) {
+        Map<String, String> result = new HashMap<>();
+        boolean isVerified = memberService.verifiedCode(authCode);
+        if (! isVerified){
+            return addErrorStatus(result);
+        }
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
+    }
+
+    // 비밀번호 확인을 위한 이메일 인증 3
+    // 비밀 번호 재설정
     @PostMapping("/reset-member-password")
-    public ResponseEntity resetMemberPassword(@Validated @RequestBody Map<String, String> requestBody,
-                                              HttpServletRequest request, BindingResult bindingResult) {
-        // TODO
+    public ResponseEntity<Map<String, String>> verificationEmail() {
         return ResponseEntity.ok().build();
     }
 

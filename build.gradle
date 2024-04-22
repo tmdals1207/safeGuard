@@ -43,6 +43,9 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+
+	// email
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
 }
 
 tasks.named('test') {
