@@ -1,17 +1,15 @@
 package com.capstone.safeGuard.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
+
+@ToString
 @RequiredArgsConstructor
 @Table(name = "notice")
 public class Notice {
@@ -29,4 +27,15 @@ public class Notice {
     private Child child;
 
     private LocalDateTime createdAt;
+
+    public void setChild(long childId) {
+    }
+    public void changeTitle(String title){
+        this.title=title;
+    }
+    public void changeContent(String content){
+        this.content=content;
+    }
+
+
 }
