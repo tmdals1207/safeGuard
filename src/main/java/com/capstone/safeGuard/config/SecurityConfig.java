@@ -34,7 +34,9 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .requestMatchers("/", "/home", "/login", "/signup",
                         "/childsignup", "/check-auth", "/member-logout",
-                        "/find-member-id", "/find-child-id-list").permitAll()
+                        "/find-member-id", "/find-child-id-list",
+                        "/verification-email-request", "/verification-email",
+                        "/reset-member-password").permitAll()
                 .requestMatchers("/group").hasRole("member")
                 .anyRequest().authenticated()
                 .and()
