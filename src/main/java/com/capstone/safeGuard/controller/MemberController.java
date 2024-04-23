@@ -345,7 +345,7 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PostMapping("/chose-child-form")
+    @PostMapping("/chose-child")
     public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
         Map<String, String> result = new HashMap<>();
 
