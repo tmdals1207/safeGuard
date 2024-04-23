@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class ResetPasswordDTO {
-    private String memberId;
+    private String id;  //member -> ID, child -> Name
     private String newPassword;
 }

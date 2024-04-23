@@ -27,10 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
@@ -331,15 +328,37 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
-    // TODO child 비번 재설정
-    @PostMapping("/reset-child-password")
-    public ResponseEntity resetChildPassword(@Validated @RequestBody Map<String, String> requestBody,
-                                              HttpServletRequest request, BindingResult bindingResult) {
+    @PostMapping("/chose-child-form")
+    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
+        Map<String, String> result = new HashMap<>();
 
-        return ResponseEntity.ok().build();
+        ArrayList<String> childList;
+        try {
+            childList = memberService.findChildList(memberId);
+        } catch (NoSuchElementException e){
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        for (int i = 0; i < childList.size(); i++) {
+            result.put(String.valueOf(i+1), childList.get(i));
+        }
+
+        return ResponseEntity.ok().body(result);
     }
 
+    @PostMapping("/chose-child-form")
+    public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
+        Map<String, String> result = new HashMap<>();
+        boolean isSuccess = memberService.resetChildPassword(dto);
 
+        if(! isSuccess){
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        return ResponseEntity.ok().build();
+    }
 
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
         result.put("status", "400");

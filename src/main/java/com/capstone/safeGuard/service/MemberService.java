@@ -16,10 +16,7 @@ import org.springframework.validation.FieldError;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -258,13 +255,41 @@ public class MemberService {
 
     @Transactional
     public boolean resetMemberPassword(ResetPasswordDTO dto){
-        Optional<Member> foundMember = memberRepository.findById(dto.getMemberId());
+        Optional<Member> foundMember = memberRepository.findById(dto.getId());
 
         if(foundMember.isEmpty()){
             return false;
         }
 
         foundMember.get().setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        return true;
+    }
+
+    public ArrayList<String> findChildList(String memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+
+        if(foundMember.isEmpty()){
+            throw new NoSuchElementException();
+        }
+
+        List<Parenting> parentingList = foundMember.get().getParentingList();
+        ArrayList<String> childNameList = new ArrayList<>();
+
+        for (Parenting parenting : parentingList) {
+            childNameList.add(parenting.getChild().getChildName());
+        }
+
+        return childNameList;
+    }
+
+    public boolean resetChildPassword(ResetPasswordDTO dto) {
+        Child foundChild = childRepository.findBychildName(dto.getId());
+
+        if (foundChild == null){
+            return false;
+        }
+
+        foundChild.setChildPassword(passwordEncoder.encode(dto.getNewPassword()));
         return true;
     }
 }
