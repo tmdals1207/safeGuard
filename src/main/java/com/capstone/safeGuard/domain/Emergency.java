@@ -2,11 +2,12 @@ package com.capstone.safeGuard.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
+@Entity @Getter @RequiredArgsConstructor
 public class Emergency {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +25,13 @@ public class Emergency {
     @OneToMany(mappedBy = "comment")
     @JsonIgnore
     private List<Comment> commentList;
+
+    @Builder
+    public Emergency(String title, String content, Member senderId, Child child, LocalDateTime createdAt) {
+        this.title = title;
+        this.content = content;
+        this.senderId = senderId;
+        this.child = child;
+        this.createdAt = createdAt;
+    }
 }
