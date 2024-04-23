@@ -285,8 +285,7 @@ public class MemberController {
     @PostMapping("/verification-email")
     public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody VerificationEmailDTO dto) {
         Map<String, String> result = new HashMap<>();
-        boolean isVerified = memberService.verifiedCode(dto.getInputId(), dto.getInputCode());
-        if (! isVerified){
+        if (! memberService.verifiedCode(dto.getInputId(), dto.getInputCode())){
             // 코드가 틀렸다는 메시지와 함께 다시 입력하는 곳으로 리다이렉트
             return addErrorStatus(result);
         }
@@ -299,9 +298,8 @@ public class MemberController {
     @PostMapping("/reset-member-password")
     public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody ResetPasswordDTO dto) {
         Map<String, String> result = new HashMap<>();
-        boolean isSuccess = memberService.resetMemberPassword(dto);
 
-        if(! isSuccess) {
+        if(! memberService.resetMemberPassword(dto)) {
             return addErrorStatus(result);
         }
         result.put("status", "200");
@@ -350,9 +348,8 @@ public class MemberController {
     @PostMapping("/chose-child-form")
     public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
         Map<String, String> result = new HashMap<>();
-        boolean isSuccess = memberService.resetChildPassword(dto);
 
-        if(! isSuccess){
+        if(! memberService.resetChildPassword(dto)){
             return addErrorStatus(result);
         }
 
