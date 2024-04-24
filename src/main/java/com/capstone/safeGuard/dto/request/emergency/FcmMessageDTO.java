@@ -6,19 +6,19 @@ import lombok.Getter;
 
 public class FcmMessageDTO {
     private boolean validateOnly;
-    private FcmMessageDTO.Message messge;
+    private FcmMessageDTO.Message message;
 
 
     @Builder
     @Getter @AllArgsConstructor
-    public class Message {
+    public static class Message {
         private FcmMessageDTO.Notification notification;
         private String token;
     }
 
     @Builder
     @Getter @AllArgsConstructor
-    public class Notification {
+    public static class Notification {
         private String title;
         private String body;
     }
