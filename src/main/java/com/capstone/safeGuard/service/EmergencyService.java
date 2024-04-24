@@ -18,11 +18,11 @@ public class EmergencyService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
 
-    public ArrayList<String> compareCoordinate(EmergencyDTO emergencyDto, Map<String, int[]> memberIdCoordinateHashMap, int length) {
+    public ArrayList<String> compareCoordinate(EmergencyDTO emergencyDto, Map<String, int[]> memberIdCoordinateHashMap, int distance) {
         ArrayList<String> neighborMemberList = new ArrayList<>();
 
         for (Map.Entry<String, int[]> entry : memberIdCoordinateHashMap.entrySet()) {
-            if (isNeighbor(emergencyDto.getLatitude(), emergencyDto.getLongitude(), entry.getValue(), length)) {
+            if (isNeighbor(emergencyDto.getLatitude(), emergencyDto.getLongitude(), entry.getValue(), distance)) {
                 neighborMemberList.add(entry.getKey());
             }
         }
@@ -37,10 +37,7 @@ public class EmergencyService {
         // 좌표 -> km
         double distance = convertCoordinateToKm(x_coordinate, y_coordinate);
 
-        if (distance <= (length)) {
-            return true;
-        }
-        return false;
+        return distance <= (length);
     }
 
     private double convertCoordinateToKm(double x_coordinate, double y_coordinate) {

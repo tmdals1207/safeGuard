@@ -292,4 +292,8 @@ public class MemberService {
         foundChild.setChildPassword(passwordEncoder.encode(dto.getNewPassword()));
         return true;
     }
+
+    public ArrayList<Member> findAllMember() {
+        return new ArrayList<>(memberRepository.findAll());
+    }
 }
