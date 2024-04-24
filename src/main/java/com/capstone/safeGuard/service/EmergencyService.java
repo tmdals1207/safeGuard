@@ -2,7 +2,7 @@ package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.dto.request.EmergencyDTO;
+import com.capstone.safeGuard.dto.request.emergency.EmergencyDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.EmergencyRepository;
 import com.capstone.safeGuard.repository.MemberRepository;

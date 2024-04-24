@@ -1,4 +1,4 @@
-package com.capstone.safeGuard.dto.request;
+package com.capstone.safeGuard.dto.request.signupandlogin;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

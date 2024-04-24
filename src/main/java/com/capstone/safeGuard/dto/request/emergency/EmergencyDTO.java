@@ -1,4 +1,4 @@
-package com.capstone.safeGuard.dto.request;
+package com.capstone.safeGuard.dto.request.emergency;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Emergency;

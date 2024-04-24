@@ -1,7 +1,7 @@
 package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.dto.request.EmergencyDTO;
+import com.capstone.safeGuard.dto.request.emergency.EmergencyDTO;
 import com.capstone.safeGuard.service.EmergencyService;
 import com.capstone.safeGuard.service.FcmService;
 import com.capstone.safeGuard.service.MemberService;
