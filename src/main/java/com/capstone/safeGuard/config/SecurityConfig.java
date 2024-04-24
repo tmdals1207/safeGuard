@@ -36,7 +36,7 @@ public class SecurityConfig {
                         "/childsignup", "/check-auth", "/member-logout",
                         "/find-member-id", "/find-child-id-list",
                         "/verification-email-request", "/verification-email",
-                        "/reset-member-password").permitAll()
+                        "/reset-member-password", "/chose-child-form", "/chose-child").permitAll()
                 .requestMatchers("/group").hasRole("member")
                 .anyRequest().authenticated()
                 .and()

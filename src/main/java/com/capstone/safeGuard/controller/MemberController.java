@@ -4,7 +4,6 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
-import com.capstone.safeGuard.dto.request.findidandresetpw.FindChildIdDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
@@ -313,27 +312,28 @@ public class MemberController {
     }
 
     @PostMapping("/find-child-id-list")
-    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody FindChildIdDTO dto,
-                                                               BindingResult bindingResult) {
-        Map<String, String> result = new HashMap<>();
-
-        if (bindingResult.hasErrors()) {
-            return addBindingError(result);
-        }
-
-        String childIds = memberService.findChildId(dto);
-        if (childIds == null) {
-            return addErrorStatus(result);
-        }
-
-        result.put("status", "200");
-        result.put("memberId", childIds);
-
-        return ResponseEntity.ok().body(result);
+    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody String memberId) {
+        return getChildList(memberId);
     }
 
     @PostMapping("/chose-child-form")
     public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
+        return getChildList(memberId);
+    }
+
+    @PostMapping("/chose-child")
+    public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(! memberService.resetChildPassword(dto)){
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<Map<String, String>> getChildList(String memberId) {
         Map<String, String> result = new HashMap<>();
 
         ArrayList<String> childList;
@@ -349,18 +349,6 @@ public class MemberController {
         }
 
         return ResponseEntity.ok().body(result);
-    }
-
-    @PostMapping("/chose-child")
-    public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
-        Map<String, String> result = new HashMap<>();
-
-        if(! memberService.resetChildPassword(dto)){
-            return addErrorStatus(result);
-        }
-
-        result.put("status", "200");
-        return ResponseEntity.ok().build();
     }
 
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {

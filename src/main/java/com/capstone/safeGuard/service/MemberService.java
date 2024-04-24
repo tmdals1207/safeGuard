@@ -169,8 +169,8 @@ public class MemberService {
         return foundMember.getMemberId();
     }
 
-    public String findChildId(FindChildIdDTO dto) {
-        Optional<Member> foundParent = memberRepository.findById(dto.getParentId());
+    public String findChildNames(String parentId) {
+        Optional<Member> foundParent = memberRepository.findById(parentId);
         if (foundParent.isEmpty()) {
             return null;
         }
@@ -180,16 +180,16 @@ public class MemberService {
             return null;
         }
 
-        return childIDsBuilder(parentingList);
+        return childNamesBuilder(parentingList);
     }
 
-    private String childIDsBuilder(List<Parenting> parentingList) {
+    private String childNamesBuilder(List<Parenting> parentingList) {
         StringBuilder childIds = new StringBuilder();
         int index = 0;
 
         childIds.append("{");
         for (Parenting parenting : parentingList) {
-            childIds.append("\"ChildID")
+            childIds.append("\"ChildName")
                     .append(index+1)
                     .append("\" : \"")
                     .append(parenting.getChild().getChildName())
