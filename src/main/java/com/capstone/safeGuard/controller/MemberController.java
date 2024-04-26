@@ -375,4 +375,7 @@ public class MemberController {
                 Collections.singleton(new SimpleGrantedAuthority(Authority.ROLE_CHILD.toString())));
         return jwtTokenProvider.generateToken(authentication);
     }
+
+    // TODO member의 아이디와 위치를 받아서 DB 갱신
+    // TODO child의  아이디와 위치를 받아서 DB 갱신
 }

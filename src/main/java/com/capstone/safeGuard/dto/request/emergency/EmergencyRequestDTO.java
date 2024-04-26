@@ -12,8 +12,8 @@ public class EmergencyRequestDTO {
     private String token;
     private String memberId;
     private String childName;
-    private double latitude;
-    private double longitude;
+    private float latitude;
+    private float longitude;
 
 
     public Emergency dtoToDomain(Member member, Child child){

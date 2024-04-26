@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -25,25 +24,27 @@ public class EmergencyService {
     private final EmergencyRepository emergencyRepository;
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
+    private final MemberService memberService;
 
-    public ArrayList<String> compareCoordinate(EmergencyRequestDTO emergencyRequestDto, Map<String, int[]> memberIdCoordinateHashMap, int distance) {
-        ArrayList<String> neighborMemberList = new ArrayList<>();
+    public ArrayList<String> getNeighborMembers(EmergencyRequestDTO dto, int distance){
+        ArrayList<String> memberIdList = new ArrayList<>();
+        ArrayList<Member> allMember = memberService.findAllMember();
 
-        for (Map.Entry<String, int[]> entry : memberIdCoordinateHashMap.entrySet()) {
-            if (isNeighbor(emergencyRequestDto.getLatitude(), emergencyRequestDto.getLongitude(), entry.getValue(), distance)) {
-                neighborMemberList.add(entry.getKey());
+        for (Member member : allMember) {
+            if (isNeighbor(dto.getLatitude(), dto.getLongitude(), member.getLatitude(), member.getLongitude(), distance)){
+                memberIdList.add(member.getMemberId());
             }
         }
 
-        return neighborMemberList;
+        return memberIdList;
     }
 
-    private boolean isNeighbor(double latitude, double longitude, int[] memberCoordinate, int length) {
-        double x_coordinate = latitude - memberCoordinate[0];
-        double y_coordinate = longitude - memberCoordinate[1];
+    private boolean isNeighbor(float latitude, float longitude, float memberLatitude, float memberLongitude, int length) {
+        double x_distance = latitude - memberLatitude;
+        double y_distance = longitude - memberLongitude;
 
         // 좌표 -> km
-        double distance = convertCoordinateToKm(x_coordinate, y_coordinate);
+        double distance = convertCoordinateToKm(x_distance, y_distance);
 
         return distance <= (length);
     }
@@ -64,7 +65,7 @@ public class EmergencyService {
         emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child));
     }
 
-    public int[] requestLocation(Member member) {
+    public int[] getLocation(Member member) {
         // TODO member들의 위치를 요청 -> 응답으로 받은 위치를 int[]{x, y} 저장
         String memberId = member.getMemberId();
 
