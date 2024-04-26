@@ -4,13 +4,10 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
-import com.capstone.safeGuard.dto.request.ChildSignUpRequestDTO;
-import com.capstone.safeGuard.dto.request.LoginRequestDTO;
-import com.capstone.safeGuard.dto.request.SignUpRequestDTO;
+import com.capstone.safeGuard.dto.request.*;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
-import com.capstone.safeGuard.util.JwtAuthenticationFilter;
 import com.capstone.safeGuard.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,10 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 
 @Controller
@@ -42,7 +36,6 @@ import java.util.HashMap;
 public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtService jwtService;
 
     @GetMapping("/login")
@@ -58,8 +51,7 @@ public class MemberController {
         Map<String, String> result = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            result.put("status", "403");
-            return ResponseEntity.status(403).body(result);
+            return addBindingError(result);
         }
 
         // Member 타입으로 로그인 하는 경우
@@ -76,8 +68,6 @@ public class MemberController {
             log.info(tokenInfo.getRefreshToken());
 
             storeTokenInBody(response, result, tokenInfo);
-            // 생성한 토큰을 저장
-            jwtService.storeToken(tokenInfo);
 
             // 세션에 memberid 저장
             HttpSession session = request.getSession();
@@ -253,9 +243,124 @@ public class MemberController {
         return addErrorStatus(result);
     }
 
+    @PostMapping("/find-member-id")
+    public ResponseEntity<Map<String, String>> findMemberId(@Validated @RequestBody FindMemberIdDTO dto,
+                                       BindingResult bindingResult) {
+        Map<String, String> result = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            return addBindingError(result);
+        }
+
+        String memberId = memberService.findMemberId(dto);
+        if (memberId == null) {
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        result.put("memberId", memberId);
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    // 비밀번호 확인을 위한 이메일 인증 1
+    // 인증번호 전송
+    @PostMapping("/verification-email-request")
+    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody String id) {
+        Map<String, String> result = new HashMap<>();
+        if(! memberService.sendCodeToEmail(id)){
+            // 해당 아이디가 존재하지 않음
+            return addErrorStatus(result);
+        }
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
+    }
+
+    // 비밀번호 확인을 위한 이메일 인증 2
+    // 인증번호 확인
+    @PostMapping("/verification-email")
+    public ResponseEntity<Map<String, String>> verificationEmail(@RequestBody VerificationEmailDTO dto) {
+        Map<String, String> result = new HashMap<>();
+        if (! memberService.verifiedCode(dto.getInputId(), dto.getInputCode())){
+            // 코드가 틀렸다는 메시지와 함께 다시 입력하는 곳으로 리다이렉트
+            return addErrorStatus(result);
+        }
+        result.put("status", "200");
+        // 비밀번호 재설정 팝업 or 리다이렉트
+        return ResponseEntity.ok().body(result);
+    }
+
+    // 비밀번호 확인을 위한 이메일 인증 3
+    @PostMapping("/reset-member-password")
+    public ResponseEntity<Map<String, String>> resetMemberPassword(@RequestBody ResetPasswordDTO dto) {
+        Map<String, String> result = new HashMap<>();
+
+        if(! memberService.resetMemberPassword(dto)) {
+            return addErrorStatus(result);
+        }
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/find-child-id-list")
+    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody FindChildIdDTO dto,
+                                                               BindingResult bindingResult) {
+        Map<String, String> result = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            return addBindingError(result);
+        }
+
+        String childIds = memberService.findChildId(dto);
+        if (childIds == null) {
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        result.put("memberId", childIds);
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/chose-child-form")
+    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
+        Map<String, String> result = new HashMap<>();
+
+        ArrayList<String> childList;
+        try {
+            childList = memberService.findChildList(memberId);
+        } catch (NoSuchElementException e){
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        for (int i = 0; i < childList.size(); i++) {
+            result.put(String.valueOf(i+1), childList.get(i));
+        }
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/chose-child")
+    public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(! memberService.resetChildPassword(dto)){
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        return ResponseEntity.ok().build();
+    }
+
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
         result.put("status", "400");
         return ResponseEntity.status(400).body(result);
+    }
+
+    private static ResponseEntity<Map<String, String>> addBindingError(Map<String, String> result) {
+        result.put("status", "403");
+        return ResponseEntity.status(403).body(result);
     }
 
     public TokenInfo generateTokenOfMember(Member member) {
