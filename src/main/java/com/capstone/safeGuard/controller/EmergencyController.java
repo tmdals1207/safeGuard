@@ -17,10 +17,10 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 public class EmergencyController {
-    /**
-     * 몇 km 이내의 사람들에게 알림을 보낼 것인지
-     */
+
+    // 몇 km 이내의 사람들에게 알림을 보낼 것인지
     static public final int DISTANCE = 1;
+
     private final EmergencyService emergencyService;
     private final MemberService memberService;
 

@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -57,16 +60,20 @@ public class EmergencyService {
     public void saveEmergency(EmergencyRequestDTO emergencyRequestDto) {
         // Emergency table에 저장
         Member member = memberRepository.findById(emergencyRequestDto.getMemberId()).orElseThrow(NoSuchElementException::new);
-        // TODO childRepo에서 findByChildName을 optional 객체로 받는것에 대해서 상의
         Child child = childRepository.findBychildName(emergencyRequestDto.getChildName());
         emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child));
     }
 
     public int[] requestLocation(Member member) {
         // TODO member들의 위치를 요청 -> 응답으로 받은 위치를 int[]{x, y} 저장
+        String memberId = member.getMemberId();
 
 
-        return null;
+
+        int x = 0;
+        int y = 0;
+
+        return new int[]{x, y};
     }
 
     public boolean sendNotificationTo(String memberId, EmergencyRequestDTO dto) {

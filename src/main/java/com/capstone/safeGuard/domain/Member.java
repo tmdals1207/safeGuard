@@ -24,6 +24,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
+    private float latitude;
+    private float longitude;
 
     @OneToMany(mappedBy = "parent")
     @JsonIgnore

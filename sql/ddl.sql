@@ -3,6 +3,8 @@ CREATE TABLE member (
                         name VARCHAR(255) NOT NULL,
                         password VARCHAR(255) NOT NULL,
                         email VARCHAR(255) NOT NULL,
+                        latitude FLOAT NOT NULL,
+                        longitude FLOAT NOT NULL,
                         PRIMARY KEY (member_id)
 );
 
@@ -10,6 +12,8 @@ CREATE TABLE child (
                        child_id BIGINT NOT NULL AUTO_INCREMENT,
                        child_name VARCHAR(255) NOT NULL,
                        child_password VARCHAR(255) NOT NULL,
+                       latitude FLOAT NOT NULL,
+                       longitude FLOAT NOT NULL,
                        PRIMARY KEY (child_id)
 );
 
