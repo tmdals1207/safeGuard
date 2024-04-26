@@ -65,21 +65,9 @@ public class EmergencyService {
         emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child));
     }
 
-    public int[] getLocation(Member member) {
-        // TODO member들의 위치를 요청 -> 응답으로 받은 위치를 int[]{x, y} 저장
-        String memberId = member.getMemberId();
-
-
-
-        int x = 0;
-        int y = 0;
-
-        return new int[]{x, y};
-    }
-
     public boolean sendNotificationTo(String memberId, EmergencyRequestDTO dto) {
         // TODO member에게 알림 보내기 테스트
-        String message = makMessage(memberId, dto);
+        String message = makeMessage(memberId, dto);
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -109,8 +97,8 @@ public class EmergencyService {
         return  googleCredentials.getAccessToken().getTokenValue();
     }
 
-    private String makMessage(String memberId, EmergencyRequestDTO dto) {
-
+    private String makeMessage(String memberId, EmergencyRequestDTO dto) {
+        // TODO 알림 내용 만들기
         return null;
     }
 
