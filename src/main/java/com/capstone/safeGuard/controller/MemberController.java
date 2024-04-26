@@ -114,10 +114,10 @@ public class MemberController {
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            log.info("bindingResult = {}", bindingResult);
-            log.info("실패 binding error ");
-            return ResponseEntity.status(400).build();
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
         }
 
         Boolean signUpSuccess = memberService.signup(dto);
@@ -138,13 +138,9 @@ public class MemberController {
     public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO dto,
                                       BindingResult bindingResult, HttpServletRequest request) {
 
-        if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            StringBuilder errorMessage = new StringBuilder();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getDefaultMessage()).append("\n");
-            }
-            return ResponseEntity.badRequest().body(null);
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
         }
 
         //로그인 하고 있는 member의 id를 가져옴
