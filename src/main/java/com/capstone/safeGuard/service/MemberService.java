@@ -85,7 +85,7 @@ public class MemberService {
     }
 
 
-    public Boolean childSignUp(ChildSignUpRequestDTO dto, String memberId) {
+    public Boolean childSignUp(ChildSignUpRequestDTO dto) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
         if (findChild.isPresent()) {
             return false;
@@ -101,6 +101,7 @@ public class MemberService {
 
         // member child 연결
         Parenting parenting = new Parenting();
+        String memberId = dto.getMemberId();
         Optional<Member> findMember = memberRepository.findById(memberId);
         if (findMember.isEmpty()) {
             return false;

@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 public class ChildSignUpRequestDTO {
+    @NotBlank
+    private String memberId;
+
     private Long child_id;
     @NotBlank
     private String childName;

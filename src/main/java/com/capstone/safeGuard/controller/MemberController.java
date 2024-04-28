@@ -127,30 +127,14 @@ public class MemberController {
     @PostMapping(value = "/childsignup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO dto,
                                       BindingResult bindingResult, HttpServletRequest request) {
-        log.info("나이스~");
+        log.info("childSignup 실행");
 
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        //TODO session에서 받아오던 memberid를 그냥 json 형식으로 같이 받아오게 변경
-
-        //로그인 하고 있는 member의 id를 가져옴
-        HttpSession session = request.getSession(false); // 새로운 세션을 생성하지 않음
-        Boolean signUpSuccess;
-        if (session != null) {
-            String memberId = (String) session.getAttribute("memberid");
-            if (memberId != null) {
-                signUpSuccess = memberService.childSignUp(dto, memberId);
-            } else {
-                return ResponseEntity.status(400).build();
-            }
-        } else {
-            return ResponseEntity.status(400).build();
-        }
-
-
+        Boolean signUpSuccess = memberService.childSignUp(dto);
         if (!signUpSuccess) {
             log.info("signupFail = {}", signUpSuccess);
             return ResponseEntity.status(400).build();
