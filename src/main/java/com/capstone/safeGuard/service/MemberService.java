@@ -169,7 +169,7 @@ public class MemberService {
         return foundMember.getMemberId();
     }
 
-    public String findChildNames(String parentId) {
+    public String findChildNamesByParentId(String parentId) {
         Optional<Member> foundParent = memberRepository.findById(parentId);
         if (foundParent.isEmpty()) {
             return null;
@@ -296,5 +296,32 @@ public class MemberService {
 
     public ArrayList<Member> findAllMember() {
         return new ArrayList<>(memberRepository.findAll());
+    }
+
+    @Transactional
+    public boolean updateMemberCoordinate(String id, float latitude, float longitude) {
+        Optional<Member> foundMember = memberRepository.findById(id);
+        if(foundMember.isEmpty()){
+            return false;
+        }
+
+        foundMember.get().setLatitude(latitude);
+        foundMember.get().setLongitude(longitude);
+
+        return true;
+    }
+
+    // 해당 메소드에서 id는 child의 name이다.
+    @Transactional
+    public boolean updateChildCoordinate(String id, float latitude, float longitude) {
+        Child foundChild = childRepository.findBychildName(id);
+        if(foundChild == null){
+            return false;
+        }
+
+        foundChild.setLatitude(latitude);
+        foundChild.setLongitude(longitude);
+
+        return true;
     }
 }

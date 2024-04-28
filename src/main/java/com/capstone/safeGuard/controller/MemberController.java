@@ -384,20 +384,16 @@ public class MemberController {
         Map<String, String> result = new HashMap<>();
 
         if(dto.getType().equals("Member")){
-            updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude());
+            if (memberService.updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
+                return addOkStatus(result);
+            }
+            return addErrorStatus(result);
+        }
+        if(memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
             return addOkStatus(result);
         }
-        updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude());
-
-        return addOkStatus(result);
+        return addErrorStatus(result);
     }
 
-    private void updateMemberCoordinate(String id, float latitude, float longitude) {
 
-    }
-
-    // 해당 메소드에서 id는 child의 name이다.
-    private void updateChildCoordinate(String id, float latitude, float longitude) {
-
-    }
 }
