@@ -10,6 +10,7 @@ import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
+import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
@@ -246,8 +247,7 @@ public class MemberController {
                 session.invalidate(); // 세션 무효화
             }
 
-            result.put("status", "200");
-            return ResponseEntity.ok().body(result);
+            return addOkStatus(result);
         }
         return addErrorStatus(result);
     }
@@ -281,8 +281,7 @@ public class MemberController {
             // 해당 아이디가 존재하지 않음
             return addErrorStatus(result);
         }
-        result.put("status", "200");
-        return ResponseEntity.ok().body(result);
+        return addOkStatus(result);
     }
 
     // 비밀번호 확인을 위한 이메일 인증 2
@@ -294,9 +293,9 @@ public class MemberController {
             // 코드가 틀렸다는 메시지와 함께 다시 입력하는 곳으로 리다이렉트
             return addErrorStatus(result);
         }
-        result.put("status", "200");
         // 비밀번호 재설정 팝업 or 리다이렉트
-        return ResponseEntity.ok().body(result);
+
+        return addOkStatus(result);
     }
 
     // 비밀번호 확인을 위한 이메일 인증 3
@@ -307,8 +306,7 @@ public class MemberController {
         if(! memberService.resetMemberPassword(dto)) {
             return addErrorStatus(result);
         }
-        result.put("status", "200");
-        return ResponseEntity.ok().body(result);
+        return addOkStatus(result);
     }
 
     @PostMapping("/find-child-id-list")
@@ -351,6 +349,11 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
+    private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
+    }
+
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
         result.put("status", "400");
         return ResponseEntity.status(400).body(result);
@@ -376,6 +379,25 @@ public class MemberController {
         return jwtTokenProvider.generateToken(authentication);
     }
 
-    // TODO member의 아이디와 위치를 받아서 DB 갱신
-    // TODO child의  아이디와 위치를 받아서 DB 갱신
+    @PostMapping("/update-coordinate")
+    public ResponseEntity<Map<String, String>> updateCoordinate(@RequestBody UpdateCoordinateDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(dto.getType().equals("Member")){
+            updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude());
+            return addOkStatus(result);
+        }
+        updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude());
+
+        return addOkStatus(result);
+    }
+
+    private void updateMemberCoordinate(String id, float latitude, float longitude) {
+
+    }
+
+    // 해당 메소드에서 id는 child의 name이다.
+    private void updateChildCoordinate(String id, float latitude, float longitude) {
+
+    }
 }
