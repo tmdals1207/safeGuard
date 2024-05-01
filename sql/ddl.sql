@@ -5,6 +5,7 @@ CREATE TABLE member (
                         email VARCHAR(255) NOT NULL,
                         latitude FLOAT NOT NULL,
                         longitude FLOAT NOT NULL,
+                        fcm_token varchar(255) NOT NULL,
                         PRIMARY KEY (member_id)
 );
 
