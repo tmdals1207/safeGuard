@@ -27,6 +27,8 @@ public class Member {
     private float latitude;
     private float longitude;
 
+    private String fcmToken;
+
     @OneToMany(mappedBy = "parent")
     @JsonIgnore
     private List<Parenting> parentingList;

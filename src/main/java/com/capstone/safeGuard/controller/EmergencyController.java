@@ -21,7 +21,6 @@ public class EmergencyController {
     static public final int DISTANCE = 1;
 
     private final EmergencyService emergencyService;
-    private final MemberService memberService;
 
     @PostMapping("/emergency")
     public ResponseEntity<Map<String, String>> emergencyCall(@RequestBody EmergencyRequestDTO emergencyRequestDto) {
@@ -37,9 +36,6 @@ public class EmergencyController {
             return ResponseEntity.ok().body(result);
         }
 
-        // 3. emergency table에 저장
-        emergencyService.saveEmergency(emergencyRequestDto);
-
         result.put("status", "200");
         return ResponseEntity.ok().body(result);
     }
@@ -49,7 +45,17 @@ public class EmergencyController {
             if(! emergencyService.sendNotificationTo(memberId, dto)){
                 return false;
             }
+
+            // 3. emergency table에 저장
+            if (! emergencyService.saveEmergency(memberId, dto)){
+                return false;
+            }
         }
         return true;
     }
+
+    // TODO 보낸 emergency 조회
+    // TODO 받은 emergency 조회
+    // TODO 보낸 emergency에 comment 달기
+    // TODO 받은 emergency에 comment 달기
 }

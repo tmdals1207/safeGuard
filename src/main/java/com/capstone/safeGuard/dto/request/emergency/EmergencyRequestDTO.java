@@ -9,18 +9,18 @@ import java.time.LocalDateTime;
 
 @Data
 public class EmergencyRequestDTO {
-    private String token;
-    private String memberId;
+    private String senderId;
     private String childName;
     private float latitude;
     private float longitude;
 
+    private final String title = "주변 아이에게 도움이 필요합니다.";
 
-    public Emergency dtoToDomain(Member member, Child child){
-        return new Emergency()
+    public Emergency dtoToDomain(Member member, Child child, String content){
+        return Emergency
                 .builder()
-                .title("제목 뭘로 할지 생각")
-                .content("내용 뭘로 할지 생각")
+                .title(title)
+                .content(content)
                 .senderId(member)
                 .child(child)
                 .createdAt(LocalDateTime.now())

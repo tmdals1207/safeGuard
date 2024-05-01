@@ -1,9 +1,12 @@
 package com.capstone.safeGuard.dto.request.emergency;
 
+import jakarta.validation.constraints.AssertFalse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+@Getter
+@Builder
 public class FcmMessageDTO {
     private boolean validateOnly;
     private FcmMessageDTO.Message message;
