@@ -15,4 +15,5 @@ public class SignUpRequestDTO {
     private String inputEmail;
     @NotBlank
     private String inputPW;
+    private String fcmToken;
 }

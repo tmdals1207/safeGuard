@@ -87,7 +87,7 @@ public class EmergencyService {
         }
 
         HttpEntity entity = new HttpEntity<>(message, headers);
-        String API_URL = "<https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send>";
+        String API_URL = "https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send";
 
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
@@ -99,7 +99,7 @@ public class EmergencyService {
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
+                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
@@ -107,9 +107,8 @@ public class EmergencyService {
 
     private String makeMessage(String receiverId, EmergencyRequestDTO dto) {
         // 1. receiverId 이용해서 받을 member의 토큰 값 가져오기
-        Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);;
+        Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
         String token = foundMember.getFcmToken();
-        // TODO member에 회원가입, 로그인 할때 fcmToken 생성
 
         // 2. dto의 childId를 이용해서 보내는 child의 정보를 가져오기
         Child foundChild = childRepository.findBychildName(dto.getChildName());

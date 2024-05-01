@@ -80,6 +80,7 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(dto.getInputPW());
         member.setPassword(encodedPassword);
         member.setAuthority(Authority.ROLE_MEMBER);
+        member.setFcmToken(dto.getFcmToken());
         memberRepository.save(member);
 
         return true;
