@@ -7,7 +7,9 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
 @Entity
 @Getter
 public class JwtToken {
@@ -17,6 +19,7 @@ public class JwtToken {
     private String grantType;
     private String accessToken;
     private String refreshToken;
+
     @Builder.Default
     @Setter
     private boolean isBlackList = false;

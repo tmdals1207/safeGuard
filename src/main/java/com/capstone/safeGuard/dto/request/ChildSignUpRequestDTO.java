@@ -1,16 +1,19 @@
 package com.capstone.safeGuard.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class ChildSignUpRequestDTO {
-    @NotBlank
     private String memberId;
-
-    private Long child_id;
-    @NotBlank
+    private long childId;
+    private String childPassword;
     private String childName;
-    @NotBlank
-    private String child_password;
+
+    public Long getChild_id() {
+        return childId;
+    }
+
+    public CharSequence getChild_password() {
+        return childPassword;
+    }
 }

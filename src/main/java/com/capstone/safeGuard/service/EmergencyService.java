@@ -2,14 +2,21 @@ package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.dto.request.EmergencyDTO;
+import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.EmergencyRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
+import com.google.auth.oauth2.GoogleCredentials;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -17,30 +24,29 @@ public class EmergencyService {
     private final EmergencyRepository emergencyRepository;
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
+    private final MemberService memberService;
 
-    public ArrayList<String> compareCoordinate(EmergencyDTO emergencyDto, Map<String, int[]> memberIdCoordinateHashMap, int length) {
-        ArrayList<String> neighborMemberList = new ArrayList<>();
+    public ArrayList<String> getNeighborMembers(EmergencyRequestDTO dto, int distance){
+        ArrayList<String> memberIdList = new ArrayList<>();
+        ArrayList<Member> allMember = memberService.findAllMember();
 
-        for (Map.Entry<String, int[]> entry : memberIdCoordinateHashMap.entrySet()) {
-            if (isNeighbor(emergencyDto.getLatitude(), emergencyDto.getLongitude(), entry.getValue(), length)) {
-                neighborMemberList.add(entry.getKey());
+        for (Member member : allMember) {
+            if (isNeighbor(dto.getLatitude(), dto.getLongitude(), member.getLatitude(), member.getLongitude(), distance)){
+                memberIdList.add(member.getMemberId());
             }
         }
 
-        return neighborMemberList;
+        return memberIdList;
     }
 
-    private boolean isNeighbor(double latitude, double longitude, int[] memberCoordinate, int length) {
-        double x_coordinate = latitude - memberCoordinate[0];
-        double y_coordinate = longitude - memberCoordinate[1];
+    private boolean isNeighbor(float latitude, float longitude, float memberLatitude, float memberLongitude, int length) {
+        double x_distance = latitude - memberLatitude;
+        double y_distance = longitude - memberLongitude;
 
         // 좌표 -> km
-        double distance = convertCoordinateToKm(x_coordinate, y_coordinate);
+        double distance = convertCoordinateToKm(x_distance, y_distance);
 
-        if (distance <= (length)) {
-            return true;
-        }
-        return false;
+        return distance <= (length);
     }
 
     private double convertCoordinateToKm(double x_coordinate, double y_coordinate) {
@@ -52,12 +58,49 @@ public class EmergencyService {
         return Math.sqrt( (x_km * x_km) + (y_km * y_km) );
     }
 
-    public void saveEmergency(EmergencyDTO emergencyDto) {
+    public void saveEmergency(EmergencyRequestDTO emergencyRequestDto) {
         // Emergency table에 저장
-        Member member = memberRepository.findById(emergencyDto.getMemberId()).orElseThrow(NoSuchElementException::new);
-        // TODO childRepo에서 findByChildName을 optional 객체로 받는것에 대해서 상의
-        Child child = childRepository.findBychildName(emergencyDto.getChildName());
-        emergencyRepository.save(emergencyDto.dtoToDomain(member, child));
+        Member member = memberRepository.findById(emergencyRequestDto.getMemberId()).orElseThrow(NoSuchElementException::new);
+        Child child = childRepository.findBychildName(emergencyRequestDto.getChildName());
+        emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child));
     }
+
+    public boolean sendNotificationTo(String memberId, EmergencyRequestDTO dto) {
+        // TODO member에게 알림 보내기 테스트
+        String message = makeMessage(memberId, dto);
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        try {
+            headers.set("Authorization", "Bearer " + getAccessToken());
+        } catch (IOException e) {
+            return false;
+        }
+
+        HttpEntity entity = new HttpEntity<>(message, headers);
+
+        String API_URL = "<https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send>";
+        ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
+
+        return response.getStatusCode() == HttpStatus.OK;
+    }
+
+    private String getAccessToken() throws IOException {
+        String firebaseConfigPath = "firebase/safeguard-2f704-firebase-adminsdk-pmiwx-0bced8bb31.json";
+
+        GoogleCredentials googleCredentials = GoogleCredentials
+                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
+                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
+
+        googleCredentials.refreshIfExpired();
+        return  googleCredentials.getAccessToken().getTokenValue();
+    }
+
+    private String makeMessage(String memberId, EmergencyRequestDTO dto) {
+        // TODO 알림 내용 만들기
+        return null;
+    }
+
 
 }

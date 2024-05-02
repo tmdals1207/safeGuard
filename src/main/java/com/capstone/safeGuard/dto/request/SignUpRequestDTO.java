@@ -15,4 +15,7 @@ public class SignUpRequestDTO {
     private String inputEmail;
     @NotBlank
     private String inputPW;
+    public String toString(){
+        return inputID +inputName +"가입 완료!";
+    }
 }
