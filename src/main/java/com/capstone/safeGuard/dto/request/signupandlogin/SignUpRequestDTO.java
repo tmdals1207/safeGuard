@@ -1,4 +1,4 @@
-package com.capstone.safeGuard.dto.request;
+package com.capstone.safeGuard.dto.request.signupandlogin;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +15,5 @@ public class SignUpRequestDTO {
     private String inputEmail;
     @NotBlank
     private String inputPW;
-    public String toString(){
-        return inputID +inputName +"가입 완료!";
-    }
+    private String fcmToken;
 }

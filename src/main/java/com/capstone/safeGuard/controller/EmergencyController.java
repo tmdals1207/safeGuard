@@ -1,7 +1,8 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.dto.request.EmergencyDTO;
+import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.service.EmergencyService;
+import com.capstone.safeGuard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,40 +16,46 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 public class EmergencyController {
-    /**
-     * 몇 km 이내의 사람들에게 알림을 보낼 것인지
-     */
-    static public final int LENGTH = 1;
+
+    // 몇 km 이내의 사람들에게 알림을 보낼 것인지
+    static public final int DISTANCE = 1;
+
     private final EmergencyService emergencyService;
 
     @PostMapping("/emergency")
-    public ResponseEntity emergencyCall(@RequestBody EmergencyDTO emergencyDto) {
-        // 1. 다른 member들의 위치를 요청 -> 응답으로 받은 위치를 저장
-        Map<String, int[]> memberIdCoordinateHashMap = getAllMemberCoordinate();
+    public ResponseEntity<Map<String, String>> emergencyCall(@RequestBody EmergencyRequestDTO emergencyRequestDto) {
+        Map<String, String> result = new HashMap<>();
 
-        // 2. emergencyDto의 위도, 경도와 비교 -> 반경 [] km내의 member들만 리스트업
-        ArrayList<String> neighborMemberList = emergencyService.compareCoordinate(emergencyDto, memberIdCoordinateHashMap, LENGTH);
+        // 1. 반경 [] km내의 member들만 리스트업
+        ArrayList<String> neighborMemberList
+                = emergencyService.getNeighborMembers(emergencyRequestDto, DISTANCE);
 
-        // 3. 반경 []km 내의 member 들에게 알림을 보냄
-        sendEmergencyToMembers(neighborMemberList);
+        // 2. 반경 []km 내의 member 들에게 알림을 보냄
+        if (! sendEmergencyToMembers(neighborMemberList, emergencyRequestDto)){
+            result.put("status", "400");
+            return ResponseEntity.ok().body(result);
+        }
 
-        // 4. emergency table에 저장
-        emergencyService.saveEmergency(emergencyDto);
-
-        return ResponseEntity.ok().build();
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
     }
 
-    public HashMap<String, int[]> getAllMemberCoordinate(){
-        int[] memberCoordinate = new int[2];
-        HashMap<String, int[]> memberIdCoordinateMap = new HashMap<>();
+    public boolean sendEmergencyToMembers(ArrayList<String> neighborMemberList, EmergencyRequestDTO dto){
+        for (String memberId : neighborMemberList) {
+            if(! emergencyService.sendNotificationTo(memberId, dto)){
+                return false;
+            }
 
-        // TODO 다른 member들의 위치를 요청 -> 응답으로 받은 위치를 저장
-
-        return memberIdCoordinateMap;
+            // 3. emergency table에 저장
+            if (! emergencyService.saveEmergency(memberId, dto)){
+                return false;
+            }
+        }
+        return true;
     }
 
-    public void sendEmergencyToMembers(ArrayList<String> neighborMemberList){
-        // TODO 반경 []km 내의 member 들에게 알림을 보냄
-    }
-
+    // TODO 보낸 emergency 조회
+    // TODO 받은 emergency 조회
+    // TODO 보낸 emergency에 comment 달기
+    // TODO 받은 emergency에 comment 달기
 }

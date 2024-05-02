@@ -1,7 +1,8 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.*;
-import com.capstone.safeGuard.dto.request.*;
+import com.capstone.safeGuard.dto.request.findidandresetpw.*;
+import com.capstone.safeGuard.dto.request.signupandlogin.*;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.EmailAuthCodeRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
@@ -79,6 +80,7 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(dto.getInputPW());
         member.setPassword(encodedPassword);
         member.setAuthority(Authority.ROLE_MEMBER);
+        member.setFcmToken(dto.getFcmToken());
         memberRepository.save(member);
 
         return true;
@@ -169,8 +171,8 @@ public class MemberService {
         return foundMember.getMemberId();
     }
 
-    public String findChildId(FindChildIdDTO dto) {
-        Optional<Member> foundParent = memberRepository.findById(dto.getParentId());
+    public String findChildNamesByParentId(String parentId) {
+        Optional<Member> foundParent = memberRepository.findById(parentId);
         if (foundParent.isEmpty()) {
             return null;
         }
@@ -180,16 +182,16 @@ public class MemberService {
             return null;
         }
 
-        return childIDsBuilder(parentingList);
+        return childNamesBuilder(parentingList);
     }
 
-    private String childIDsBuilder(List<Parenting> parentingList) {
+    private String childNamesBuilder(List<Parenting> parentingList) {
         StringBuilder childIds = new StringBuilder();
         int index = 0;
 
         childIds.append("{");
         for (Parenting parenting : parentingList) {
-            childIds.append("\"ChildID")
+            childIds.append("\"ChildName")
                     .append(index+1)
                     .append("\" : \"")
                     .append(parenting.getChild().getChildName())
@@ -291,6 +293,37 @@ public class MemberService {
         }
 
         foundChild.setChildPassword(passwordEncoder.encode(dto.getNewPassword()));
+        return true;
+    }
+
+    public ArrayList<Member> findAllMember() {
+        return new ArrayList<>(memberRepository.findAll());
+    }
+
+    @Transactional
+    public boolean updateMemberCoordinate(String id, float latitude, float longitude) {
+        Optional<Member> foundMember = memberRepository.findById(id);
+        if(foundMember.isEmpty()){
+            return false;
+        }
+
+        foundMember.get().setLatitude(latitude);
+        foundMember.get().setLongitude(longitude);
+
+        return true;
+    }
+
+    // 해당 메소드에서 id는 child의 name이다.
+    @Transactional
+    public boolean updateChildCoordinate(String id, float latitude, float longitude) {
+        Child foundChild = childRepository.findBychildName(id);
+        if(foundChild == null){
+            return false;
+        }
+
+        foundChild.setLatitude(latitude);
+        foundChild.setLongitude(longitude);
+
         return true;
     }
 }

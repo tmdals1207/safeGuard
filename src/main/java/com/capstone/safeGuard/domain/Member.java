@@ -24,6 +24,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
+    private float latitude;
+    private float longitude;
+
+    private String fcmToken;
 
     @OneToMany(mappedBy = "parent")
     @JsonIgnore

@@ -24,6 +24,9 @@ public class Child {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
+    private float latitude;
+    private float longitude;
+
     @OneToMany(mappedBy = "child")
     @JsonIgnore
     private List<Parenting> parentingList;
