@@ -1,7 +1,9 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Emergency;
 import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.FcmMessageDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
@@ -135,5 +137,25 @@ public class EmergencyService {
         }
     }
 
+    public List<Emergency> getSentEmergency(String memberId) {
+        List<Emergency> foundEmergency = emergencyRepository.findAllBySenderId(memberId);
+        if (foundEmergency.isEmpty()){
+            return null;
+        }
 
+        return foundEmergency;
+    }
+
+    // TODO 받은 emergency 및 comment 조회 -> 어케하냐
+    public List<Emergency> getReceivedEmergency(String memberId) {
+
+        return null;
+    }
+
+    // TODO emergency에 comment 달기
+    public boolean writeEmergency(CommentRequestDTO commentRequestDTO) {
+
+
+        return true;
+    }
 }
