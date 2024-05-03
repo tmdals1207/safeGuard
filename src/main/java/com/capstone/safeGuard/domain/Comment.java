@@ -17,7 +17,7 @@ public class Comment {
     private Long commentId;
 
     @ManyToOne
-    private Notice notice;
+    private Emergency emergency;
 
     @ManyToOne
     private Member commentator;
