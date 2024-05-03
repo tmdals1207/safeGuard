@@ -10,21 +10,20 @@ CREATE TABLE member (
 );
 
 CREATE TABLE child (
-                       child_id BIGINT NOT NULL AUTO_INCREMENT,
                        child_name VARCHAR(255) NOT NULL,
                        child_password VARCHAR(255) NOT NULL,
                        latitude FLOAT NOT NULL,
                        longitude FLOAT NOT NULL,
-                       PRIMARY KEY (child_id)
+                       PRIMARY KEY (child_name)
 );
 
 CREATE TABLE parenting (
-                           parenting_id BIGINT NOT NULL,
+                           parenting_id BIGINT NOT NULL Auto_Increment,
                            parent_id VARCHAR(255) NOT NULL,
-                           child_id BIGINT NOT NULL,
+                           child_name VARCHAR(255) NOT NULL,
                            PRIMARY KEY (parenting_id),
                            FOREIGN KEY (parent_id) REFERENCES Member (member_id),
-                           FOREIGN KEY (child_id) REFERENCES Child (child_id)
+                           FOREIGN KEY (child_name) REFERENCES Child (child_name)
 );
 
 CREATE TABLE helping (

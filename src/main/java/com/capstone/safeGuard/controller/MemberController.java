@@ -9,6 +9,7 @@ import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
+import com.capstone.safeGuard.dto.request.signupandlogin.ParentingDto;
 import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
@@ -131,8 +132,8 @@ public class MemberController {
     }
 
     @PostMapping(value = "/childsignup", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO dto,
-                                      BindingResult bindingResult, HttpServletRequest request) {
+    public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO childDto,
+                                      ParentingDto parentingDto, BindingResult bindingResult) {
         log.info("childSignup 실행");
 
         String errorMessage = memberService.validateBindingError(bindingResult);
@@ -140,7 +141,7 @@ public class MemberController {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        Boolean signUpSuccess = memberService.childSignUp(dto);
+        Boolean signUpSuccess = memberService.childSignUp(childDto, parentingDto);
         if (!signUpSuccess) {
             log.info("signupFail = {}", signUpSuccess);
             return ResponseEntity.status(400).build();
@@ -154,6 +155,8 @@ public class MemberController {
         return "group";
     }
 
+
+    //TODO 제거 시 parenting 재거 필요
     @PostMapping("/childremove")
     public ResponseEntity childRemove(@Validated @RequestBody Map<String, String> requestBody,
                                       HttpServletRequest request, BindingResult bindingResult) {
@@ -174,6 +177,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    //TODO 변경 필요
     @PostMapping("/addhelper")
     public ResponseEntity addHelper(@Validated @RequestBody Map<String, String> requestBody,
                                     HttpServletRequest request, BindingResult bindingResult) {

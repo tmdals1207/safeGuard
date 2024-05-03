@@ -16,9 +16,8 @@ import java.util.List;
 @Table(name = "child")
 public class Child {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long childId;
     private String childName;
+
     private String childPassword;
 
     @Enumerated(EnumType.STRING)

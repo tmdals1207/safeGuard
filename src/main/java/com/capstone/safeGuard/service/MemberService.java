@@ -87,34 +87,56 @@ public class MemberService {
     }
 
 
-    public Boolean childSignUp(ChildSignUpRequestDTO dto) {
-        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
+    public Boolean childSignUp(ChildSignUpRequestDTO childDto, ParentingDto parentingDto) {
+        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(childDto.getChildName()));
         if (findChild.isPresent()) {
             return false;
         }
+        log.info(childDto.getMemberId());
+        log.info(childDto.getChildName());
+        log.info(childDto.getChildPassword());
+        log.info(String.valueOf(childDto.getChildId()));
 
         Child child = new Child();
-        child.setChildId(dto.getChild_id());
-        child.setChildName(dto.getChildName());
-        String encodedPassword = passwordEncoder.encode(dto.getChild_password());
+        child.setChildName(childDto.getChildName());
+        String encodedPassword = passwordEncoder.encode(childDto.getChild_password());
         child.setChildPassword(encodedPassword);
         child.setAuthority(Authority.ROLE_CHILD);
         childRepository.save(child);
 
         // member child 연결
-        Parenting parenting = new Parenting();
-        String memberId = dto.getMemberId();
+        String memberId = childDto.getMemberId();
         Optional<Member> findMember = memberRepository.findById(memberId);
         if (findMember.isEmpty()) {
             return false;
         }
-        parenting.setParent(findMember.get());
-        parenting.setChild(child);
-        parentingRepository.save(parenting);
+        saveParenting(parentingDto, memberId, child);
 
         return true;
     }
 
+    public void saveParenting(ParentingDto parentingDto, String memberId, Child child) {
+        // 부모와 자식 엔티티의 ID를 사용하여 엔티티 객체를 가져옴
+        Optional<Member> parent = memberRepository.findById(memberId);
+
+        if (parent.isEmpty() || child==null) {
+            // 부모나 자식이 존재하지 않는 경우 처리
+            return;
+        }
+
+        log.info("child : " + child.getChildName());
+        log.info("parent : " + memberRepository.findById(memberId));
+
+        // Parenting 엔티티 생성
+        Parenting parenting = new Parenting();
+        parenting.setParent(parent.get());
+        parenting.setChild(child);
+
+        // Parenting 엔티티 저장
+        parentingRepository.save(parenting);
+    }
+
+    //TODO helping 추가 재구현 필요
     public Boolean addHelper(String memberId, String childName) {
         Helping helping = new Helping();
         Child selectedChild = childRepository.findBychildName(childName);
