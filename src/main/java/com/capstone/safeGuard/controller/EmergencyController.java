@@ -65,7 +65,7 @@ public class EmergencyController {
         return ResponseEntity.status(400).body(result);
     }
 
-    @GetMapping("/sent-emergency")
+    @PostMapping("/sent-emergency")
     public ResponseEntity<Map<String, String>> showSentEmergency(@RequestBody String memberId){
         List<Emergency> sentEmergencyList = emergencyService.getSentEmergency(memberId);
 
@@ -100,9 +100,9 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
-    // TODO emergency 디테일 추가
+    // TODO emergency 디테일 보여주기 + comment도
     @PostMapping("/emergency-detail")
-    public ResponseEntity<Map<String, String>> emergencyDetail(){
+    public ResponseEntity<Map<String, String>> emergencyDetail(@RequestBody String emergencyId){
         HashMap<String, String> result = new HashMap<>();
 
 
@@ -115,11 +115,10 @@ public class EmergencyController {
         if (sentEmergencyList == null){
             return null;
         }
-        int count = 1;
         for (Emergency emergency : sentEmergencyList) {
-            result.put(count + "", emergency.getTitle());
-            count++;
+            result.put(emergency.getEmergencyId() + "", emergency.getTitle());
         }
+
         return result;
     }
 }
