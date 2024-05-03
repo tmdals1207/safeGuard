@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -138,7 +139,8 @@ public class EmergencyService {
     }
 
     public List<Emergency> getSentEmergency(String memberId) {
-        List<Emergency> foundEmergency = emergencyRepository.findAllBySenderId(memberId);
+        Member member = memberRepository.findById(memberId).get();
+        List<Emergency> foundEmergency = emergencyRepository.findAllBySenderId(member);
         if (foundEmergency.isEmpty()){
             return null;
         }
