@@ -1,6 +1,7 @@
 package com.capstone.safeGuard.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Table(name = "comment")
 public class Comment {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
     @ManyToOne
@@ -24,4 +25,12 @@ public class Comment {
 
     private String comment;
     private LocalDateTime createdAt;
+
+    @Builder
+    public Comment(Emergency emergency, Member commentator, String comment) {
+        this.emergency = emergency;
+        this.commentator = commentator;
+        this.comment = comment;
+        this.createdAt = LocalDateTime.now();
+    }
 }

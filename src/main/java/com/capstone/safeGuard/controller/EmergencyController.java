@@ -77,7 +77,7 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
-    @GetMapping("/recieved-emergency")
+    @PostMapping("/recieved-emergency")
     public ResponseEntity<Map<String, String>> showReceivedEmergency(@RequestBody String memberId){
         List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(memberId);
 
@@ -89,7 +89,7 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
-    @GetMapping("/write-comment")
+    @PostMapping("/write-comment")
     public ResponseEntity<Map<String, String>> writeComment(@RequestBody CommentRequestDTO commentRequestDTO){
         HashMap<String, String> result = new HashMap<>();
 
@@ -100,6 +100,14 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
+    // TODO emergency 디테일 추가
+    @PostMapping("/emergency-detail")
+    public ResponseEntity<Map<String, String>> emergencyDetail(){
+        HashMap<String, String> result = new HashMap<>();
+
+
+        return addOkStatus(result);
+    }
 
     private static HashMap<String, String> addEmergencyList(List<Emergency> sentEmergencyList) {
         HashMap<String, String> result = new HashMap<>();

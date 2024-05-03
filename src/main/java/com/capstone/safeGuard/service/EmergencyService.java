@@ -1,12 +1,14 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Comment;
 import com.capstone.safeGuard.domain.Emergency;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.FcmMessageDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
+import com.capstone.safeGuard.repository.CommentRepository;
 import com.capstone.safeGuard.repository.EmergencyRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class EmergencyService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
     private final MemberService memberService;
+    private final CommentRepository commentRepository;
 
     public ArrayList<String> getNeighborMembers(EmergencyRequestDTO dto, int distance){
         ArrayList<String> memberIdList = new ArrayList<>();
@@ -154,10 +156,17 @@ public class EmergencyService {
         return null;
     }
 
-    // TODO emergency에 comment 달기
     public boolean writeEmergency(CommentRequestDTO commentRequestDTO) {
+        Comment comment = Comment.builder()
+                .commentator(memberRepository.findById(commentRequestDTO.getCommentatorId()).get())
+                .emergency(emergencyRepository.findById(Long.valueOf(commentRequestDTO.getEmergencyId())).get())
+                .comment(commentRequestDTO.getCommentContent())
+                .build();
 
+        commentRepository.save(comment);
 
         return true;
     }
+
+    // TODO emergency 디테일 추가
 }
