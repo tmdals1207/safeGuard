@@ -1,5 +1,6 @@
 package com.capstone.safeGuard.controller;
 
+import com.capstone.safeGuard.domain.Comment;
 import com.capstone.safeGuard.domain.Emergency;
 import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
@@ -7,7 +8,6 @@ import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -100,11 +100,24 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
-    // TODO emergency 디테일 보여주기 + comment도
     @PostMapping("/emergency-detail")
     public ResponseEntity<Map<String, String>> emergencyDetail(@RequestBody String emergencyId){
         HashMap<String, String> result = new HashMap<>();
 
+        Emergency emergency  = emergencyService.getEmergencyDetail(emergencyId);
+        if(emergency == null){
+            return addErrorStatus(result);
+        }
+
+        result.put("Title", emergency.getTitle());
+        result.put("Content", emergency.getContent());
+
+        List<Comment> commentList = emergency.getCommentList();
+        for (Comment comment : commentList) {
+            result.put("writer", comment.getCommentator().getName());
+            result.put("comment", comment.getComment());
+            result.put("written at", comment.getCreatedAt().toString());
+        }
 
         return addOkStatus(result);
     }

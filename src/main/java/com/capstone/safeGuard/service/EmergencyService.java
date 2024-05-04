@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -141,8 +142,12 @@ public class EmergencyService {
     }
 
     public List<Emergency> getSentEmergency(String memberId) {
-        Member member = memberRepository.findById(memberId).get();
-        List<Emergency> foundEmergency = emergencyRepository.findAllBySenderId(member);
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty()){
+            return null;
+        }
+
+        List<Emergency> foundEmergency = emergencyRepository.findAllBySenderId(foundMember.get());
         if (foundEmergency.isEmpty()){
             return null;
         }
@@ -157,9 +162,15 @@ public class EmergencyService {
     }
 
     public boolean writeEmergency(CommentRequestDTO commentRequestDTO) {
+        Optional<Member> foundMember = memberRepository.findById(commentRequestDTO.getCommentatorId());
+        Optional<Emergency> foundEmergency = emergencyRepository.findById(Long.valueOf(commentRequestDTO.getEmergencyId()));
+        if(foundMember.isEmpty() || foundEmergency.isEmpty()){
+            return false;
+        }
+
         Comment comment = Comment.builder()
-                .commentator(memberRepository.findById(commentRequestDTO.getCommentatorId()).get())
-                .emergency(emergencyRepository.findById(Long.valueOf(commentRequestDTO.getEmergencyId())).get())
+                .commentator(foundMember.get())
+                .emergency(foundEmergency.get())
                 .comment(commentRequestDTO.getCommentContent())
                 .build();
 
@@ -168,6 +179,9 @@ public class EmergencyService {
         return true;
     }
 
-    // TODO emergency 디테일 추가
 
+    public Emergency getEmergencyDetail(String emergencyId) {
+        Optional<Emergency> foundEmergency = emergencyRepository.findById(Long.valueOf(emergencyId));
+        return foundEmergency.orElse(null);
+    }
 }
