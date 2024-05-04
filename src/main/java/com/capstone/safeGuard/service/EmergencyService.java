@@ -1,16 +1,10 @@
 package com.capstone.safeGuard.service;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Comment;
-import com.capstone.safeGuard.domain.Emergency;
-import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.FcmMessageDTO;
-import com.capstone.safeGuard.repository.ChildRepository;
-import com.capstone.safeGuard.repository.CommentRepository;
-import com.capstone.safeGuard.repository.EmergencyRepository;
-import com.capstone.safeGuard.repository.MemberRepository;
+import com.capstone.safeGuard.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -35,6 +29,7 @@ public class EmergencyService {
     private final ChildRepository childRepository;
     private final MemberService memberService;
     private final CommentRepository commentRepository;
+    private final EmergencyReceiverRepository emergencyReceiverRepository;
 
     public ArrayList<String> getNeighborMembers(EmergencyRequestDTO dto, int distance){
         ArrayList<String> memberIdList = new ArrayList<>();
@@ -68,13 +63,19 @@ public class EmergencyService {
         return Math.sqrt( (x_km * x_km) + (y_km * y_km) );
     }
 
-    public boolean saveEmergency(String sentMessage, EmergencyRequestDTO emergencyRequestDto) {
+    public void saveEmergency(String sentMessage, String receiverId, EmergencyRequestDTO emergencyRequestDto) {
         // Emergency table에 저장
         Member member = memberRepository.findById(emergencyRequestDto.getSenderId()).orElseThrow(NoSuchElementException::new);
         Child child = childRepository.findBychildName(emergencyRequestDto.getChildName());
 
-        emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child, sentMessage));
-        return true;
+        Emergency emergency = emergencyRequestDto.dtoToDomain(member, child, sentMessage);
+        emergencyRepository.save(emergency);
+
+        EmergencyReceiver emergencyReceiver = EmergencyReceiver.builder()
+                .emergency(emergency)
+                .emergencyReceiverId(receiverId)
+                .build();
+        emergencyReceiverRepository.save(emergencyReceiver);
     }
 
     public boolean sendNotificationTo(String receiverId, EmergencyRequestDTO dto) {
@@ -99,7 +100,7 @@ public class EmergencyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        saveEmergency(message, dto);
+        saveEmergency(message, receiverId, dto);
         return true;
     }
 
@@ -158,10 +159,20 @@ public class EmergencyService {
         return foundEmergency;
     }
 
-    // TODO 받은 emergency 및 comment 조회 -> 어케하냐
+    // TODO 받은 emergency 및 comment 조회 테스트
     public List<Emergency> getReceivedEmergency(String memberId) {
+        List<Emergency> result = new ArrayList<>();
 
-        return null;
+        List<EmergencyReceiver> foundEmergencyList = emergencyReceiverRepository.findAllByReceiverId(memberId);
+        if (foundEmergencyList.isEmpty()){
+            return null;
+        }
+
+        for (EmergencyReceiver received : foundEmergencyList) {
+            result.add(received.getEmergency());
+        }
+
+        return result;
     }
 
     public boolean writeEmergency(CommentRequestDTO commentRequestDTO) {
