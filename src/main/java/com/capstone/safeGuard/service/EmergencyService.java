@@ -19,6 +19,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,15 +68,12 @@ public class EmergencyService {
         return Math.sqrt( (x_km * x_km) + (y_km * y_km) );
     }
 
-    public boolean saveEmergency(String receiverId, EmergencyRequestDTO emergencyRequestDto) {
+    public boolean saveEmergency(String sentMessage, EmergencyRequestDTO emergencyRequestDto) {
         // Emergency table에 저장
         Member member = memberRepository.findById(emergencyRequestDto.getSenderId()).orElseThrow(NoSuchElementException::new);
         Child child = childRepository.findBychildName(emergencyRequestDto.getChildName());
-        String message = makeMessage(receiverId, emergencyRequestDto);
-        if (message == null) {
-            return false;
-        }
-        emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child, message));
+
+        emergencyRepository.save(emergencyRequestDto.dtoToDomain(member, child, sentMessage));
         return true;
     }
 
@@ -97,7 +95,12 @@ public class EmergencyService {
 
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-        return response.getStatusCode() == HttpStatus.OK;
+        if(response.getStatusCode() != HttpStatus.OK){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        saveEmergency(message, dto);
+        return true;
     }
 
     private String getAccessToken() throws IOException {
