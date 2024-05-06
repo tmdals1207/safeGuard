@@ -11,7 +11,6 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @Table(name = "helping")
 public class Helping {
-    //TODO 변경 필요
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long helpingId;

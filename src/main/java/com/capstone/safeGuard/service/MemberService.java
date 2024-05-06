@@ -3,10 +3,7 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
-import com.capstone.safeGuard.repository.ChildRepository;
-import com.capstone.safeGuard.repository.EmailAuthCodeRepository;
-import com.capstone.safeGuard.repository.MemberRepository;
-import com.capstone.safeGuard.repository.ParentingRepository;
+import com.capstone.safeGuard.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +24,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
     private final ParentingRepository parentingRepository;
+    private final HelpingRepository helpingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final MailService mailService;
@@ -87,7 +85,7 @@ public class MemberService {
     }
 
 
-    public Boolean childSignUp(ChildSignUpRequestDTO childDto, ParentingDto parentingDto) {
+    public Boolean childSignUp(ChildSignUpRequestDTO childDto) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(childDto.getChildName()));
         if (findChild.isPresent()) {
             return false;
@@ -110,12 +108,12 @@ public class MemberService {
         if (findMember.isEmpty()) {
             return false;
         }
-        saveParenting(parentingDto, memberId, child);
+        saveParenting(memberId, child);
 
         return true;
     }
 
-    public void saveParenting(ParentingDto parentingDto, String memberId, Child child) {
+    public void saveParenting(String memberId, Child child) {
         // 부모와 자식 엔티티의 ID를 사용하여 엔티티 객체를 가져옴
         Optional<Member> parent = memberRepository.findById(memberId);
 
@@ -123,9 +121,6 @@ public class MemberService {
             // 부모나 자식이 존재하지 않는 경우 처리
             return;
         }
-
-        log.info("child : " + child.getChildName());
-        log.info("parent : " + memberRepository.findById(memberId));
 
         // Parenting 엔티티 생성
         Parenting parenting = new Parenting();
@@ -136,9 +131,11 @@ public class MemberService {
         parentingRepository.save(parenting);
     }
 
-    //TODO helping 추가 재구현 필요
-    public Boolean addHelper(String memberId, String childName) {
+    public Boolean addHelper(AddMemberDto addMemberDto) {
         Helping helping = new Helping();
+        String childName = addMemberDto.getChildName();
+        String memberId = addMemberDto.getParentId();
+
         Child selectedChild = childRepository.findBychildName(childName);
         if (selectedChild == null) {
             return false;
@@ -150,6 +147,8 @@ public class MemberService {
         helping.setHelper(findMember.get());
         helping.setChild(selectedChild);
 
+        helpingRepository.save(helping);
+
         return true;
     }
 
@@ -159,6 +158,15 @@ public class MemberService {
             return false;
         }
         childRepository.delete(selectedChild);
+        return true;
+    }
+
+    public Boolean helperRemove(String helperName) {
+        Helping helper = helpingRepository.findByHelperName(helperName);
+        if(helper == null) {
+            return false;
+        }
+        helpingRepository.delete(helper);
         return true;
     }
 

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 
-public class ParentingDto {
+public class AddMemberDto {
     private String parentId;
     private String childName;
 }

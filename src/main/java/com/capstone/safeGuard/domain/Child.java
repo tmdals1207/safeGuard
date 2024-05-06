@@ -26,19 +26,19 @@ public class Child {
     private float latitude;
     private float longitude;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Parenting> parentingList;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Helping> helpingList;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Coordinate> livingAreas;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Coordinate> forbiddenAreas;
 
