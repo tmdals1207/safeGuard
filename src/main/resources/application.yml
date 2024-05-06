@@ -2,7 +2,7 @@ spring:
   application:
     name: safeGuard
   datasource:
-    url: jdbc:mysql://localhost/capstone
+    url: jdbc:mysql://localhost:8088/capstone
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -29,5 +29,7 @@ spring:
           writetimeout: 5000
 
 
+server:
+  port: 8080
 jwt:
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
