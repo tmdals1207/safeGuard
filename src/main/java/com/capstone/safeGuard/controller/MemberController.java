@@ -4,7 +4,13 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
-import com.capstone.safeGuard.dto.request.*;
+import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
+import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
+import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
+import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
+import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
+import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
+import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
@@ -241,8 +247,7 @@ public class MemberController {
                 session.invalidate(); // 세션 무효화
             }
 
-            result.put("status", "200");
-            return ResponseEntity.ok().body(result);
+            return addOkStatus(result);
         }
         return addErrorStatus(result);
     }
@@ -276,8 +281,7 @@ public class MemberController {
             // 해당 아이디가 존재하지 않음
             return addErrorStatus(result);
         }
-        result.put("status", "200");
-        return ResponseEntity.ok().body(result);
+        return addOkStatus(result);
     }
 
     // 비밀번호 확인을 위한 이메일 인증 2
@@ -289,9 +293,9 @@ public class MemberController {
             // 코드가 틀렸다는 메시지와 함께 다시 입력하는 곳으로 리다이렉트
             return addErrorStatus(result);
         }
-        result.put("status", "200");
         // 비밀번호 재설정 팝업 or 리다이렉트
-        return ResponseEntity.ok().body(result);
+
+        return addOkStatus(result);
     }
 
     // 비밀번호 확인을 위한 이메일 인증 3
@@ -302,32 +306,32 @@ public class MemberController {
         if(! memberService.resetMemberPassword(dto)) {
             return addErrorStatus(result);
         }
-        result.put("status", "200");
-        return ResponseEntity.ok().body(result);
+        return addOkStatus(result);
     }
 
     @PostMapping("/find-child-id-list")
-    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody FindChildIdDTO dto,
-                                                               BindingResult bindingResult) {
-        Map<String, String> result = new HashMap<>();
-
-        if (bindingResult.hasErrors()) {
-            return addBindingError(result);
-        }
-
-        String childIds = memberService.findChildId(dto);
-        if (childIds == null) {
-            return addErrorStatus(result);
-        }
-
-        result.put("status", "200");
-        result.put("memberId", childIds);
-
-        return ResponseEntity.ok().body(result);
+    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody String memberId) {
+        return getChildList(memberId);
     }
 
     @PostMapping("/chose-child-form")
     public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
+        return getChildList(memberId);
+    }
+
+    @PostMapping("/chose-child")
+    public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(! memberService.resetChildPassword(dto)){
+            return addErrorStatus(result);
+        }
+
+        result.put("status", "200");
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<Map<String, String>> getChildList(String memberId) {
         Map<String, String> result = new HashMap<>();
 
         ArrayList<String> childList;
@@ -345,16 +349,9 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PostMapping("/chose-child")
-    public ResponseEntity<Map<String, String>> choseChildToChangePassword(@RequestBody ResetPasswordDTO dto){
-        Map<String, String> result = new HashMap<>();
-
-        if(! memberService.resetChildPassword(dto)){
-            return addErrorStatus(result);
-        }
-
+    private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
         result.put("status", "200");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(result);
     }
 
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
@@ -381,4 +378,22 @@ public class MemberController {
                 Collections.singleton(new SimpleGrantedAuthority(Authority.ROLE_CHILD.toString())));
         return jwtTokenProvider.generateToken(authentication);
     }
+
+    @PostMapping("/update-coordinate")
+    public ResponseEntity<Map<String, String>> updateCoordinate(@RequestBody UpdateCoordinateDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(dto.getType().equals("Member")){
+            if (memberService.updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
+                return addOkStatus(result);
+            }
+            return addErrorStatus(result);
+        }
+        if(memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
+            return addOkStatus(result);
+        }
+        return addErrorStatus(result);
+    }
+
+
 }
