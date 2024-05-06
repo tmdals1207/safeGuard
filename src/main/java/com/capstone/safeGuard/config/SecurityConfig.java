@@ -25,6 +25,14 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final String[] permitAllList = {
+            "/", "/home", "/login", "/signup",
+            "/childsignup", "/check-auth", "/member-logout",
+            "/find-member-id", "/find-child-id-list",
+            "/verification-email-request", "/verification-email",
+            "/reset-member-password", "/chose-child-form", "/chose-child"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -32,11 +40,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests()
-                .requestMatchers("/", "/home", "/login", "/signup",
-                        "/childsignup", "/check-auth", "/member-logout",
-                        "/find-member-id", "/find-child-id-list",
-                        "/verification-email-request", "/verification-email",
-                        "/reset-member-password").permitAll()
+                .requestMatchers(permitAllList).permitAll()
                 .requestMatchers("/group").hasRole("member")
                 .anyRequest().authenticated()
                 .and()

@@ -3,6 +3,9 @@ CREATE TABLE member (
                         name VARCHAR(255) NOT NULL,
                         password VARCHAR(255) NOT NULL,
                         email VARCHAR(255) NOT NULL,
+                        latitude FLOAT NOT NULL,
+                        longitude FLOAT NOT NULL,
+                        fcm_token varchar(255) NOT NULL,
                         PRIMARY KEY (member_id)
 );
 
@@ -10,6 +13,8 @@ CREATE TABLE child (
                        child_id BIGINT NOT NULL AUTO_INCREMENT,
                        child_name VARCHAR(255) NOT NULL,
                        child_password VARCHAR(255) NOT NULL,
+                       latitude FLOAT NOT NULL,
+                       longitude FLOAT NOT NULL,
                        PRIMARY KEY (child_id)
 );
 
@@ -94,4 +99,10 @@ CREATE TABLE jwt_token (
                            refresh_token VARCHAR(255) NOT NULL,
                            is_black_list TINYINT NOT NULL,
                            PRIMARY KEY (token_id)
+);
+CREATE TABLE mem_fcm_key (
+                             id BIGINT NOT NULL AUTO_INCREMENT,
+                             member_id VARCHAR(255) NOT NULL,
+                             fcm_token VARCHAR(500) NOT NULL,
+                             PRIMARY KEY (id)
 );
