@@ -177,7 +177,6 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    //TODO 변경 필요
     @PostMapping("/addhelper")
     public ResponseEntity addHelper(@Validated @RequestBody AddMemberDto addMemberDto,
                                     BindingResult bindingResult) {
@@ -195,6 +194,26 @@ public class MemberController {
             return ResponseEntity.status(400).build();
         }
         log.info("add success = {}", addSuccess);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/helperremove")
+    public ResponseEntity helperRemove(@Validated @RequestBody Map<String, String> requestBody,
+                                      BindingResult bindingResult) {
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
+        String helperName = requestBody.get("helperName");
+
+        Boolean RemoveSuccess = memberService.helperRemove(helperName);
+        if (!RemoveSuccess) {
+            return ResponseEntity.status(400).build();
+        }
+
+        log.info("헬퍼 삭제 성공!");
         return ResponseEntity.ok().build();
     }
 
