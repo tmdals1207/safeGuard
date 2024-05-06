@@ -57,6 +57,10 @@ dependencies {
 
 	// email
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
+
+	//fcm
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
 }
 
 tasks.named('test') {
