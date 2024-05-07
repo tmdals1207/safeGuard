@@ -37,7 +37,7 @@ CREATE TABLE helping (
 );
 
 CREATE TABLE coordinate (
-                            coordinate_id BIGINT NOT NULL,
+                            coordinate_id BIGINT NOT NULL AUTO_INCREMENT,
                             child_id BIGINT NOT NULL,
                             is_living_area TINYINT(1) NOT NULL,
                             x_of_north_west FLOAT NOT NULL,

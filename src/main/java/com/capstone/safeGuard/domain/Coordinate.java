@@ -13,7 +13,7 @@ import lombok.Setter;
 @Table(name = "coordinate")
 @Builder
 public class Coordinate {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long coordinateId;
 
     @ManyToOne
