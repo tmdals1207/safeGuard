@@ -37,11 +37,17 @@ CREATE TABLE helping (
 );
 
 CREATE TABLE coordinate (
-                            coordinate_id BIGINT NOT NULL,
+                            coordinate_id BIGINT NOT NULL AUTO_INCREMENT,
                             child_id BIGINT NOT NULL,
                             is_living_area TINYINT(1) NOT NULL,
-                            x DOUBLE NOT NULL,
-                            y DOUBLE NOT NULL,
+                            x_of_north_west FLOAT NOT NULL,
+                            y_of_north_west FLOAT NOT NULL,
+                            x_of_north_east FLOAT NOT NULL,
+                            y_of_north_east FLOAT NOT NULL,
+                            x_of_south_west FLOAT NOT NULL,
+                            y_of_south_west FLOAT NOT NULL,
+                            x_of_south_east FLOAT NOT NULL,
+                            y_of_south_east FLOAT NOT NULL,
                             PRIMARY KEY (coordinate_id),
                             FOREIGN KEY (child_id) REFERENCES Child (child_id)
 );
