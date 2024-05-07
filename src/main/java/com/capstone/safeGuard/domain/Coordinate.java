@@ -1,6 +1,7 @@
 package com.capstone.safeGuard.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @Table(name = "coordinate")
+@Builder
 public class Coordinate {
     @Id
     private long coordinateId;
