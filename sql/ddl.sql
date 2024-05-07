@@ -40,8 +40,8 @@ CREATE TABLE coordinate (
                             coordinate_id BIGINT NOT NULL,
                             child_id BIGINT NOT NULL,
                             is_living_area TINYINT(1) NOT NULL,
-                            x DOUBLE NOT NULL,
-                            y DOUBLE NOT NULL,
+                            x FLOAT NOT NULL,
+                            y FLOAT NOT NULL,
                             PRIMARY KEY (coordinate_id),
                             FOREIGN KEY (child_id) REFERENCES Child (child_id)
 );
