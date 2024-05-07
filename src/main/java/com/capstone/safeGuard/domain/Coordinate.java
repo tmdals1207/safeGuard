@@ -18,6 +18,13 @@ public class Coordinate {
     private Child child;
 
     private boolean isLivingArea;
-    private float x;
-    private float y;
+
+    private float xOfNorthWest;
+    private float yOfNorthWest;
+    private float xOfNorthEast;
+    private float yOfNorthEast;
+    private float xOfSouthWest;
+    private float yOfSouthWest;
+    private float xOfSouthEast;
+    private float yOfSouthEast;
 }
