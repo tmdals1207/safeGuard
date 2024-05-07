@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @Table(name = "coordinate")
-@Builder
 public class Coordinate {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long coordinateId;
@@ -29,4 +28,19 @@ public class Coordinate {
     private float yOfSouthWest;
     private float xOfSouthEast;
     private float yOfSouthEast;
+
+
+    @Builder
+    public Coordinate(Child child, boolean isLivingArea, float xOfNorthWest, float yOfNorthWest, float xOfNorthEast, float yOfNorthEast, float xOfSouthWest, float yOfSouthWest, float xOfSouthEast, float yOfSouthEast) {
+        this.child = child;
+        this.isLivingArea = isLivingArea;
+        this.xOfNorthWest = xOfNorthWest;
+        this.yOfNorthWest = yOfNorthWest;
+        this.xOfNorthEast = xOfNorthEast;
+        this.yOfNorthEast = yOfNorthEast;
+        this.xOfSouthWest = xOfSouthWest;
+        this.yOfSouthWest = yOfSouthWest;
+        this.xOfSouthEast = xOfSouthEast;
+        this.yOfSouthEast = yOfSouthEast;
+    }
 }
