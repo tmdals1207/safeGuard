@@ -20,6 +20,7 @@ public class Coordinate {
 
     private boolean isLivingArea;
 
+    // TODO float -> double
     private float xOfNorthWest;
     private float yOfNorthWest;
     private float xOfNorthEast;

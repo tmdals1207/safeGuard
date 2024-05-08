@@ -16,6 +16,8 @@ import java.util.Map;
 public class CoordinateController {
     private final CoordinateService coordinateService;
 
+    // TODO childId 받는 부분 childName으로 변경
+
     @PostMapping("/{child-id}/add-safe")
     public ResponseEntity<Map<String, String>> addLivingArea(
             @PathVariable("child-id") String childId,
@@ -65,6 +67,7 @@ public class CoordinateController {
     }
 
     // TODO 위험, 안전 구역 표시
+    //  map<areaId, map<bool, string>> 만들어서 넘김
 
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
         result.put("status", "200");
