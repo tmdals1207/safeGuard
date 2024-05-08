@@ -64,6 +64,8 @@ public class CoordinateController {
         return addOkStatus(result);
     }
 
+    // TODO 위험, 안전 구역 표시
+
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
         result.put("status", "200");
         return ResponseEntity.ok().body(result);
