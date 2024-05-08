@@ -3,6 +3,7 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Coordinate;
 import com.capstone.safeGuard.dto.request.coordinate.AddAreaDTO;
+import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.CoordinateRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,36 +20,39 @@ public class CoordinateService {
 
     @Transactional
     public boolean addForbiddenArea(AddAreaDTO addAreaDTO){
-        Optional<Child> foundChild = childRepository.findById(addAreaDTO.getChildId());
-        if(foundChild.isEmpty()){
+        Child foundChild = childRepository.findBychildName(addAreaDTO.getChildName());
+        if(foundChild == null){
             return false;
         }
 
-        foundChild.get().getForbiddenAreas()
-                .add(addAreaDTO.dtoToDomain(foundChild.get(), false));
+        foundChild.getForbiddenAreas()
+                .add(addAreaDTO.dtoToDomain(foundChild, false));
         return true;
     }
 
     @Transactional
     public boolean addLivingArea(AddAreaDTO addAreaDTO){
-        Optional<Child> foundChild = childRepository.findById(addAreaDTO.getChildId());
-        if(foundChild.isEmpty()){
+        Child foundChild = childRepository.findBychildName(addAreaDTO.getChildName());
+        if(foundChild == null){
             return false;
         }
 
-        foundChild.get().getForbiddenAreas()
-                .add(addAreaDTO.dtoToDomain(foundChild.get(), true));
+        foundChild.getForbiddenAreas()
+                .add(addAreaDTO.dtoToDomain(foundChild, true));
 
         return true;
     }
 
     @Transactional
-    public boolean deleteArea(Long childId, Long coordinateId){
-        Optional<Child> foundChild = childRepository.findById(childId);
-        Optional<Coordinate> foundCoordinate = coordinateRepository.findById(coordinateId);
-        if(foundChild.isEmpty() ||
+    public boolean deleteArea(DeleteAreaDTO dto){
+        String areaID = dto.getAreaID();
+        String childName = dto.getChildName();
+
+        Child foundChild = childRepository.findBychildName(childName);
+        Optional<Coordinate> foundCoordinate = coordinateRepository.findById(Long.parseLong(areaID));
+        if( (foundChild == null) ||
                 foundCoordinate.isEmpty() ||
-                (foundCoordinate.get().getChild() != foundChild.get()) ){
+                ( foundChild.equals(foundCoordinate.get().getChild()) ) ){
             return false;
         }
 

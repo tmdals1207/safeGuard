@@ -15,7 +15,8 @@ public class AddAreaDTO {
     private float xOfPointD;
     private float yOfPointD;
 
-    private long childId;
+    private String childName;
+    private String memberID;
 
     public Coordinate dtoToDomain(Child child, boolean isLiving) {
         float[] location = findLocation();
