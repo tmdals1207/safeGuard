@@ -24,8 +24,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
     private String fcmToken;
 

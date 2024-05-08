@@ -20,19 +20,23 @@ public class Coordinate {
 
     private boolean isLivingArea;
 
-    // TODO float -> double
-    private float xOfNorthWest;
-    private float yOfNorthWest;
-    private float xOfNorthEast;
-    private float yOfNorthEast;
-    private float xOfSouthWest;
-    private float yOfSouthWest;
-    private float xOfSouthEast;
-    private float yOfSouthEast;
+    private double xOfNorthWest;
+    private double yOfNorthWest;
+    private double xOfNorthEast;
+    private double yOfNorthEast;
+    private double xOfSouthWest;
+    private double yOfSouthWest;
+    private double xOfSouthEast;
+    private double yOfSouthEast;
 
 
     @Builder
-    public Coordinate(Child child, boolean isLivingArea, float xOfNorthWest, float yOfNorthWest, float xOfNorthEast, float yOfNorthEast, float xOfSouthWest, float yOfSouthWest, float xOfSouthEast, float yOfSouthEast) {
+    public Coordinate(Child child, boolean isLivingArea,
+                      double xOfNorthWest, double yOfNorthWest,
+                      double xOfNorthEast, double yOfNorthEast,
+                      double xOfSouthWest, double yOfSouthWest,
+                      double xOfSouthEast, double yOfSouthEast) {
+
         this.child = child;
         this.isLivingArea = isLivingArea;
         this.xOfNorthWest = xOfNorthWest;

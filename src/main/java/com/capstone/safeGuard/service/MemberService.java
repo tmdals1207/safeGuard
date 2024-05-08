@@ -300,7 +300,7 @@ public class MemberService {
     }
 
     @Transactional
-    public boolean updateMemberCoordinate(String id, float latitude, float longitude) {
+    public boolean updateMemberCoordinate(String id, double latitude, double longitude) {
         Optional<Member> foundMember = memberRepository.findById(id);
         if(foundMember.isEmpty()){
             return false;
@@ -314,7 +314,7 @@ public class MemberService {
 
     // 해당 메소드에서 id는 child의 name이다.
     @Transactional
-    public boolean updateChildCoordinate(String id, float latitude, float longitude) {
+    public boolean updateChildCoordinate(String id, double latitude, double longitude) {
         Child foundChild = childRepository.findBychildName(id);
         if(foundChild == null){
             return false;

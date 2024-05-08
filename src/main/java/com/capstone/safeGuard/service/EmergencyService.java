@@ -43,7 +43,7 @@ public class EmergencyService {
         return memberIdList;
     }
 
-    private boolean isNeighbor(float latitude, float longitude, float memberLatitude, float memberLongitude, int length) {
+    private boolean isNeighbor(double latitude, double longitude, double memberLatitude, double memberLongitude, int length) {
         double x_distance = latitude - memberLatitude;
         double y_distance = longitude - memberLongitude;
 

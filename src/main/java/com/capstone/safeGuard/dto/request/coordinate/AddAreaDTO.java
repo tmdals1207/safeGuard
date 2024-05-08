@@ -6,20 +6,20 @@ import lombok.Getter;
 
 @Getter
 public class AddAreaDTO {
-    private float xOfPointA;
-    private float yOfPointA;
-    private float xOfPointB;
-    private float yOfPointB;
-    private float xOfPointC;
-    private float yOfPointC;
-    private float xOfPointD;
-    private float yOfPointD;
+    private double xOfPointA;
+    private double yOfPointA;
+    private double xOfPointB;
+    private double yOfPointB;
+    private double xOfPointC;
+    private double yOfPointC;
+    private double xOfPointD;
+    private double yOfPointD;
 
     private String childName;
     private String memberID;
 
     public Coordinate dtoToDomain(Child child, boolean isLiving) {
-        float[] location = findLocation();
+        double[] location = findLocation();
 
 
         return Coordinate.builder()
@@ -38,18 +38,18 @@ public class AddAreaDTO {
                 .build();
     }
 
-    private float[] findLocation() {
-        float[] result = new float[8];
+    private double[] findLocation() {
+        double[] result = new double[8];
 
-        float[][] coordinates = {
+        double[][] coordinates = {
                 {xOfPointA, yOfPointA},
                 {xOfPointB, yOfPointB},
                 {xOfPointC, yOfPointC},
                 {xOfPointD, yOfPointD}
         };
 
-        float centerX = (xOfPointA + xOfPointB + xOfPointC + xOfPointD) / 4;
-        float centerY = (yOfPointA + yOfPointB + yOfPointC + yOfPointD) / 4;
+        double centerX = (xOfPointA + xOfPointB + xOfPointC + xOfPointD) / 4;
+        double centerY = (yOfPointA + yOfPointB + yOfPointC + yOfPointD) / 4;
 
         for(int i = 0; i < 4; i++){
             switch (findQuadrant(centerX, centerY, coordinates[i][0], coordinates[i][1])) {
@@ -75,7 +75,7 @@ public class AddAreaDTO {
         return result;
     }
 
-    private int findQuadrant(float centerX, float centerY, float x, float y) {
+    private int findQuadrant(double centerX, double centerY, double x, double y) {
         if (centerX - x < 0) {
             if (centerY - y < 0) {
                 // -- sw

@@ -3,8 +3,8 @@ CREATE TABLE member (
                         name VARCHAR(255) NOT NULL,
                         password VARCHAR(255) NOT NULL,
                         email VARCHAR(255) NOT NULL,
-                        latitude FLOAT NOT NULL,
-                        longitude FLOAT NOT NULL,
+                        latitude DOUBLE NOT NULL,
+                        longitude DOUBLE NOT NULL,
                         fcm_token varchar(255) NOT NULL,
                         PRIMARY KEY (member_id)
 );
@@ -13,8 +13,8 @@ CREATE TABLE child (
                        child_id BIGINT NOT NULL AUTO_INCREMENT,
                        child_name VARCHAR(255) NOT NULL,
                        child_password VARCHAR(255) NOT NULL,
-                       latitude FLOAT NOT NULL,
-                       longitude FLOAT NOT NULL,
+                       latitude DOUBLE NOT NULL,
+                       longitude DOUBLE NOT NULL,
                        PRIMARY KEY (child_id)
 );
 
@@ -40,14 +40,14 @@ CREATE TABLE coordinate (
                             coordinate_id BIGINT NOT NULL AUTO_INCREMENT,
                             child_id BIGINT NOT NULL,
                             is_living_area TINYINT(1) NOT NULL,
-                            x_of_north_west FLOAT NOT NULL,
-                            y_of_north_west FLOAT NOT NULL,
-                            x_of_north_east FLOAT NOT NULL,
-                            y_of_north_east FLOAT NOT NULL,
-                            x_of_south_west FLOAT NOT NULL,
-                            y_of_south_west FLOAT NOT NULL,
-                            x_of_south_east FLOAT NOT NULL,
-                            y_of_south_east FLOAT NOT NULL,
+                            x_of_north_west DOUBLE NOT NULL,
+                            y_of_north_west DOUBLE NOT NULL,
+                            x_of_north_east DOUBLE NOT NULL,
+                            y_of_north_east DOUBLE NOT NULL,
+                            x_of_south_west DOUBLE NOT NULL,
+                            y_of_south_west DOUBLE NOT NULL,
+                            x_of_south_east DOUBLE NOT NULL,
+                            y_of_south_east DOUBLE NOT NULL,
                             PRIMARY KEY (coordinate_id),
                             FOREIGN KEY (child_id) REFERENCES Child (child_id)
 );
