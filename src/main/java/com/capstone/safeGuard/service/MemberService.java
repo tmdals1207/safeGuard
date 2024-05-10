@@ -3,10 +3,7 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
-import com.capstone.safeGuard.repository.ChildRepository;
-import com.capstone.safeGuard.repository.EmailAuthCodeRepository;
-import com.capstone.safeGuard.repository.MemberRepository;
-import com.capstone.safeGuard.repository.ParentingRepository;
+import com.capstone.safeGuard.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +24,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
     private final ParentingRepository parentingRepository;
+    private final HelpingRepository helpingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final MailService mailService;
@@ -87,35 +85,57 @@ public class MemberService {
     }
 
 
-    public Boolean childSignUp(ChildSignUpRequestDTO dto, String memberId) {
-        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(dto.getChildName()));
+    public Boolean childSignUp(ChildSignUpRequestDTO childDto) {
+        Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(childDto.getChildName()));
         if (findChild.isPresent()) {
             return false;
         }
+        log.info(childDto.getMemberId());
+        log.info(childDto.getChildName());
+        log.info(childDto.getChildPassword());
+        log.info(String.valueOf(childDto.getChildId()));
 
         Child child = new Child();
-        child.setChildId(dto.getChild_id());
-        child.setChildName(dto.getChildName());
-        String encodedPassword = passwordEncoder.encode(dto.getChild_password());
+        child.setChildName(childDto.getChildName());
+        String encodedPassword = passwordEncoder.encode(childDto.getChild_password());
         child.setChildPassword(encodedPassword);
         child.setAuthority(Authority.ROLE_CHILD);
         childRepository.save(child);
 
         // member child 연결
-        Parenting parenting = new Parenting();
+        String memberId = childDto.getMemberId();
         Optional<Member> findMember = memberRepository.findById(memberId);
         if (findMember.isEmpty()) {
             return false;
         }
-        parenting.setParent(findMember.get());
-        parenting.setChild(child);
-        parentingRepository.save(parenting);
+        saveParenting(memberId, child);
 
         return true;
     }
 
-    public Boolean addHelper(String memberId, String childName) {
+    public void saveParenting(String memberId, Child child) {
+        // 부모와 자식 엔티티의 ID를 사용하여 엔티티 객체를 가져옴
+        Optional<Member> parent = memberRepository.findById(memberId);
+
+        if (parent.isEmpty() || child==null) {
+            // 부모나 자식이 존재하지 않는 경우 처리
+            return;
+        }
+
+        // Parenting 엔티티 생성
+        Parenting parenting = new Parenting();
+        parenting.setParent(parent.get());
+        parenting.setChild(child);
+
+        // Parenting 엔티티 저장
+        parentingRepository.save(parenting);
+    }
+
+    public Boolean addHelper(AddMemberDto addMemberDto) {
         Helping helping = new Helping();
+        String childName = addMemberDto.getChildName();
+        String memberId = addMemberDto.getParentId();
+
         Child selectedChild = childRepository.findBychildName(childName);
         if (selectedChild == null) {
             return false;
@@ -127,6 +147,8 @@ public class MemberService {
         helping.setHelper(findMember.get());
         helping.setChild(selectedChild);
 
+        helpingRepository.save(helping);
+
         return true;
     }
 
@@ -136,6 +158,15 @@ public class MemberService {
             return false;
         }
         childRepository.delete(selectedChild);
+        return true;
+    }
+
+    public Boolean helperRemove(String helperName) {
+        Helping helper = helpingRepository.findByHelperName(helperName);
+        if(helper == null) {
+            return false;
+        }
+        helpingRepository.delete(helper);
         return true;
     }
 
