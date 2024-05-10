@@ -74,12 +74,6 @@ public class MemberController {
             log.info(tokenInfo.getRefreshToken());
 
             storeTokenInBody(response, result, tokenInfo);
-
-            // 세션에 memberid 저장
-            // TODO session 사용하는 부분 보고 날리기
-            HttpSession session = request.getSession();
-            session.setAttribute("memberid", memberLogin.getMemberId());
-
         }
         // Child 타입으로 로그인 하는 경우
         else {
@@ -238,16 +232,7 @@ public class MemberController {
         } catch (Exception e) {
             return addErrorStatus(result);
         }
-        boolean isLogoutSuccess = memberService.logout(requestToken);
-
-        HttpSession session = request.getSession(false);
-
-        if (isLogoutSuccess) {
-            if (session != null) {
-                session.removeAttribute("memberid"); // 세션에서 memberid 삭제
-                session.invalidate(); // 세션 무효화
-            }
-
+        if (memberService.logout(requestToken)) {
             return addOkStatus(result);
         }
         return addErrorStatus(result);
