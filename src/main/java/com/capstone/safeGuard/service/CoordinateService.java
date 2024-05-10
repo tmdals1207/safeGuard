@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -60,4 +61,13 @@ public class CoordinateService {
         return true;
     }
 
+    public ArrayList<Coordinate> readAreasByChild(String childName) {
+        Child foundChild = childRepository.findBychildName(childName);
+
+        ArrayList<Coordinate> foundCoordinates = coordinateRepository.findAllByChild(foundChild);
+        if(foundCoordinates.isEmpty()){
+            return null;
+        }
+        return foundCoordinates;
+    }
 }

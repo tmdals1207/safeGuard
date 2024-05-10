@@ -44,22 +44,22 @@ public class EmergencyService {
     }
 
     private boolean isNeighbor(double latitude, double longitude, double memberLatitude, double memberLongitude, int length) {
-        double x_distance = latitude - memberLatitude;
-        double y_distance = longitude - memberLongitude;
+        double latitudeDistance = latitude - memberLatitude;
+        double longitudeDistance = longitude - memberLongitude;
 
         // 좌표 -> km
-        double distance = convertCoordinateToKm(x_distance, y_distance);
+        double distance = convertCoordinateToKm(latitudeDistance, longitudeDistance);
 
         return distance <= (length);
     }
 
-    private double convertCoordinateToKm(double x_coordinate, double y_coordinate) {
+    private double convertCoordinateToKm(double latitudeDistance, double longitudeDistance) {
         // 위도 35~38도(한국) 기준으로
         // 대략 위도는 1도당 111km, 경도는 1도당 89km
-        double x_km = 111 * x_coordinate;
-        double y_km = 89 * y_coordinate;
+        double latitudeKm = 111 * latitudeDistance;
+        double longitudeKm = 89 * longitudeDistance;
 
-        return Math.sqrt( (x_km * x_km) + (y_km * y_km) );
+        return Math.sqrt( (latitudeKm * latitudeKm) + (longitudeKm * longitudeKm) );
     }
 
     public void saveEmergency(String sentMessage, String receiverId, EmergencyRequestDTO emergencyRequestDto) {
