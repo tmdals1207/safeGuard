@@ -4,6 +4,7 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
+import com.capstone.safeGuard.dto.request.findidandresetpw.EmailRequestDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
 import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
@@ -261,9 +262,9 @@ public class MemberController {
     // 비밀번호 확인을 위한 이메일 인증 1
     // 인증번호 전송
     @PostMapping("/verification-email-request")
-    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody String id) {
+    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody EmailRequestDTO dto) {
         Map<String, String> result = new HashMap<>();
-        if(! memberService.sendCodeToEmail(id)){
+        if(! memberService.sendCodeToEmail(dto.getInputId())){
             // 해당 아이디가 존재하지 않음
             return addErrorStatus(result);
         }
