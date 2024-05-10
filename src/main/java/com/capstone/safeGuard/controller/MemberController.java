@@ -76,6 +76,7 @@ public class MemberController {
             storeTokenInBody(response, result, tokenInfo);
 
             // 세션에 memberid 저장
+            // TODO session 사용하는 부분 보고 날리기
             HttpSession session = request.getSession();
             session.setAttribute("memberid", memberLogin.getMemberId());
 

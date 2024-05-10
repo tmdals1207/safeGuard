@@ -15,6 +15,7 @@ public class AddAreaDTO {
     private double xOfPointD;
     private double yOfPointD;
 
+    // TODO member마다 저장하도록 변경
     private String childName;
     private String memberID;
 
