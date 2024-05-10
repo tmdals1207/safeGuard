@@ -16,4 +16,7 @@ public class SignUpRequestDTO {
     @NotBlank
     private String inputPW;
     private String fcmToken;
+    public String toString(){
+        return inputID +inputName +"가입 완료!";
+    }
 }

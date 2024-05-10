@@ -99,3 +99,9 @@ CREATE TABLE jwt_token (
                            is_black_list TINYINT NOT NULL,
                            PRIMARY KEY (token_id)
 );
+CREATE TABLE mem_fcm_key (
+                             id BIGINT NOT NULL AUTO_INCREMENT,
+                             member_id VARCHAR(255) NOT NULL,
+                             fcm_token VARCHAR(500) NOT NULL,
+                             PRIMARY KEY (id)
+);
