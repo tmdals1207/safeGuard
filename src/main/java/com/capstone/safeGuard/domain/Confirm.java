@@ -1,5 +1,6 @@
 package com.capstone.safeGuard.domain;
 
+import com.google.firebase.messaging.Notification;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @RequiredArgsConstructor
 @Table(name = "confirm")
-public class Confirm {
+public class Confirm  {
     @Id
     private long confirmId;
     private String title;

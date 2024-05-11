@@ -5,9 +5,9 @@ import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
 import com.capstone.safeGuard.dto.request.findidandresetpw.*;
+import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
 import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
-import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
 import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
@@ -283,7 +283,7 @@ public class MemberController {
     }
 
     @PostMapping("/find-child-list")
-    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody GetMemberIdDTO dto) {
+    public ResponseEntity<Map<String, String>> findChildNameList(@Validated @RequestBody GetMemberIdDTO dto) {
         return getChildList(dto.getMemberId());
     }
 
@@ -367,6 +367,5 @@ public class MemberController {
         }
         return addErrorStatus(result);
     }
-
 
 }

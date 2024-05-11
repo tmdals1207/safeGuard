@@ -63,6 +63,7 @@ dependencies {
 
 	// firebase
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
 }
 
 tasks.named('test') {
