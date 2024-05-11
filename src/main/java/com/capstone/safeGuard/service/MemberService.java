@@ -71,6 +71,12 @@ public class MemberService {
             return false;
         }
 
+        String email = dto.getInputEmail();
+        if(checkEmailDuplicate(email)) {
+            log.info("Email Duplicate");
+            return false;
+        }
+
         Member member = new Member();
         member.setMemberId(dto.getInputID());
         member.setEmail(dto.getInputEmail());
@@ -84,6 +90,9 @@ public class MemberService {
         return true;
     }
 
+    public boolean checkEmailDuplicate(String email) {
+        return memberRepository.existsByEmail(email);
+    }
 
     public Boolean childSignUp(ChildSignUpRequestDTO childDto) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(childDto.getChildName()));
