@@ -4,10 +4,7 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
-import com.capstone.safeGuard.dto.request.findidandresetpw.EmailRequestDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
+import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
@@ -285,14 +282,14 @@ public class MemberController {
         return addOkStatus(result);
     }
 
-    @PostMapping("/find-child-id-list")
-    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody String memberId) {
-        return getChildList(memberId);
+    @PostMapping("/find-child-list")
+    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody GetMemberIdDTO dto) {
+        return getChildList(dto.getMemberId());
     }
 
     @PostMapping("/chose-child-form")
-    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
-        return getChildList(memberId);
+    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody GetMemberIdDTO dto){
+        return getChildList(dto.getMemberId());
     }
 
     @PostMapping("/chose-child")
