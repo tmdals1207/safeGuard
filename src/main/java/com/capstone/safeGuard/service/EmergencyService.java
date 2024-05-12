@@ -121,7 +121,7 @@ public class EmergencyService {
         Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
         String token = foundMember.getFcmToken();
 
-        // 2. dto의 childId를 이용해서 보내는 child의 정보를 가져오기
+        // 2. dto의 childName을 이용해서 보내는 child의 정보를 가져오기
         Child foundChild = childRepository.findBychildName(dto.getChildName());
         if (foundChild == null) {
             throw new NoSuchElementException();

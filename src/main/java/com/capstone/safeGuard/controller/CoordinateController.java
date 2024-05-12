@@ -1,9 +1,10 @@
 package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Coordinate;
-import com.capstone.safeGuard.dto.reponse.ReadAreaResponseDTO;
+import com.capstone.safeGuard.dto.response.ReadAreaResponseDTO;
 import com.capstone.safeGuard.dto.request.coordinate.AddAreaDTO;
 import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
+import com.capstone.safeGuard.dto.request.coordinate.GetChildNameDTO;
 import com.capstone.safeGuard.service.CoordinateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -54,12 +55,12 @@ public class CoordinateController {
         return addOkStatus(result);
     }
 
-    @PostMapping("read-areas")
-    public ResponseEntity<Map<String, ReadAreaResponseDTO>> readAreas(@RequestBody String childName){
+    @PostMapping("/read-areas")
+    public ResponseEntity<Map<String, ReadAreaResponseDTO>> readAreas(@RequestBody GetChildNameDTO dto){
         HashMap<String, ReadAreaResponseDTO> result = new HashMap<>();
 
         // 1. childID에 저장되어 있는 coordinate 불러오기
-        ArrayList<Coordinate> coordinates = coordinateService.readAreasByChild(childName);
+        ArrayList<Coordinate> coordinates = coordinateService.readAreasByChild(dto.getChildName());
 
         // 2. responseDTO로 변경
         for (Coordinate coordinate : coordinates) {
