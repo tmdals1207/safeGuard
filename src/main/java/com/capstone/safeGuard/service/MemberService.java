@@ -161,6 +161,15 @@ public class MemberService {
         return true;
     }
 
+    public Boolean memberRemove(String memberId) {
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            return false;
+        }
+        memberRepository.delete(member.get());
+        return true;
+    }
+
     public Boolean childRemove(String childName) {
         Child selectedChild = childRepository.findBychildName(childName);
         if (selectedChild == null) {
