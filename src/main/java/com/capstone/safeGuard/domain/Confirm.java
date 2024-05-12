@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @RequiredArgsConstructor
 @Table(name = "confirm")
-public class Confirm {
+public class Confirm  {
     @Id
     private long confirmId;
     private String title;
