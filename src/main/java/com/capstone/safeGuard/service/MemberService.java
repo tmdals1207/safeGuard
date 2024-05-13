@@ -93,7 +93,6 @@ public class MemberService {
         log.info(childDto.getMemberId());
         log.info(childDto.getChildName());
         log.info(childDto.getChildPassword());
-        log.info(String.valueOf(childDto.getChildId()));
 
         Child child = new Child();
         child.setChildName(childDto.getChildName());

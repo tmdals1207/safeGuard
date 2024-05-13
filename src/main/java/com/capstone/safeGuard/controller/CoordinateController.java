@@ -59,7 +59,7 @@ public class CoordinateController {
     public ResponseEntity<Map<String, ReadAreaResponseDTO>> readAreas(@RequestBody GetChildNameDTO dto){
         HashMap<String, ReadAreaResponseDTO> result = new HashMap<>();
 
-        // 1. childID에 저장되어 있는 coordinate 불러오기
+        // 1. child에 저장되어 있는 coordinate 불러오기
         ArrayList<Coordinate> coordinates = coordinateService.readAreasByChild(dto.getChildName());
 
         // 2. responseDTO로 변경
