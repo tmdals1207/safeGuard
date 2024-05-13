@@ -13,7 +13,7 @@ public interface ChildRepository extends JpaRepository<Child, Long> {
     public Child findByChildName(String name); // child_name 사용
 
     @Query(value = "SELECT parent.parent_id from child childRow " +
-            "LEFT JOIN parenting parent ON parent.child_id = childRow.child_id " +
+            "LEFT JOIN parenting parent ON parent.child_name = childRow.child_name " +
             "WHERE childRow.child_name = :childName ", nativeQuery = true)
     public List<String> findAllMemberByChildName(@Param("childName") String childName);
 
