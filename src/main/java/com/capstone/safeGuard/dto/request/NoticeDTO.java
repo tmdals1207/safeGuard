@@ -23,8 +23,6 @@ public class NoticeDTO {
     private String content;
     @NotBlank
     private NoticeLevel noticeLevel;
-    @NotBlank
-    private long childId;
 
     private LocalDateTime createdAt;
 }

@@ -18,14 +18,15 @@ public class Member {
     private String memberId;
     private String name;
     private String password;
+
     private String email;
 
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
     private String fcmToken;
 

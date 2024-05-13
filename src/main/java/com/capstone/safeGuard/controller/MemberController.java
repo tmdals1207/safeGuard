@@ -4,9 +4,8 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
-import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
+import com.capstone.safeGuard.dto.request.findidandresetpw.*;
+import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
 import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
@@ -27,7 +26,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,11 +72,6 @@ public class MemberController {
             log.info(tokenInfo.getRefreshToken());
 
             storeTokenInBody(response, result, tokenInfo);
-
-            // 세션에 memberid 저장
-            HttpSession session = request.getSession();
-            session.setAttribute("memberid", memberLogin.getMemberId());
-
         }
         // Child 타입으로 로그인 하는 경우
         else {
@@ -90,6 +83,9 @@ public class MemberController {
             // child가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfChild(childLogin);
             storeTokenInBody(response, result, tokenInfo);
+
+            HttpSession session = request.getSession();
+            session.setAttribute("childName", childLogin.getChildName());
         }
         return ResponseEntity.ok().body(result);
     }
@@ -108,21 +104,22 @@ public class MemberController {
     }
 
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
+    public ResponseEntity<Map<String, String>> memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            log.info("bindingResult = {}", bindingResult);
-            log.info("실패 binding error ");
-            return ResponseEntity.status(400).build();
+        HashMap<String, String> result = new HashMap<>();
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return addErrorStatus(result);
         }
 
         Boolean signUpSuccess = memberService.signup(dto);
         if (!signUpSuccess) {
             log.info("signupFail = {}", signUpSuccess);
-            return ResponseEntity.status(400).build();
+            return addErrorStatus(result);
         }
         log.info("signup success = {}", signUpSuccess);
-        return ResponseEntity.ok().build();
+        return addOkStatus(result);
     }
 
     @GetMapping("/childsignup")
@@ -131,33 +128,16 @@ public class MemberController {
     }
 
     @PostMapping(value = "/childsignup", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO dto,
-                                      BindingResult bindingResult, HttpServletRequest request) {
+    public ResponseEntity childSignUp(@Validated @RequestBody ChildSignUpRequestDTO childDto,
+                                      BindingResult bindingResult) {
+        log.info("childSignup 실행");
 
-        if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            StringBuilder errorMessage = new StringBuilder();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getDefaultMessage()).append("\n");
-            }
-            return ResponseEntity.badRequest().body(null);
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        //로그인 하고 있는 member의 id를 가져옴
-        HttpSession session = request.getSession(false); // 새로운 세션을 생성하지 않음
-        Boolean signUpSuccess;
-        if (session != null) {
-            String memberId = (String) session.getAttribute("memberid");
-            if (memberId != null) {
-                signUpSuccess = memberService.childSignUp(dto, memberId);
-            } else {
-                return ResponseEntity.status(400).build();
-            }
-        } else {
-            return ResponseEntity.status(400).build();
-        }
-
-
+        Boolean signUpSuccess = memberService.childSignUp(childDto);
         if (!signUpSuccess) {
             log.info("signupFail = {}", signUpSuccess);
             return ResponseEntity.status(400).build();
@@ -173,7 +153,7 @@ public class MemberController {
 
     @PostMapping("/childremove")
     public ResponseEntity childRemove(@Validated @RequestBody Map<String, String> requestBody,
-                                      HttpServletRequest request, BindingResult bindingResult) {
+                                       BindingResult bindingResult) {
 
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
@@ -192,8 +172,8 @@ public class MemberController {
     }
 
     @PostMapping("/addhelper")
-    public ResponseEntity addHelper(@Validated @RequestBody Map<String, String> requestBody,
-                                    HttpServletRequest request, BindingResult bindingResult) {
+    public ResponseEntity addHelper(@Validated @RequestBody AddMemberDto addMemberDto,
+                                    BindingResult bindingResult) {
 
 
         String errorMessage = memberService.validateBindingError(bindingResult);
@@ -201,30 +181,33 @@ public class MemberController {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        String childName = requestBody.get("childName");
-
-        HttpSession session = request.getSession();
-        session.setAttribute("selectedChildName", childName);
-
-
-        session = request.getSession(false); // 새로운 세션을 생성하지 않음
-        String memberId = (String) session.getAttribute("memberid");
-        Boolean addSuccess;
-        if (session != null) {
-            if (childName != null) {
-                addSuccess = memberService.addHelper(memberId, childName);
-            } else {
-                return ResponseEntity.status(400).build();
-            }
-        } else {
-            return ResponseEntity.status(400).build();
-        }
+        Boolean addSuccess = memberService.addHelper(addMemberDto);
 
         if (!addSuccess) {
             log.info("add Fail = {}", addSuccess);
             return ResponseEntity.status(400).build();
         }
         log.info("add success = {}", addSuccess);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/helperremove")
+    public ResponseEntity helperRemove(@Validated @RequestBody Map<String, String> requestBody,
+                                      BindingResult bindingResult) {
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
+        String helperName = requestBody.get("helperName");
+
+        Boolean RemoveSuccess = memberService.helperRemove(helperName);
+        if (!RemoveSuccess) {
+            return ResponseEntity.status(400).build();
+        }
+
+        log.info("헬퍼 삭제 성공!");
         return ResponseEntity.ok().build();
     }
 
@@ -237,16 +220,7 @@ public class MemberController {
         } catch (Exception e) {
             return addErrorStatus(result);
         }
-        boolean isLogoutSuccess = memberService.logout(requestToken);
-
-        HttpSession session = request.getSession(false);
-
-        if (isLogoutSuccess) {
-            if (session != null) {
-                session.removeAttribute("memberid"); // 세션에서 memberid 삭제
-                session.invalidate(); // 세션 무효화
-            }
-
+        if (memberService.logout(requestToken)) {
             return addOkStatus(result);
         }
         return addErrorStatus(result);
@@ -275,9 +249,9 @@ public class MemberController {
     // 비밀번호 확인을 위한 이메일 인증 1
     // 인증번호 전송
     @PostMapping("/verification-email-request")
-    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody String id) {
+    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody EmailRequestDTO dto) {
         Map<String, String> result = new HashMap<>();
-        if(! memberService.sendCodeToEmail(id)){
+        if(! memberService.sendCodeToEmail(dto.getInputId())){
             // 해당 아이디가 존재하지 않음
             return addErrorStatus(result);
         }
@@ -309,14 +283,14 @@ public class MemberController {
         return addOkStatus(result);
     }
 
-    @PostMapping("/find-child-id-list")
-    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody String memberId) {
-        return getChildList(memberId);
+    @PostMapping("/find-child-list")
+    public ResponseEntity<Map<String, String>> findChildNameList(@Validated @RequestBody GetMemberIdDTO dto) {
+        return getChildList(dto.getMemberId());
     }
 
     @PostMapping("/chose-child-form")
-    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
-        return getChildList(memberId);
+    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody GetMemberIdDTO dto){
+        return getChildList(dto.getMemberId());
     }
 
     @PostMapping("/chose-child")
@@ -394,6 +368,5 @@ public class MemberController {
         }
         return addErrorStatus(result);
     }
-
 
 }

@@ -16,30 +16,29 @@ import java.util.List;
 @Table(name = "child")
 public class Child {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long childId;
     private String childName;
+
     private String childPassword;
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Parenting> parentingList;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Helping> helpingList;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Coordinate> livingAreas;
 
-    @OneToMany(mappedBy = "child")
+    @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Coordinate> forbiddenAreas;
 

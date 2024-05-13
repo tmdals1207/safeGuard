@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 public class EmergencyRequestDTO {
     private String senderId;
     private String childName;
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
     private final String title = "주변 아이에게 도움이 필요합니다.";
 
