@@ -122,6 +122,31 @@ public class MemberController {
         return addOkStatus(result);
     }
 
+    @GetMapping("/memberremove")
+    public String showMemberRemoveForm() {
+        return "login";
+    }
+
+    @PostMapping("/memberremove")
+    public ResponseEntity memberRemove(@Validated @RequestBody Map<String, String> requestBody,
+                                      BindingResult bindingResult) {
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
+        String memberId = requestBody.get("memberId");
+
+        Boolean RemoveSuccess = memberService.memberRemove(memberId);
+        if (!RemoveSuccess) {
+            return ResponseEntity.status(400).build();
+        }
+
+        log.info("멤버 삭제 성공!");
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/childsignup")
     public String showChildSignUpForm() {
         return "group";
