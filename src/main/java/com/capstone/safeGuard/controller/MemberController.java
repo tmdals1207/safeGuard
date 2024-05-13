@@ -4,12 +4,10 @@ import com.capstone.safeGuard.domain.Authority;
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
-import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
-import com.capstone.safeGuard.dto.request.findidandresetpw.VerificationEmailDTO;
+import com.capstone.safeGuard.dto.request.findidandresetpw.*;
+import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
 import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
-import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
 import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
@@ -74,11 +72,6 @@ public class MemberController {
             log.info(tokenInfo.getRefreshToken());
 
             storeTokenInBody(response, result, tokenInfo);
-
-            // 세션에 memberid 저장
-            HttpSession session = request.getSession();
-            session.setAttribute("memberid", memberLogin.getMemberId());
-
         }
         // Child 타입으로 로그인 하는 경우
         else {
@@ -111,21 +104,22 @@ public class MemberController {
     }
 
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
+    public ResponseEntity<Map<String, String>> memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
+        HashMap<String, String> result = new HashMap<>();
 
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
-            return ResponseEntity.badRequest().body(errorMessage);
+            return addErrorStatus(result);
         }
 
         Boolean signUpSuccess = memberService.signup(dto);
         if (!signUpSuccess) {
             log.info("signupFail = {}", signUpSuccess);
-            return ResponseEntity.status(400).build();
+            return addErrorStatus(result);
         }
         log.info("signup success = {}", signUpSuccess);
-        return ResponseEntity.ok().build();
+        return addOkStatus(result);
     }
 
     @GetMapping("/memberremove")
@@ -251,16 +245,7 @@ public class MemberController {
         } catch (Exception e) {
             return addErrorStatus(result);
         }
-        boolean isLogoutSuccess = memberService.logout(requestToken);
-
-        HttpSession session = request.getSession(false);
-
-        if (isLogoutSuccess) {
-            if (session != null) {
-                session.removeAttribute("memberid"); // 세션에서 memberid 삭제
-                session.invalidate(); // 세션 무효화
-            }
-
+        if (memberService.logout(requestToken)) {
             return addOkStatus(result);
         }
         return addErrorStatus(result);
@@ -289,9 +274,9 @@ public class MemberController {
     // 비밀번호 확인을 위한 이메일 인증 1
     // 인증번호 전송
     @PostMapping("/verification-email-request")
-    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody String id) {
+    public ResponseEntity<Map<String, String>> verificationEmailRequest(@RequestBody EmailRequestDTO dto) {
         Map<String, String> result = new HashMap<>();
-        if(! memberService.sendCodeToEmail(id)){
+        if(! memberService.sendCodeToEmail(dto.getInputId())){
             // 해당 아이디가 존재하지 않음
             return addErrorStatus(result);
         }
@@ -323,14 +308,14 @@ public class MemberController {
         return addOkStatus(result);
     }
 
-    @PostMapping("/find-child-id-list")
-    public ResponseEntity<Map<String, String>> findChildIdList(@Validated @RequestBody String memberId) {
-        return getChildList(memberId);
+    @PostMapping("/find-child-list")
+    public ResponseEntity<Map<String, String>> findChildNameList(@Validated @RequestBody GetMemberIdDTO dto) {
+        return getChildList(dto.getMemberId());
     }
 
     @PostMapping("/chose-child-form")
-    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody String memberId){
-        return getChildList(memberId);
+    public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody GetMemberIdDTO dto){
+        return getChildList(dto.getMemberId());
     }
 
     @PostMapping("/chose-child")
@@ -408,6 +393,5 @@ public class MemberController {
         }
         return addErrorStatus(result);
     }
-
 
 }

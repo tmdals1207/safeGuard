@@ -1,4 +1,4 @@
-package com.capstone.safeGuard.dto.reponse;
+package com.capstone.safeGuard.dto.response;
 
 import lombok.Builder;
 

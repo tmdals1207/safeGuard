@@ -28,8 +28,6 @@ public class Notice {
 
     private LocalDateTime createdAt;
 
-    public void setChild(long childId) {
-    }
     public void changeTitle(String title){
         this.title=title;
     }
