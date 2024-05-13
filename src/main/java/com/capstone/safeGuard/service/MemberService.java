@@ -93,7 +93,6 @@ public class MemberService {
         log.info(childDto.getMemberId());
         log.info(childDto.getChildName());
         log.info(childDto.getChildPassword());
-        log.info(String.valueOf(childDto.getChildId()));
 
         Child child = new Child();
         child.setChildName(childDto.getChildName());
@@ -216,24 +215,24 @@ public class MemberService {
     }
 
     private String childNamesBuilder(List<Parenting> parentingList) {
-        StringBuilder childIds = new StringBuilder();
+        StringBuilder childNames = new StringBuilder();
         int index = 0;
 
-        childIds.append("{");
+        childNames.append("{");
         for (Parenting parenting : parentingList) {
-            childIds.append("\"ChildName")
+            childNames.append("\"ChildName")
                     .append(index+1)
                     .append("\" : \"")
                     .append(parenting.getChild().getChildName())
                     .append("\"");
 
             if(index < parentingList.size() - 1){
-                childIds.append(",");
+                childNames.append(",");
             }
         }
-        childIds.append("}");
+        childNames.append("}");
 
-        return childIds.toString();
+        return childNames.toString();
     }
 
     public boolean sendCodeToEmail(String memberId) {

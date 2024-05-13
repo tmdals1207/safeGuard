@@ -1,6 +1,5 @@
 package com.capstone.safeGuard.domain;
 
-import com.google.firebase.messaging.Notification;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -104,21 +104,22 @@ public class MemberController {
     }
 
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
+    public ResponseEntity<Map<String, String>> memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
+        HashMap<String, String> result = new HashMap<>();
 
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
-            return ResponseEntity.badRequest().body(errorMessage);
+            return addErrorStatus(result);
         }
 
         Boolean signUpSuccess = memberService.signup(dto);
         if (!signUpSuccess) {
             log.info("signupFail = {}", signUpSuccess);
-            return ResponseEntity.status(400).build();
+            return addErrorStatus(result);
         }
         log.info("signup success = {}", signUpSuccess);
-        return ResponseEntity.ok().build();
+        return addOkStatus(result);
     }
 
     @GetMapping("/childsignup")

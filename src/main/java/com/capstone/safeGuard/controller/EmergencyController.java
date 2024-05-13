@@ -3,7 +3,9 @@ package com.capstone.safeGuard.controller;
 import com.capstone.safeGuard.domain.Comment;
 import com.capstone.safeGuard.domain.Emergency;
 import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
+import com.capstone.safeGuard.dto.request.emergency.EmergencyIdDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
+import com.capstone.safeGuard.dto.request.emergency.MemberIdDTO;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -62,24 +64,24 @@ public class EmergencyController {
     }
 
     @PostMapping("/sent-emergency")
-    public ResponseEntity<Map<String, String>> showSentEmergency(@RequestBody String memberId){
-        List<Emergency> sentEmergencyList = emergencyService.getSentEmergency(memberId);
+    public ResponseEntity<Map<String, String>> showSentEmergency(@RequestBody MemberIdDTO dto){
+        List<Emergency> sentEmergencyList = emergencyService.getSentEmergency(dto.getMemberId());
 
         HashMap<String, String> result = addEmergencyList(sentEmergencyList);
         if (result == null) {
-            return addErrorStatus(result);
+            return addErrorStatus(new HashMap<String, String>());
         }
 
         return addOkStatus(result);
     }
 
     @PostMapping("/recieved-emergency")
-    public ResponseEntity<Map<String, String>> showReceivedEmergency(@RequestBody String memberId){
-        List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(memberId);
+    public ResponseEntity<Map<String, String>> showReceivedEmergency(@RequestBody MemberIdDTO dto){
+        List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
 
         HashMap<String, String> result = addEmergencyList(sentEmergencyList);
         if (result == null) {
-            return addErrorStatus(result);
+            return addErrorStatus(new HashMap<String, String>());
         }
 
         return addOkStatus(result);
@@ -97,10 +99,10 @@ public class EmergencyController {
     }
 
     @PostMapping("/emergency-detail")
-    public ResponseEntity<Map<String, String>> emergencyDetail(@RequestBody String emergencyId){
+    public ResponseEntity<Map<String, String>> emergencyDetail(@RequestBody EmergencyIdDTO dto){
         HashMap<String, String> result = new HashMap<>();
 
-        Emergency emergency  = emergencyService.getEmergencyDetail(emergencyId);
+        Emergency emergency  = emergencyService.getEmergencyDetail(dto.getEmergencyId());
         if(emergency == null){
             return addErrorStatus(result);
         }
