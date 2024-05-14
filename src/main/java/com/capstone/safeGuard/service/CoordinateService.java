@@ -7,6 +7,7 @@ import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.CoordinateRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CoordinateService {
     private final CoordinateRepository coordinateRepository;
     private final ChildRepository childRepository;
@@ -28,6 +30,8 @@ public class CoordinateService {
 
         foundChild.getForbiddenAreas()
                 .add(addAreaDTO.dtoToDomain(foundChild, false));
+
+        log.info("addForbiddenArea 성공 ");
         return true;
     }
 
@@ -41,6 +45,7 @@ public class CoordinateService {
         foundChild.getForbiddenAreas()
                 .add(addAreaDTO.dtoToDomain(foundChild, true));
 
+        log.info("addLivingArea 성공 ");
         return true;
     }
 
