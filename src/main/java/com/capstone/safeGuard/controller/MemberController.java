@@ -236,6 +236,15 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    //로그인한 멤버의 자식(그룹)들을 찾아서 반환
+    @PostMapping("/group")
+    public List<Child> showChildList (@Validated @RequestBody Map<String, String> requestBody) {
+
+        String memberId = requestBody.get("memberId");
+
+        return memberService.getChildList(memberId);
+    }
+
     @GetMapping("/member-logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
         Map<String, String> result = new HashMap<>();

@@ -196,6 +196,23 @@ public class MemberService {
         return true;
     }
 
+    public List<Child> getChildList(String memberId) {
+        Optional<Member> loginedMember = memberRepository.findById(memberId);
+        if (loginedMember.isEmpty()) {
+            return null;
+        }
+        Member member = loginedMember.get();
+
+        List<Child> childList = new ArrayList<>();
+        for (Parenting parenting : member.getParentingList()) {
+
+            if (Objects.equals(parenting.getParent().getMemberId(), member.getMemberId())) {
+                childList.add(parenting.getChild());
+            }
+        }
+        return childList;
+    }
+
     public String validateBindingError(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
@@ -373,4 +390,6 @@ public class MemberService {
 
         return true;
     }
+
+
 }
