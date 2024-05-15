@@ -16,7 +16,6 @@ public class AddAreaDTO {
     private double yOfPointD;
 
     private String childName;
-    private String memberID;
 
     public Coordinate dtoToDomain(Child child, boolean isLiving) {
         return Coordinate.builder()
