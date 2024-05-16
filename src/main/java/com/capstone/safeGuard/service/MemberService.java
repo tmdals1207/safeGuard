@@ -373,4 +373,12 @@ public class MemberService {
 
         return true;
     }
+
+    public boolean isPresent(String id, boolean flag) {
+        if(flag){
+           return memberRepository.findById(id).isPresent();
+        }
+
+        return childRepository.findBychildName(id) != null;
+    }
 }
