@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConfirmService {
     private final ChildRepository childRepository;
-    private final FirebaseMessaging firebaseMessaging;
+//    private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
 
     public boolean sendConfirm(Member sender, Child child) {
@@ -32,26 +32,26 @@ public class ConfirmService {
         }
 
         // 2. child의 모든 parent에게 알림 전송
-        for (Parenting parenting : parentingList) {
-            Member parent = parenting.getParent();
-
-            // parent_token를 찾기
-            String parentMemberId= parent.getMemberId();
-            List<String> parentToken = fcmTokenRepository.findAllTokenByMemberId(parentMemberId);
-
-            try {
-                for (String tokenItem : parentToken) {
-                    Message msg = Message.builder()
-                            .setToken(tokenItem)
-                            .setNotification(new Notification("Confirm", "Children arrived"))
-                            .build();
-                    firebaseMessaging.send(msg);
-                }
-            } catch (FirebaseMessagingException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
+//        for (Parenting parenting : parentingList) {
+//            Member parent = parenting.getParent();
+//
+//            // parent_token를 찾기
+//            String parentMemberId= parent.getMemberId();
+//            List<String> parentToken = fcmTokenRepository.findAllTokenByMemberId(parentMemberId);
+//
+//            try {
+//                for (String tokenItem : parentToken) {
+//                    Message msg = Message.builder()
+//                            .setToken(tokenItem)
+//                            .setNotification(new Notification("Confirm", "Children arrived"))
+//                            .build();
+//                    firebaseMessaging.send(msg);
+//                }
+//            } catch (FirebaseMessagingException e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//        }
 
         return true;
     }

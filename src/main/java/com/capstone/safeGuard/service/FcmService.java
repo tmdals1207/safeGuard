@@ -17,21 +17,21 @@ import java.util.List;
 public class FcmService {
 
     private final ChildRepository childRepository;
-    private final FirebaseMessaging firebaseMessaging;
+//    private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
 
     void sendFcm(List<String> token) {
-        try {
-            for (String tokenItem : token) {
-                Message msg = Message.builder()
-                        .setToken(tokenItem)
-                        .setNotification(new Notification("Warning", "Children are not in the safe zone"))
-                        .build();
-                firebaseMessaging.send(msg);
-            }
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            for (String tokenItem : token) {
+//                Message msg = Message.builder()
+//                        .setToken(tokenItem)
+//                        .setNotification(new Notification("Warning", "Children are not in the safe zone"))
+//                        .build();
+//                firebaseMessaging.send(msg);
+//            }
+//        } catch (FirebaseMessagingException e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 
