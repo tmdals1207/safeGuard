@@ -332,6 +332,7 @@ public class MemberService {
         return childNameList;
     }
 
+    @Transactional
     public boolean resetChildPassword(ResetPasswordDTO dto) {
         Child foundChild = childRepository.findBychildName(dto.getId());
 
