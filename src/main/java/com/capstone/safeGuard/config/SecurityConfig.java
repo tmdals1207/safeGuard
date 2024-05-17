@@ -32,7 +32,8 @@ public class SecurityConfig {
             "/verification-email-request", "/verification-email",
             "/reset-member-password", "/chose-child-form", "/chose-child",
             "/add-safe", "/add-dangerous", "/delete-area", "/read-areas",
-            "/childremove", "/addhelper", "/helperremove"
+            "/childremove", "/addhelper", "/helperremove",
+            "/duplicate-check-child", "/duplicate-check-member"
     };
 
     @Bean
