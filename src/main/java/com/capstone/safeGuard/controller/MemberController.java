@@ -38,6 +38,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
+    private final NoticeController noticeController;
 
     @GetMapping("/login")
     public String showLoginForm() {
@@ -342,6 +343,7 @@ public class MemberController {
             return addErrorStatus(result);
         }
         if(memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
+            noticeController.sendNotice(dto.getId());
             return addOkStatus(result);
         }
         return addErrorStatus(result);

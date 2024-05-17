@@ -382,4 +382,16 @@ public class MemberService {
 
         return childRepository.findBychildName(id) != null;
     }
+
+    public Child findChildByChildName(String childName) {
+        return childRepository.findBychildName(childName);
+    }
+
+    public Member findParentByChild(Child foundChild) {
+        return foundChild
+                .getParentingList()
+                .stream()
+                .findFirst()
+                .get().getParent();
+    }
 }

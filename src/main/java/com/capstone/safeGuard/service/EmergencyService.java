@@ -78,7 +78,6 @@ public class EmergencyService {
     }
 
     public boolean sendNotificationTo(String receiverId, EmergencyRequestDTO dto) {
-        // TODO member에게 알림 보내기 테스트
         String message = makeMessage(receiverId, dto);
         RestTemplate restTemplate = new RestTemplate();
 
@@ -91,7 +90,7 @@ public class EmergencyService {
         }
 
         HttpEntity entity = new HttpEntity<>(message, headers);
-        // TODO 여기 fcm 경로 재설정 필요
+        // TODO 여기 fcm 경로
         String API_URL = "https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send";
 
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
@@ -105,8 +104,8 @@ public class EmergencyService {
     }
 
     private String getAccessToken() throws IOException {
-//        String firebaseConfigPath = "firebase/safeguard-2f704-firebase-adminsdk-pmiwx-0bced8bb31.json";
-        String firebaseConfigPath = "auth_fcm.json";
+        String firebaseConfigPath = "firebase/safeguard-2f704-firebase-adminsdk-pmiwx-0bced8bb31.json";
+//        String firebaseConfigPath = "auth_fcm.json";
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
@@ -160,7 +159,6 @@ public class EmergencyService {
         return foundEmergency;
     }
 
-    // TODO 받은 emergency 및 comment 조회 테스트
     public List<Emergency> getReceivedEmergency(String memberId) {
         List<Emergency> result = new ArrayList<>();
 
