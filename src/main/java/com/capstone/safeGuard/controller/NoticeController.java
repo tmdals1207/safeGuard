@@ -27,6 +27,58 @@ public class NoticeController {
     public ResponseEntity<Map<String, String>> sendNotice(String childName) {
         Map<String, String> result = new HashMap<>();
         Child foundChild = memberService.findChildByChildName(childName);
+        if (foundChild == null) {
+            result.put("message", "해당하는 아이가 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+
+        double[] childPosition = {foundChild.getLatitude(), foundChild.getLongitude()};
+        String currentStatus = "일반구역";
+
+        // 위험 구역 점검
+        for (Coordinate forbiddenArea : foundChild.getForbiddenAreas()) {
+            double[][] polygon = {
+                    {forbiddenArea.getXOfNorthWest(), forbiddenArea.getYOfNorthWest()},
+                    {forbiddenArea.getXOfNorthEast(), forbiddenArea.getYOfNorthEast()},
+                    {forbiddenArea.getXOfSouthEast(), forbiddenArea.getYOfSouthEast()},
+                    {forbiddenArea.getXOfSouthWest(), forbiddenArea.getYOfSouthWest()}
+            };
+
+            if (isPointInPolygon(polygon, childPosition)) {
+                currentStatus = "위험구역";
+                break;
+            }
+        }
+
+        // 안전 구역 점검
+        if (!currentStatus.equals("위험구역")) {
+            for (Coordinate livingArea : foundChild.getLivingAreas()) {
+                double[][] polygon = {
+                        {livingArea.getXOfNorthWest(), livingArea.getYOfNorthWest()},
+                        {livingArea.getXOfNorthEast(), livingArea.getYOfNorthEast()},
+                        {livingArea.getXOfSouthEast(), livingArea.getYOfSouthEast()},
+                        {livingArea.getXOfSouthWest(), livingArea.getYOfSouthWest()}
+                };
+
+                if (isPointInPolygon(polygon, childPosition)) {
+                    currentStatus = "안전구역";
+                    break;
+                }
+            }
+        }
+
+        // 구역 변경 시 FCM 메시지 전송
+        if (currentStatus.equals("위험구역") && !"위험구역".equals(foundChild.getLastStatus())) {
+            sendNoticeToMember("parentId", childName, NoticeLevel.WARN, "아이가 위험구역에 있습니다.");
+        } else if ((currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) && "위험구역".equals(foundChild.getLastStatus())) {
+            sendNoticeToMember("parentId", childName, NoticeLevel.INFO, "아이가 안전구역 또는 일반구역으로 이동했습니다.");
+        }
+
+        // 마지막 상태 갱신
+        foundChild.setLastStatus(currentStatus);
+
+        result.put("status", currentStatus);
+        result.put("message", currentStatus.equals("위험구역") ? "아이가 위험구역에 있습니다." : currentStatus.equals("안전구역") ? "아이가 안전 구역에 있습니다." : "아이가 일반 구역에 있습니다.");
         return ResponseEntity.ok(result);
     }
 
