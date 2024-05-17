@@ -332,6 +332,7 @@ public class MemberService {
         return childNameList;
     }
 
+    @Transactional
     public boolean resetChildPassword(ResetPasswordDTO dto) {
         Child foundChild = childRepository.findBychildName(dto.getId());
 
@@ -372,5 +373,25 @@ public class MemberService {
         foundChild.setLongitude(longitude);
 
         return true;
+    }
+
+    public boolean isPresent(String id, boolean flag) {
+        if(flag){
+           return memberRepository.findById(id).isPresent();
+        }
+
+        return childRepository.findBychildName(id) != null;
+    }
+
+    public Child findChildByChildName(String childName) {
+        return childRepository.findBychildName(childName);
+    }
+
+    public Member findParentByChild(Child foundChild) {
+        return foundChild
+                .getParentingList()
+                .stream()
+                .findFirst()
+                .get().getParent();
     }
 }

@@ -31,6 +31,8 @@ public class CoordinateService {
         foundChild.getForbiddenAreas()
                 .add(addAreaDTO.dtoToDomain(foundChild, false));
 
+        coordinateRepository.save(addAreaDTO.dtoToDomain(foundChild, false));
+
         log.info("addForbiddenArea 성공 ");
         return true;
     }
@@ -44,6 +46,8 @@ public class CoordinateService {
 
         foundChild.getForbiddenAreas()
                 .add(addAreaDTO.dtoToDomain(foundChild, true));
+
+        coordinateRepository.save(addAreaDTO.dtoToDomain(foundChild, true));
 
         log.info("addLivingArea 성공 ");
         return true;
