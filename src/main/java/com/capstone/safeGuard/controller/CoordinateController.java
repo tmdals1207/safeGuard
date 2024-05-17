@@ -7,6 +7,7 @@ import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
 import com.capstone.safeGuard.dto.request.coordinate.GetChildNameDTO;
 import com.capstone.safeGuard.service.CoordinateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class CoordinateController {
     private final CoordinateService coordinateService;
 
@@ -25,10 +27,13 @@ public class CoordinateController {
     public ResponseEntity<Map<String, String>> addLivingArea(@RequestBody AddAreaDTO dto){
         HashMap<String, String> result = new HashMap<>();
 
+        log.info("add-safe 받았음");
         if(! coordinateService.addLivingArea(dto)){
+            log.info("add-safe 실패");
             return addErrorStatus(result);
         }
 
+        log.info("add-safe 성공");
         return addOkStatus(result);
     }
 
@@ -37,10 +42,13 @@ public class CoordinateController {
     public ResponseEntity<Map<String, String>> addForbiddenArea(@RequestBody AddAreaDTO dto){
         HashMap<String, String> result = new HashMap<>();
 
+        log.info("add-dangerous 받았음");
         if(! coordinateService.addForbiddenArea(dto)){
+            log.info("add-dangerous 실패");
             return addErrorStatus(result);
         }
 
+        log.info("add-dangerous 성공");
         return addOkStatus(result);
     }
 
