@@ -70,6 +70,7 @@ public class MemberController {
             TokenInfo tokenInfo = generateTokenOfMember(memberLogin);
             storeTokenInBody(response, result, tokenInfo);
             result.put("Type", "Member");
+            // TODO status add
         }
         // Child 타입으로 로그인 하는 경우
         else {
