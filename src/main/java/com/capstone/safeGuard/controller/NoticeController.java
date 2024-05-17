@@ -83,6 +83,13 @@ public class NoticeController {
     }
 
     private boolean sendNoticeToMember(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
+        //TODO fcmsercive와 연동 필요
+        fcmService.sendFcm(receiverId, noticeLevel.name(), message);
+
+        // notice 저장
+        //TODO notice 수정 필요
+        Notice notice = new Notice(receiverId, childName, noticeLevel, message);
+        noticeRepository.save(notice);
 
         return true;
     }
