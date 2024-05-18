@@ -18,6 +18,7 @@ public class Notice {
     private long noticeId;
     private String title;
     private String content;
+    private String receiverId;
 
     @Column(name = "level")
     @Enumerated(EnumType.STRING)

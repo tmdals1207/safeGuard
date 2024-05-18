@@ -7,6 +7,7 @@ import com.capstone.safeGuard.domain.NoticeLevel;
 import com.capstone.safeGuard.repository.NoticeRepository;
 import com.capstone.safeGuard.service.FcmService;
 import com.capstone.safeGuard.service.MemberService;
+import com.capstone.safeGuard.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.Map;
 @Slf4j
 public class NoticeController {
     private final MemberService memberService;
+    private final NoticeService noticeService;
     private final FcmService fcmService;
     private final NoticeRepository noticeRepository;
 
@@ -86,12 +88,8 @@ public class NoticeController {
         //TODO fcmsercive와 연동 필요
         fcmService.sendFcm(receiverId, noticeLevel.name(), message);
 
-        // notice 저장
-        //TODO notice 수정 필요
-        Notice notice = new Notice(receiverId, childName, noticeLevel, message);
-        noticeRepository.save(notice);
-
-        return true;
+        Boolean saveNotice = noticeService.createNotice(receiverId, childName, noticeLevel, message);
+        return saveNotice != null;
     }
 
     public static boolean isPointInPolygon(double[][] polygon, double[] point) {
