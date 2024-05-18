@@ -1,9 +1,11 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.*;
+import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Helping;
+import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.request.confirm.SendConfirmRequest;
-import com.capstone.safeGuard.repository.ConfirmRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
+import com.capstone.safeGuard.service.ConfirmService;
 import com.capstone.safeGuard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ import java.util.Optional;
 @Slf4j
 public class ConfirmController {
     private final MemberService memberService;
-    private final ConfirmRepository confirmRepository;
     private final MemberRepository memberRepository;
+    private final ConfirmService confirmService;
 
     @PostMapping("/send-confirm")
     public ResponseEntity<Map<String, String>> sendConfirm(@RequestBody SendConfirmRequest dto) {
@@ -68,27 +69,11 @@ public class ConfirmController {
         // TODO fcm을 이용한 sendConfirm
 
         // confirm 저장
-        saveConfirm(child, helping, confirmType);
+        confirmService.saveConfirm(child, helping, confirmType);
         return true;
     }
 
-    private void saveConfirm(Child child, Helping helping, String confirmType) {
 
-        Confirm confirm = new Confirm();
-        if( confirmType.equals("ARRIVED") ){
-            confirm.setConfirmType(ConfirmType.ARRIVED);
-        } else if( confirmType.equals("DEPART") ){
-            confirm.setConfirmType(ConfirmType.DEPART);
-        } else {
-            confirm.setConfirmType(ConfirmType.UNCONFIRMED);
-        }
-        confirm.setChild(child);
-        confirm.setTitle("");
-        confirm.setContent("");
-        confirm.setCreatedAt(LocalDateTime.now());
-        confirm.setHelping_id(helping);
-        confirmRepository.save(confirm);
-    }
 
 
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
