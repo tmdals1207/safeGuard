@@ -38,6 +38,7 @@ public class TrackingLocationController {
         return ResponseEntity.ok("Success");
     }
 
+    //notify call 경우
     private boolean needNotify(double latLocate, double longLocate) {
         return random.nextBoolean();
     }

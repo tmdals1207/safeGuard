@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Table(name = "confirm")
 public class Confirm  {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long confirmId;
     private String title;
     private String content;

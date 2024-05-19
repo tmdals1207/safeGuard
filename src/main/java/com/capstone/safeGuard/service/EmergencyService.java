@@ -137,7 +137,7 @@ public class EmergencyService {
                                 .title(dto.getTitle())
                                 .body(body)
                                 .build()
-                        ).build()).validateOnly(false).build();
+                         ).build()).validateOnly(false).build();
 
         try {
             return om.writeValueAsString(fcmMessageDto);

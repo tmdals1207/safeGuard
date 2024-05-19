@@ -14,7 +14,7 @@ CREATE TABLE child (
                        child_password VARCHAR(255) NOT NULL,
                        latitude DOUBLE NOT NULL,
                        longitude DOUBLE NOT NULL,
-                       PRIMARY KEY (child_id)
+                       PRIMARY KEY (child_name)
 );
 
 CREATE TABLE parenting (
