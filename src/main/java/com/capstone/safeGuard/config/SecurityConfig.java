@@ -31,7 +31,7 @@ public class SecurityConfig {
             "/find-member-id", "/find-child-id-list",
             "/verification-email-request", "/verification-email",
             "/reset-member-password", "/chose-child-form", "/chose-child",
-            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas",
+            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas", "/update-coordinate",
             "/childremove", "/addhelper", "/helperremove",
             "/duplicate-check-child", "/duplicate-check-member",
             "/send-confirm", "/fatal",
