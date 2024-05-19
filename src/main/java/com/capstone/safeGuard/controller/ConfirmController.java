@@ -72,7 +72,6 @@ public class ConfirmController {
             return false;
         }
 
-        // TODO fcm을 이용한 sendConfirm
         return confirmService.sendNotificationTo(receiverId, confirm);
     }
 

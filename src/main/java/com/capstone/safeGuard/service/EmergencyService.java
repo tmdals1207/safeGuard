@@ -90,7 +90,6 @@ public class EmergencyService {
         }
 
         HttpEntity entity = new HttpEntity<>(message, headers);
-        // TODO 여기 fcm 경로
         String API_URL = "https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send";
 
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
