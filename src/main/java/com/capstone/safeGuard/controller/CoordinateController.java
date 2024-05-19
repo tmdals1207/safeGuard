@@ -29,12 +29,24 @@ public class CoordinateController {
         HashMap<String, String> result = new HashMap<>();
 
         log.info("add-safe 받았음");
-        if(! coordinateService.addLivingArea(dto)){
+        log.info("Received add-safe request");
+        log.info("xOfPointA: " + dto.getXOfPointA());
+        log.info("yOfPointA: " + dto.getYOfPointA());
+        log.info("xOfPointB: " + dto.getXOfPointB());
+        log.info("yOfPointB: " + dto.getYOfPointB());
+        log.info("xOfPointC: " + dto.getXOfPointC());
+        log.info("yOfPointC: " + dto.getYOfPointC());
+        log.info("xOfPointD: " + dto.getXOfPointD());
+        log.info("yOfPointD: " + dto.getYOfPointD());
+        log.info("childName: " + dto.getChildName());
+        Long areaId = coordinateService.addLivingArea(dto);
+        if(areaId == 0L){
             log.info("add-safe 실패");
             return addErrorStatus(result);
         }
 
         log.info("add-safe 성공");
+        result.put("area id", areaId.toString());
         return addOkStatus(result);
     }
 
@@ -44,12 +56,14 @@ public class CoordinateController {
         HashMap<String, String> result = new HashMap<>();
 
         log.info("add-dangerous 받았음");
-        if(! coordinateService.addForbiddenArea(dto)){
+        Long areaId = coordinateService.addForbiddenArea(dto);
+        if(areaId == 0L){
             log.info("add-dangerous 실패");
             return addErrorStatus(result);
         }
 
         log.info("add-dangerous 성공");
+        result.put("area id", areaId.toString());
         return addOkStatus(result);
     }
 

@@ -2,9 +2,9 @@ package com.capstone.safeGuard.dto.request.coordinate;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Coordinate;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class AddAreaDTO {
     private double xOfPointA;
     private double yOfPointA;

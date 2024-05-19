@@ -26,34 +26,35 @@ public class NoticeService {
         Notice notice = new Notice();
         notice.setChild(child);
         notice.setNoticeLevel(noticeLevel);
+        // TODO 제목, 내용 적기
         notice.setTitle("");
         notice.setContent("");
         notice.setCreatedAt(LocalDateTime.now());
         noticeRepository.save(notice);
     }
 
-    public Boolean createNotice(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
-        Notice notice = new Notice();
-        notice.setTitle("Title");
-        notice.setContent("Content");
-        notice.setReceiverId(receiverId);
-
-        if(! memberRepository.existsByMemberId(receiverId)) {
-            return false;
-        }
-        notice.setNoticeLevel(noticeLevel);
-
-        Child child = childRepository.findByChildName(childName);
-
-        if (child == null) {
-            return false;
-        }
-        notice.setChild(child);
-        notice.setCreatedAt(LocalDateTime.now());
-
-        noticeRepository.save(notice);
-
-        return true;
-
-    }
+//    public Boolean createNotice(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
+//        Notice notice = new Notice();
+//        notice.setTitle("Title");
+//        notice.setContent("Content");
+//        notice.setReceiverId(receiverId);
+//
+//        if(! memberRepository.existsByMemberId(receiverId)) {
+//            return false;
+//        }
+//        notice.setNoticeLevel(noticeLevel);
+//
+//        Child child = childRepository.findByChildName(childName);
+//
+//        if (child == null) {
+//            return false;
+//        }
+//        notice.setChild(child);
+//        notice.setCreatedAt(LocalDateTime.now());
+//
+//        noticeRepository.save(notice);
+//
+//        return true;
+//
+//    }
 }
