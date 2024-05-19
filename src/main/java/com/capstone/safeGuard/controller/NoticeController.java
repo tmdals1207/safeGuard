@@ -90,8 +90,7 @@ public class NoticeController {
         for (Parenting parenting : parentingList) {
             Notice notice = noticeService.createNotice(parenting.getParent().getMemberId(),
                     child.getChildName(),
-                    noticeLevel,
-                    "");
+                    noticeLevel);
             if (notice == null){
                 return false;
             }

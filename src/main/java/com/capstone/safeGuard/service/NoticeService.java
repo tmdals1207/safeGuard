@@ -34,11 +34,10 @@ public class NoticeService {
     private final ChildRepository childRepository;
 
     @Transactional
-    public Notice createNotice(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
+    public Notice createNotice(String receiverId, String childName, NoticeLevel noticeLevel) {
         Notice notice = new Notice();
-        // TODO 제목, 내용 적기
-        notice.setTitle("Title");
-        notice.setContent("Content");
+        notice.setTitle(noticeLevel.name());
+        notice.setContent("아이 이름 : " + childName);
         notice.setReceiverId(receiverId);
 
         if(! memberRepository.existsByMemberId(receiverId)) {
@@ -90,16 +89,13 @@ public class NoticeService {
         Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
         String token = foundMember.getFcmToken();
 
-        // 2. dto의 childName을 이용해서 보내는 child의 정보를 가져오기
-        String body = "아이 이름 : " + notice.getChild().getChildName();
-
         ObjectMapper om = new ObjectMapper();
         FcmMessageDTO fcmMessageDto = FcmMessageDTO.builder()
                 .message(FcmMessageDTO.Message.builder()
                         .token(token)
                         .notification(FcmMessageDTO.Notification.builder()
                                 .title(notice.getTitle())
-                                .body(body)
+                                .body(notice.getContent())
                                 .build()
                         ).build()).validateOnly(false).build();
         try {

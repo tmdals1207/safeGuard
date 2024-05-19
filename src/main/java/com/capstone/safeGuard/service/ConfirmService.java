@@ -38,10 +38,10 @@ public class ConfirmService {
         } else {
             confirm.setConfirmType(ConfirmType.UNCONFIRMED);
         }
+
         confirm.setChild(child);
-        // TODO 제목, 내용 적기
-        confirm.setTitle("");
-        confirm.setContent("");
+        confirm.setTitle(confirmType);
+        confirm.setContent("아이 이름 : " + child.getChildName());
         confirm.setCreatedAt(LocalDateTime.now());
         confirm.setHelping_id(helping);
         confirmRepository.save(confirm);
@@ -80,16 +80,13 @@ public class ConfirmService {
         Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
         String token = foundMember.getFcmToken();
 
-        // 2. dto의 childName을 이용해서 보내는 child의 정보를 가져오기
-        String body = "아이 이름 : " + confirm.getChild().getChildName();
-
         ObjectMapper om = new ObjectMapper();
         FcmMessageDTO fcmMessageDto = FcmMessageDTO.builder()
                 .message(FcmMessageDTO.Message.builder()
                         .token(token)
                         .notification(FcmMessageDTO.Notification.builder()
                                 .title(confirm.getTitle())
-                                .body(body)
+                                .body(confirm.getContent())
                                 .build()
                         ).build()).validateOnly(false).build();
         try {

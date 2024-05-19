@@ -47,8 +47,7 @@ dependencies {
 	//security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-crypto'
-	// TODO 물어보기
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.4.5'
+	//implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.4.5'
 
 
 	// jwt
@@ -62,9 +61,8 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
 
 	// firebase
-	// implementation 'com.google.firebase:firebase-admin:9.2.0'
-	// TODO 물어보기
-	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	//implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
 }
 
 tasks.named('test') {
