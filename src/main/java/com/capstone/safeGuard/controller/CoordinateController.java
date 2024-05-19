@@ -23,6 +23,7 @@ import java.util.Map;
 public class CoordinateController {
     private final CoordinateService coordinateService;
 
+    // TODO 저장 시에 0으로 저장되는 에러 해결
     @PostMapping("/add-safe")
     public ResponseEntity<Map<String, String>> addLivingArea(@RequestBody AddAreaDTO dto){
         HashMap<String, String> result = new HashMap<>();
