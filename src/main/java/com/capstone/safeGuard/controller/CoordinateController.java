@@ -1,10 +1,10 @@
 package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Coordinate;
-import com.capstone.safeGuard.dto.response.ReadAreaResponseDTO;
 import com.capstone.safeGuard.dto.request.coordinate.AddAreaDTO;
 import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
 import com.capstone.safeGuard.dto.request.coordinate.GetChildNameDTO;
+import com.capstone.safeGuard.dto.response.ReadAreaResponseDTO;
 import com.capstone.safeGuard.service.CoordinateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,22 +23,11 @@ import java.util.Map;
 public class CoordinateController {
     private final CoordinateService coordinateService;
 
-    // TODO 저장 시에 0으로 저장되는 에러 해결
     @PostMapping("/add-safe")
     public ResponseEntity<Map<String, String>> addLivingArea(@RequestBody AddAreaDTO dto){
         HashMap<String, String> result = new HashMap<>();
 
         log.info("add-safe 받았음");
-        log.info("Received add-safe request");
-        log.info("xOfPointA: " + dto.getXOfPointA());
-        log.info("yOfPointA: " + dto.getYOfPointA());
-        log.info("xOfPointB: " + dto.getXOfPointB());
-        log.info("yOfPointB: " + dto.getYOfPointB());
-        log.info("xOfPointC: " + dto.getXOfPointC());
-        log.info("yOfPointC: " + dto.getYOfPointC());
-        log.info("xOfPointD: " + dto.getXOfPointD());
-        log.info("yOfPointD: " + dto.getYOfPointD());
-        log.info("childName: " + dto.getChildName());
         Long areaId = coordinateService.addLivingArea(dto);
         if(areaId == 0L){
             log.info("add-safe 실패");

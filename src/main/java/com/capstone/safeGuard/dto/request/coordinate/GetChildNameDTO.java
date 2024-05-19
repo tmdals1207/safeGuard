@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class GetChildNameDTO {
-    private String childName;
+    public String childName;
 }

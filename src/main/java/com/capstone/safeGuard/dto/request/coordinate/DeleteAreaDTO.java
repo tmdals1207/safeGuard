@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class DeleteAreaDTO {
-    private String areaID;
-    private String childName;
-    private String memberID;
+    public String areaID;
+    public String childName;
+    public String memberID;
 }

@@ -2,18 +2,20 @@ package com.capstone.safeGuard.dto.request.coordinate;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Coordinate;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class AddAreaDTO {
-    private double xOfPointA;
-    private double yOfPointA;
-    private double xOfPointB;
-    private double yOfPointB;
-    private double xOfPointC;
-    private double yOfPointC;
-    private double xOfPointD;
-    private double yOfPointD;
+    public double xOfPointA;
+    public double yOfPointA;
+    public double xOfPointB;
+    public double yOfPointB;
+    public double xOfPointC;
+    public double yOfPointC;
+    public double xOfPointD;
+    public double yOfPointD;
 
     private String childName;
 
