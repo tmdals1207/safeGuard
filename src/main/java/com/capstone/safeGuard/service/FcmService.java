@@ -24,14 +24,13 @@ public class FcmService {
     private final ChildRepository childRepository;
     private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
-    private final NoticeRepository noticeRepository;
 
-    void sendFcm(List<String> token) {
+    void sendFcm(List<String> token,String title,String body) {
         try {
             for (String tokenItem : token) {
                 Message msg = Message.builder()
                         .setToken(tokenItem)
-                        .setNotification(new Notification("warning", "Children are not in the safe zone"))
+                        .setNotification(new Notification(title,body))
                         .build();
                 firebaseMessaging.send(msg);
             }
@@ -43,7 +42,7 @@ public class FcmService {
 
     public void sendNoticeReport(String childUserName) {
         List<String> parentUserNames = childRepository.findAllMemberByChildName(childUserName);
-        sendFcm(findFcmToken(parentUserNames));
+        sendFcm(findFcmToken(parentUserNames),"warning", "Children are not in the safe zone");
     }
 
     private List<String> findFcmToken(List<String> member) {
@@ -54,17 +53,9 @@ public class FcmService {
         }
         return token;
     }
-    private Notice createNotice( String childName, String memberId){
-        Child child= childRepository.findByChildName(childName);
-        Notice notice= new Notice();
-        String title="";
-        NoticeLevel noticeLevel =NoticeLevel.INFO;
-        notice.setTitle(title);
-        notice.setCreatedAt(LocalDateTime.now());
-        notice.setNoticeLevel(noticeLevel);
-        notice.setChild(child);
-        noticeRepository.save(notice);
-        return notice;
+    public void sendFcm(String receiverId, String title, String message) {
+        List<String> tokens = fcmTokenRepository.findAllTokenByMemberId(receiverId);
+        sendFcm(tokens, title, message);
     }
 
 }
