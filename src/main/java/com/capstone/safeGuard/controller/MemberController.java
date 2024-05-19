@@ -343,7 +343,7 @@ public class MemberController {
             return addErrorStatus(result);
         }
         if(memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
-            noticeController.sendNotice(dto.getId());
+//            noticeController.sendNotice(dto.getId());
             return addOkStatus(result);
         }
         return addErrorStatus(result);

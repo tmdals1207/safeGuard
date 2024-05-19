@@ -3,7 +3,6 @@ package com.capstone.safeGuard.controller;
 import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.fatal.FatalRequest;
 import com.capstone.safeGuard.repository.ChildRepository;
-import com.capstone.safeGuard.repository.NoticeRepository;
 import com.capstone.safeGuard.service.MemberService;
 import com.capstone.safeGuard.service.NoticeService;
 import lombok.RequiredArgsConstructor;
