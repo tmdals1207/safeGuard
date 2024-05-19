@@ -73,9 +73,6 @@ public class ConfirmController {
         return true;
     }
 
-
-
-
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
         result.put("status", "200");
         return ResponseEntity.ok().body(result);

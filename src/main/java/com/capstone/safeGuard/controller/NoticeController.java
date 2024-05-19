@@ -4,14 +4,21 @@ import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Coordinate;
 import com.capstone.safeGuard.domain.NoticeLevel;
 import com.capstone.safeGuard.domain.Parenting;
+import com.capstone.safeGuard.dto.request.fatal.FatalRequest;
+import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.NoticeRepository;
 import com.capstone.safeGuard.service.MemberService;
 import com.capstone.safeGuard.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,6 +27,7 @@ public class NoticeController {
     private final MemberService memberService;
     private final NoticeService noticeService;
     private final NoticeRepository noticeRepository;
+    private final ChildRepository childRepository;
 
     public String sendNotice(String childName) {
         Child foundChild = memberService.findChildByChildName(childName);
@@ -91,7 +99,7 @@ public class NoticeController {
         // TODO fcm을 이용한 sendNotice
 
         // notice 저장
-        noticeService.saveNotice(child, noticeLevel);
+        noticeService.createNotice(receiverId, child.getChildName(), noticeLevel, "");
 
         return true;
     }
@@ -114,6 +122,31 @@ public class NoticeController {
         }
 
         return inside;
+    }
+
+    @PostMapping("/fatal")
+    public ResponseEntity<Map<String, String>> fatal(@RequestBody FatalRequest dto) {
+        Map<String, String> result = new HashMap<>();
+        Child foundChild = childRepository.findBychildName(dto.getChildName());
+
+        List<Parenting> childParentingList = foundChild.getParentingList();
+        for (Parenting parenting : childParentingList) {
+            if(! sendNoticeToMember(parenting.getParent().getMemberId(), foundChild, NoticeLevel.FATAL)){
+                return addErrorStatus(result);
+            }
+        }
+
+        return addOkStatus(result);
+    }
+
+    private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
+        result.put("status", "200");
+        return ResponseEntity.ok().body(result);
+    }
+
+    private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
+        result.put("status", "400");
+        return ResponseEntity.status(400).body(result);
     }
 }
 

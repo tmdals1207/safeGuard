@@ -33,7 +33,8 @@ public class SecurityConfig {
             "/reset-member-password", "/chose-child-form", "/chose-child",
             "/add-safe", "/add-dangerous", "/delete-area", "/read-areas",
             "/childremove", "/addhelper", "/helperremove",
-            "/duplicate-check-child", "/duplicate-check-member"
+            "/duplicate-check-child", "/duplicate-check-member",
+            "/send-confirm", "/fatal",
     };
 
     @Bean
