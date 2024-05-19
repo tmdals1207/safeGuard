@@ -21,19 +21,17 @@ public class NoticeService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
 
-    @Transactional
-    public void saveNotice(Child child, NoticeLevel noticeLevel) {
-        Notice notice = new Notice();
-        notice.setChild(child);
-        notice.setNoticeLevel(noticeLevel);
-        // TODO 제목, 내용 적기
-        notice.setTitle("");
-        notice.setContent("");
-        notice.setCreatedAt(LocalDateTime.now());
-        noticeRepository.save(notice);
+    public boolean sendNotificationTo(Notice notice){
+        // TODO fcm을 이용한 sendNotice
+
+
+
+        return true;
     }
 
-    public Boolean createNotice(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
+
+    @Transactional
+    public Notice createNotice(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
         Notice notice = new Notice();
         // TODO 제목, 내용 적기
         notice.setTitle("Title");
@@ -41,21 +39,20 @@ public class NoticeService {
         notice.setReceiverId(receiverId);
 
         if(! memberRepository.existsByMemberId(receiverId)) {
-            return false;
+            return null;
         }
         notice.setNoticeLevel(noticeLevel);
 
         Child child = childRepository.findByChildName(childName);
 
         if (child == null) {
-            return false;
+            return null;
         }
         notice.setChild(child);
         notice.setCreatedAt(LocalDateTime.now());
 
         noticeRepository.save(notice);
 
-        return true;
-
+        return notice;
     }
 }

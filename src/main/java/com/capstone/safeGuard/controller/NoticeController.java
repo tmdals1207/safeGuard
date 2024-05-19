@@ -1,9 +1,6 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Coordinate;
-import com.capstone.safeGuard.domain.NoticeLevel;
-import com.capstone.safeGuard.domain.Parenting;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.fatal.FatalRequest;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.repository.NoticeRepository;
@@ -26,7 +23,6 @@ import java.util.Map;
 public class NoticeController {
     private final MemberService memberService;
     private final NoticeService noticeService;
-    private final NoticeRepository noticeRepository;
     private final ChildRepository childRepository;
 
     public String sendNotice(String childName) {
@@ -54,7 +50,7 @@ public class NoticeController {
         }
 
         // 안전 구역 점검
-        if (! currentStatus.equals("위험구역")) {
+        if (!currentStatus.equals("위험구역")) {
             for (Coordinate livingArea : foundChild.getLivingAreas()) {
                 double[][] polygon = {
                         {livingArea.getXOfNorthWest(), livingArea.getYOfNorthWest()},
@@ -73,19 +69,15 @@ public class NoticeController {
         List<Parenting> childParentingList = foundChild.getParentingList();
         // 구역 변경 시 FCM 메시지 전송
         if (currentStatus.equals("위험구역") && !"위험구역".equals(foundChild.getLastStatus())) {
-            for (Parenting parenting : childParentingList) {
-                if(! sendNoticeToMember(parenting.getParent().getMemberId(), foundChild, NoticeLevel.WARN)){
-                    return "에러 : 전송 실패";
-                }
+            if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.WARN)) {
+                return "에러 : 전송 실패";
             }
             // 마지막 상태 갱신
             foundChild.setLastStatus(currentStatus);
             return "전송 완료";
         } else if ((currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) && "위험구역".equals(foundChild.getLastStatus())) {
-            for (Parenting parenting : childParentingList) {
-                if(! sendNoticeToMember(parenting.getParent().getMemberId(), foundChild, NoticeLevel.INFO)){
-                    return "에러 : 전송 실패";
-                }
+            if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.INFO)) {
+                return "에러 : 전송 실패";
             }
             // 마지막 상태 갱신
             foundChild.setLastStatus(currentStatus);
@@ -95,11 +87,17 @@ public class NoticeController {
         return null;
     }
 
-    public boolean sendNoticeToMember(String receiverId, Child child, NoticeLevel noticeLevel) {
-        // TODO fcm을 이용한 sendNotice
-
-        // notice 저장
-        noticeService.createNotice(receiverId, child.getChildName(), noticeLevel, "");
+    public boolean sendNoticeToMember(List<Parenting> parentingList, Child child, NoticeLevel noticeLevel) {
+        for (Parenting parenting : parentingList) {
+            Notice notice = noticeService.createNotice(parenting.getParent().getMemberId(),
+                    child.getChildName(),
+                    noticeLevel,
+                    "");
+            if (notice == null){
+                return false;
+            }
+            return noticeService.sendNotificationTo(notice);
+        }
 
         return true;
     }
@@ -130,10 +128,8 @@ public class NoticeController {
         Child foundChild = childRepository.findBychildName(dto.getChildName());
 
         List<Parenting> childParentingList = foundChild.getParentingList();
-        for (Parenting parenting : childParentingList) {
-            if(! sendNoticeToMember(parenting.getParent().getMemberId(), foundChild, NoticeLevel.FATAL)){
-                return addErrorStatus(result);
-            }
+        if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.FATAL)) {
+            return addErrorStatus(result);
         }
 
         return addOkStatus(result);

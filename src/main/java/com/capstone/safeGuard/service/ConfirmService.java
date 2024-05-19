@@ -19,7 +19,7 @@ public class ConfirmService {
     private final ConfirmRepository confirmRepository;
 
     @Transactional
-    public void saveConfirm(Child child, Helping helping, String confirmType) {
+    public Confirm saveConfirm(Child child, Helping helping, String confirmType) {
         Confirm confirm = new Confirm();
         if( confirmType.equals("ARRIVED") ){
             confirm.setConfirmType(ConfirmType.ARRIVED);
@@ -35,5 +35,15 @@ public class ConfirmService {
         confirm.setCreatedAt(LocalDateTime.now());
         confirm.setHelping_id(helping);
         confirmRepository.save(confirm);
+
+        return confirm;
+    }
+
+    public boolean sendNotificationTo(String receiverId, Confirm confirm){
+        // TODO fcm을 이용한 sendNotice
+
+
+
+        return true;
     }
 }

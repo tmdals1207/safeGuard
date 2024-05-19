@@ -1,6 +1,7 @@
 package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Confirm;
 import com.capstone.safeGuard.domain.Helping;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.request.confirm.SendConfirmRequest;
@@ -66,11 +67,13 @@ public class ConfirmController {
     }
 
     private boolean sendConfirmToMember(String receiverId, Child child, Helping helping, String confirmType) {
-        // TODO fcm을 이용한 sendConfirm
+        Confirm confirm = confirmService.saveConfirm(child, helping, confirmType);
+        if(confirm == null){
+            return false;
+        }
 
-        // confirm 저장
-        confirmService.saveConfirm(child, helping, confirmType);
-        return true;
+        // TODO fcm을 이용한 sendConfirm
+        return confirmService.sendNotificationTo(receiverId, confirm);
     }
 
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
