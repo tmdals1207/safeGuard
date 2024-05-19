@@ -30,7 +30,10 @@ public class SecurityConfig {
             "/childsignup", "/check-auth", "/member-logout",
             "/find-member-id", "/find-child-id-list",
             "/verification-email-request", "/verification-email",
-            "/reset-member-password", "/chose-child-form", "/chose-child"
+            "/reset-member-password", "/chose-child-form", "/chose-child",
+            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas",
+            "/childremove", "/addhelper", "/helperremove",
+            "/duplicate-check-child", "/duplicate-check-member"
     };
 
     @Bean

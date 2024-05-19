@@ -5,10 +5,7 @@ import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
 import com.capstone.safeGuard.dto.request.findidandresetpw.*;
-import com.capstone.safeGuard.dto.request.signupandlogin.AddMemberDto;
-import com.capstone.safeGuard.dto.request.signupandlogin.ChildSignUpRequestDTO;
-import com.capstone.safeGuard.dto.request.signupandlogin.LoginRequestDTO;
-import com.capstone.safeGuard.dto.request.signupandlogin.SignUpRequestDTO;
+import com.capstone.safeGuard.dto.request.signupandlogin.*;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
@@ -41,6 +38,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
+    private final NoticeController noticeController;
 
     @GetMapping("/login")
     public String showLoginForm() {
@@ -52,6 +50,9 @@ public class MemberController {
                                                      BindingResult bindingResult,
                                                      HttpServletResponse response,
                                                      HttpServletRequest request) {
+        log.info(dto.getEditTextID());
+        log.info(dto.getLoginType());
+
         Map<String, String> result = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
@@ -67,11 +68,8 @@ public class MemberController {
 
             // member가 존재하는 경우 token을 전달
             TokenInfo tokenInfo = generateTokenOfMember(memberLogin);
-            log.info(tokenInfo.getGrantType());
-            log.info(tokenInfo.getAccessToken());
-            log.info(tokenInfo.getRefreshToken());
-
             storeTokenInBody(response, result, tokenInfo);
+            result.put("Type", "Member");
         }
         // Child 타입으로 로그인 하는 경우
         else {
@@ -86,8 +84,9 @@ public class MemberController {
 
             HttpSession session = request.getSession();
             session.setAttribute("childName", childLogin.getChildName());
+            result.put("Type", "Child");
         }
-        return ResponseEntity.ok().body(result);
+        return addOkStatus(result);
     }
 
     private void storeTokenInBody(HttpServletResponse response, Map<String, String> result, TokenInfo tokenInfo) {
@@ -104,20 +103,49 @@ public class MemberController {
     }
 
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
+    public ResponseEntity<Map<String, String>> memberSignUp(@Validated @RequestBody SignUpRequestDTO dto,
                                        BindingResult bindingResult) {
+        log.info(dto.getInputID());
+        log.info(dto.getInputName());
+
+        HashMap<String, String> result = new HashMap<>();
+
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return addErrorStatus(result);
+        }
+
+        Boolean signUpSuccess = memberService.signup(dto);
+        if (!signUpSuccess) {
+            log.info("signupFail = {}", signUpSuccess);
+            return addErrorStatus(result);
+        }
+        log.info("signup success = {}", signUpSuccess);
+        return addOkStatus(result);
+    }
+
+    @GetMapping("/memberremove")
+    public String showMemberRemoveForm() {
+        return "login";
+    }
+
+    @PostMapping("/memberremove")
+    public ResponseEntity memberRemove(@Validated @RequestBody Map<String, String> requestBody,
+                                      BindingResult bindingResult) {
 
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        Boolean signUpSuccess = memberService.signup(dto);
-        if (!signUpSuccess) {
-            log.info("signupFail = {}", signUpSuccess);
+        String memberId = requestBody.get("memberId");
+
+        Boolean RemoveSuccess = memberService.memberRemove(memberId);
+        if (!RemoveSuccess) {
             return ResponseEntity.status(400).build();
         }
-        log.info("signup success = {}", signUpSuccess);
+
+        log.info("멤버 삭제 성공!");
         return ResponseEntity.ok().build();
     }
 
@@ -304,6 +332,43 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/update-coordinate")
+    public ResponseEntity<Map<String, String>> updateCoordinate(@RequestBody UpdateCoordinateDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(dto.getType().equals("Member")){
+            if (memberService.updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
+                return addOkStatus(result);
+            }
+            return addErrorStatus(result);
+        }
+        if(memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
+            noticeController.sendNotice(dto.getId());
+            return addOkStatus(result);
+        }
+        return addErrorStatus(result);
+    }
+
+    @PostMapping("/duplicate-check-member")
+    public ResponseEntity<Map<String, String>> duplicateCheckMember(@RequestBody GetIdDTO dto){
+        Map<String, String> result = new HashMap<>();
+        if(memberService.isPresent(dto.getId(), true)){
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
+    @PostMapping("/duplicate-check-child")
+    public ResponseEntity<Map<String, String>> duplicateCheckChild(@RequestBody GetIdDTO dto){
+        Map<String, String> result = new HashMap<>();
+        if(memberService.isPresent(dto.getId(), false)){
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
     private ResponseEntity<Map<String, String>> getChildList(String memberId) {
         Map<String, String> result = new HashMap<>();
 
@@ -351,21 +416,4 @@ public class MemberController {
                 Collections.singleton(new SimpleGrantedAuthority(Authority.ROLE_CHILD.toString())));
         return jwtTokenProvider.generateToken(authentication);
     }
-
-    @PostMapping("/update-coordinate")
-    public ResponseEntity<Map<String, String>> updateCoordinate(@RequestBody UpdateCoordinateDTO dto){
-        Map<String, String> result = new HashMap<>();
-
-        if(dto.getType().equals("Member")){
-            if (memberService.updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
-                return addOkStatus(result);
-            }
-            return addErrorStatus(result);
-        }
-        if(memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())){
-            return addOkStatus(result);
-        }
-        return addErrorStatus(result);
-    }
-
 }

@@ -71,6 +71,12 @@ public class MemberService {
             return false;
         }
 
+        String email = dto.getInputEmail();
+        if(checkEmailDuplicate(email)) {
+            log.info("Email Duplicate");
+            return false;
+        }
+
         Member member = new Member();
         member.setMemberId(dto.getInputID());
         member.setEmail(dto.getInputEmail());
@@ -84,6 +90,9 @@ public class MemberService {
         return true;
     }
 
+    public boolean checkEmailDuplicate(String email) {
+        return memberRepository.existsByEmail(email);
+    }
 
     public Boolean childSignUp(ChildSignUpRequestDTO childDto) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(childDto.getChildName()));
@@ -93,7 +102,6 @@ public class MemberService {
         log.info(childDto.getMemberId());
         log.info(childDto.getChildName());
         log.info(childDto.getChildPassword());
-        log.info(String.valueOf(childDto.getChildId()));
 
         Child child = new Child();
         child.setChildName(childDto.getChildName());
@@ -149,6 +157,15 @@ public class MemberService {
 
         helpingRepository.save(helping);
 
+        return true;
+    }
+
+    public Boolean memberRemove(String memberId) {
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            return false;
+        }
+        memberRepository.delete(member.get());
         return true;
     }
 
@@ -216,24 +233,24 @@ public class MemberService {
     }
 
     private String childNamesBuilder(List<Parenting> parentingList) {
-        StringBuilder childIds = new StringBuilder();
+        StringBuilder childNames = new StringBuilder();
         int index = 0;
 
-        childIds.append("{");
+        childNames.append("{");
         for (Parenting parenting : parentingList) {
-            childIds.append("\"ChildName")
+            childNames.append("\"ChildName")
                     .append(index+1)
                     .append("\" : \"")
                     .append(parenting.getChild().getChildName())
                     .append("\"");
 
             if(index < parentingList.size() - 1){
-                childIds.append(",");
+                childNames.append(",");
             }
         }
-        childIds.append("}");
+        childNames.append("}");
 
-        return childIds.toString();
+        return childNames.toString();
     }
 
     public boolean sendCodeToEmail(String memberId) {
@@ -315,6 +332,7 @@ public class MemberService {
         return childNameList;
     }
 
+    @Transactional
     public boolean resetChildPassword(ResetPasswordDTO dto) {
         Child foundChild = childRepository.findBychildName(dto.getId());
 
@@ -355,5 +373,25 @@ public class MemberService {
         foundChild.setLongitude(longitude);
 
         return true;
+    }
+
+    public boolean isPresent(String id, boolean flag) {
+        if(flag){
+           return memberRepository.findById(id).isPresent();
+        }
+
+        return childRepository.findBychildName(id) != null;
+    }
+
+    public Child findChildByChildName(String childName) {
+        return childRepository.findBychildName(childName);
+    }
+
+    public Member findParentByChild(Child foundChild) {
+        return foundChild
+                .getParentingList()
+                .stream()
+                .findFirst()
+                .get().getParent();
     }
 }

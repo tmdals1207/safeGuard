@@ -29,15 +29,15 @@ CREATE TABLE parenting (
 CREATE TABLE helping (
                          helping_id BIGINT NOT NULL,
                          helper_id VARCHAR(255) NOT NULL,
-                         child_id BIGINT NOT NULL,
+                         child_name VARCHAR(255) NOT NULL,
                          PRIMARY KEY (helping_id),
                          FOREIGN KEY (helper_id) REFERENCES Member (member_id),
-                         FOREIGN KEY (child_id) REFERENCES Child (child_id)
+                         FOREIGN KEY (child_name) REFERENCES Child (child_name)
 );
 
 CREATE TABLE coordinate (
                             coordinate_id BIGINT NOT NULL AUTO_INCREMENT,
-                            child_id BIGINT NOT NULL,
+                            child_name VARCHAR(255) NOT NULL,
                             is_living_area TINYINT(1) NOT NULL,
                             x_of_north_west DOUBLE NOT NULL,
                             y_of_north_west DOUBLE NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE coordinate (
                             x_of_south_east DOUBLE NOT NULL,
                             y_of_south_east DOUBLE NOT NULL,
                             PRIMARY KEY (coordinate_id),
-                            FOREIGN KEY (child_id) REFERENCES Child (child_id)
+                            FOREIGN KEY (child_name) REFERENCES Child (child_name)
 );
 
 CREATE TABLE notice (
@@ -56,10 +56,10 @@ CREATE TABLE notice (
                         title VARCHAR(255) NOT NULL,
                         content TEXT NOT NULL,
                         level ENUM('INFO', 'WARN', 'FATAL') NOT NULL,
-                        child_id BIGINT NOT NULL,
+                        child_name VARCHAR(255) NOT NULL,
                         created_at DATETIME NOT NULL,
                         PRIMARY KEY (notice_id),
-                        FOREIGN KEY (child_id) REFERENCES Child (child_id)
+                        FOREIGN KEY (child_name) REFERENCES Child (child_name)
 );
 
 CREATE TABLE emergency (
@@ -67,11 +67,11 @@ CREATE TABLE emergency (
                         title VARCHAR(255) NOT NULL,
                         content TEXT NOT NULL,
                         sender_id BIGINT NOT NULL ,
-                        child_id BIGINT NOT NULL,
+                        child_name VARCHAR(255) NOT NULL,
                         created_at DATETIME NOT NULL,
                         PRIMARY KEY (emergency_id),
                         FOREIGN KEY (sender_id) REFERENCES Member (member_id),
-                        FOREIGN KEY (child_id) REFERENCES Child (child_id)
+                        FOREIGN KEY (child_name) REFERENCES Child (child_name)
 );
 
 CREATE TABLE confirm (
@@ -80,11 +80,11 @@ CREATE TABLE confirm (
                          content TEXT NOT NULL,
                          type ENUM('ARRIVED', 'DEPART', 'UNCONFIRMED') NOT NULL,
                          helping_id BIGINT NOT NULL ,
-                         child_id BIGINT NOT NULL,
+                         child_name BIGINT NOT NULL,
                          created_at DATETIME NOT NULL,
                          PRIMARY KEY (confirm_id),
                          FOREIGN KEY (helping_id) REFERENCES Helping (helping_id),
-                         FOREIGN KEY (child_id) REFERENCES Child (child_id)
+                         FOREIGN KEY (child_name) REFERENCES Child (child_name)
 );
 
 CREATE TABLE comment (

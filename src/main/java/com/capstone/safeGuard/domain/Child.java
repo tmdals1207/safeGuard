@@ -26,6 +26,8 @@ public class Child {
     private double latitude;
     private double longitude;
 
+    private String lastStatus;
+
     @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Parenting> parentingList;

@@ -1,11 +1,13 @@
 package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Coordinate;
-import com.capstone.safeGuard.dto.reponse.ReadAreaResponseDTO;
+import com.capstone.safeGuard.dto.response.ReadAreaResponseDTO;
 import com.capstone.safeGuard.dto.request.coordinate.AddAreaDTO;
 import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
+import com.capstone.safeGuard.dto.request.coordinate.GetChildNameDTO;
 import com.capstone.safeGuard.service.CoordinateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,17 +19,34 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class CoordinateController {
     private final CoordinateService coordinateService;
 
+    // TODO 저장 시에 0으로 저장되는 에러 해결
     @PostMapping("/add-safe")
     public ResponseEntity<Map<String, String>> addLivingArea(@RequestBody AddAreaDTO dto){
         HashMap<String, String> result = new HashMap<>();
 
-        if(! coordinateService.addLivingArea(dto)){
+        log.info("add-safe 받았음");
+        log.info("Received add-safe request");
+        log.info("xOfPointA: " + dto.getXOfPointA());
+        log.info("yOfPointA: " + dto.getYOfPointA());
+        log.info("xOfPointB: " + dto.getXOfPointB());
+        log.info("yOfPointB: " + dto.getYOfPointB());
+        log.info("xOfPointC: " + dto.getXOfPointC());
+        log.info("yOfPointC: " + dto.getYOfPointC());
+        log.info("xOfPointD: " + dto.getXOfPointD());
+        log.info("yOfPointD: " + dto.getYOfPointD());
+        log.info("childName: " + dto.getChildName());
+        Long areaId = coordinateService.addLivingArea(dto);
+        if(areaId == 0L){
+            log.info("add-safe 실패");
             return addErrorStatus(result);
         }
 
+        log.info("add-safe 성공");
+        result.put("area id", areaId.toString());
         return addOkStatus(result);
     }
 
@@ -36,10 +55,15 @@ public class CoordinateController {
     public ResponseEntity<Map<String, String>> addForbiddenArea(@RequestBody AddAreaDTO dto){
         HashMap<String, String> result = new HashMap<>();
 
-        if(! coordinateService.addForbiddenArea(dto)){
+        log.info("add-dangerous 받았음");
+        Long areaId = coordinateService.addForbiddenArea(dto);
+        if(areaId == 0L){
+            log.info("add-dangerous 실패");
             return addErrorStatus(result);
         }
 
+        log.info("add-dangerous 성공");
+        result.put("area id", areaId.toString());
         return addOkStatus(result);
     }
 
@@ -54,12 +78,12 @@ public class CoordinateController {
         return addOkStatus(result);
     }
 
-    @PostMapping("read-areas")
-    public ResponseEntity<Map<String, ReadAreaResponseDTO>> readAreas(@RequestBody String childName){
+    @PostMapping("/read-areas")
+    public ResponseEntity<Map<String, ReadAreaResponseDTO>> readAreas(@RequestBody GetChildNameDTO dto){
         HashMap<String, ReadAreaResponseDTO> result = new HashMap<>();
 
-        // 1. childID에 저장되어 있는 coordinate 불러오기
-        ArrayList<Coordinate> coordinates = coordinateService.readAreasByChild(childName);
+        // 1. child에 저장되어 있는 coordinate 불러오기
+        ArrayList<Coordinate> coordinates = coordinateService.readAreasByChild(dto.getChildName());
 
         // 2. responseDTO로 변경
         for (Coordinate coordinate : coordinates) {

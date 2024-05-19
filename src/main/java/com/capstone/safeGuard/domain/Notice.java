@@ -18,6 +18,7 @@ public class Notice {
     private long noticeId;
     private String title;
     private String content;
+    private String receiverId;
 
     @Column(name = "level")
     @Enumerated(EnumType.STRING)
@@ -28,8 +29,6 @@ public class Notice {
 
     private LocalDateTime createdAt;
 
-    public void setChild(Child childId) {
-    }
     public void changeTitle(String title){
         this.title=title;
     }

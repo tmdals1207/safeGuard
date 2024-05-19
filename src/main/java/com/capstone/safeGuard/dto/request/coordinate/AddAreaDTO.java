@@ -2,9 +2,9 @@ package com.capstone.safeGuard.dto.request.coordinate;
 
 import com.capstone.safeGuard.domain.Child;
 import com.capstone.safeGuard.domain.Coordinate;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class AddAreaDTO {
     private double xOfPointA;
     private double yOfPointA;
@@ -16,7 +16,6 @@ public class AddAreaDTO {
     private double yOfPointD;
 
     private String childName;
-    private String memberID;
 
     public Coordinate dtoToDomain(Child child, boolean isLiving) {
         return Coordinate.builder()

@@ -3,8 +3,6 @@ package com.capstone.safeGuard.dto.request.coordinate;
 import lombok.Getter;
 
 @Getter
-public class DeleteAreaDTO {
-    private String areaID;
+public class GetChildNameDTO {
     private String childName;
-    private String memberID;
 }
