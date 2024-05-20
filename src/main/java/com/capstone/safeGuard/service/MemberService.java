@@ -196,6 +196,23 @@ public class MemberService {
         return true;
     }
 
+    public List<Child> getChildList(String memberId) {
+        Optional<Member> loginedMember = memberRepository.findById(memberId);
+        if (loginedMember.isEmpty()) {
+            return null;
+        }
+        Member member = loginedMember.get();
+
+        List<Child> childList = new ArrayList<>();
+        for (Parenting parenting : member.getParentingList()) {
+
+            if (Objects.equals(parenting.getParent().getMemberId(), member.getMemberId())) {
+                childList.add(parenting.getChild());
+            }
+        }
+        return childList;
+    }
+
     public String validateBindingError(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
@@ -374,6 +391,37 @@ public class MemberService {
 
         return true;
     }
+
+    @Transactional
+    public Map<String, Double> getMemberCoordinate(String id) {
+        Optional<Member> foundMember = memberRepository.findById(id);
+        if (foundMember.isEmpty()) {
+            return null;
+        }
+
+        Member member = foundMember.get();
+        Map<String, Double> coordinates = new HashMap<>();
+        coordinates.put("latitude", member.getLatitude());
+        coordinates.put("longitude", member.getLongitude());
+
+        return coordinates;
+    }
+
+    @Transactional
+    public Map<String, Double> getChildCoordinate(String id) {
+        Child foundChild = childRepository.findBychildName(id);
+        if (foundChild == null) {
+            return null;
+        }
+
+        Map<String, Double> coordinates = new HashMap<>();
+        coordinates.put("latitude", foundChild.getLatitude());
+        coordinates.put("longitude", foundChild.getLongitude());
+
+        return coordinates;
+    }
+
+
 
     public boolean isPresent(String id, boolean flag) {
         if(flag){
