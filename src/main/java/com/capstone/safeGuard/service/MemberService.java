@@ -32,17 +32,26 @@ public class MemberService {
 
     private static final int emailAuthCodeDuration =  1800; // 30 * 60 * 1000 == 30분
 
+    @Transactional
     public Member memberLogin(LoginRequestDTO dto) {
-        Optional<Member> findMember = memberRepository.findById(dto.getEditTextID());
-        // ID가 없는 경우
-        return findMember
-                .map(member -> findMemberWithAuthenticate(member, dto.getEditTextPW()))
-                .orElse(null);
+        // 존재하는 멤버인가
+        Optional<Member> foundMember = memberRepository.findById(dto.getEditTextID());
+        if(foundMember.isEmpty()){
+            return null;
+        }
 
-        // 비밀번호 일치하는지 찾는 부분
+        // ID와 PW가 일치하는가
+        Member member = findMemberWithAuthenticate(foundMember.get(), dto.getEditTextPW());
+        if(member == null){
+            return null;
+        }
+
+        member.setFcmToken(dto.getFcmToken());
+
+        return member;
     }
 
-    private Member findMemberWithAuthenticate(Member findMember, String rawPassword) {
+    public Member findMemberWithAuthenticate(Member findMember, String rawPassword) {
         if (passwordEncoder.matches(rawPassword, findMember.getPassword())) {
             return findMember;
         }
