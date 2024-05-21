@@ -43,6 +43,7 @@ public class FCMService {
 
         try {
             firebaseMessaging.send(message);
+            log.info("Sent notification Success!!");
             return "성공";
         } catch (FirebaseMessagingException e) {
             return null;

@@ -31,6 +31,7 @@ public class NoticeService {
         notice.setReceiverId(receiverId);
 
         if(! memberRepository.existsByMemberId(receiverId)) {
+            log.info("createNotice memberId not exist!!");
             return null;
         }
         notice.setNoticeLevel(noticeLevel);
@@ -38,6 +39,7 @@ public class NoticeService {
         Child child = childRepository.findByChildName(childName);
 
         if (child == null) {
+            log.info("createNotice childName not exist!!");
             return null;
         }
         notice.setChild(child);
