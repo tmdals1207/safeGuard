@@ -76,6 +76,7 @@ public class EmergencyService {
         return emergency;
     }
 
+    @Transactional
     public boolean sendNotificationTo(String receiverId, Emergency emergency){
         FCMNotificationDTO message = makeMessage(receiverId, emergency);
         return fcmService.SendNotificationByToken(message) != null;
