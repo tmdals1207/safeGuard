@@ -75,7 +75,7 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
-    @PostMapping("/recieved-emergency")
+    @PostMapping("/received-emergency")
     public ResponseEntity<Map<String, String>> showReceivedEmergency(@RequestBody MemberIdDTO dto){
         List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
 

@@ -1,13 +1,9 @@
 package com.capstone.safeGuard.service;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Member;
-import com.capstone.safeGuard.domain.Notice;
-import com.capstone.safeGuard.domain.NoticeLevel;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.emergency.FcmMessageDTO;
-import com.capstone.safeGuard.repository.ChildRepository;
+import com.capstone.safeGuard.repository.ConfirmRepository;
 import com.capstone.safeGuard.repository.MemberRepository;
-import com.capstone.safeGuard.repository.NoticeRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -28,40 +24,35 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NoticeService {
-    private final NoticeRepository noticeRepository;
+public class ConfirmService {
+    private final ConfirmRepository confirmRepository;
     private final MemberRepository memberRepository;
-    private final ChildRepository childRepository;
 
     @Transactional
-    public Notice createNotice(String receiverId, String childName, NoticeLevel noticeLevel) {
-        Notice notice = new Notice();
-        notice.setTitle(noticeLevel.name());
-        notice.setContent("아이 이름 : " + childName);
-        notice.setReceiverId(receiverId);
-
-        if(! memberRepository.existsByMemberId(receiverId)) {
-            return null;
+    public Confirm saveConfirm(Child child, Helping helping, String confirmType) {
+        Confirm confirm = new Confirm();
+        if( confirmType.equals("ARRIVED") ){
+            confirm.setConfirmType(ConfirmType.ARRIVED);
+        } else if( confirmType.equals("DEPART") ){
+            confirm.setConfirmType(ConfirmType.DEPART);
+        } else {
+            confirm.setConfirmType(ConfirmType.UNCONFIRMED);
         }
-        notice.setNoticeLevel(noticeLevel);
 
-        Child child = childRepository.findByChildName(childName);
+        confirm.setChild(child);
+        confirm.setTitle(confirmType);
+        confirm.setContent("아이 이름 : " + child.getChildName());
+        confirm.setCreatedAt(LocalDateTime.now());
+        confirm.setHelping_id(helping);
+        confirmRepository.save(confirm);
 
-        if (child == null) {
-            return null;
-        }
-        notice.setChild(child);
-        notice.setCreatedAt(LocalDateTime.now());
-
-        noticeRepository.save(notice);
-
-        return notice;
+        return confirm;
     }
 
-    public boolean sendNotificationTo(Notice notice){
-        // TODO fcm을 테스트
-        String receiverId = notice.getReceiverId();
-        String message = makeMessage(receiverId, notice);
+    public boolean sendNotificationTo(String receiverId, Confirm confirm){
+        // TODO fcm 테스트
+
+        String message = makeMessage(receiverId, confirm);
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -84,7 +75,7 @@ public class NoticeService {
         return true;
     }
 
-    private String makeMessage(String receiverId, Notice notice) {
+    private String makeMessage(String receiverId, Confirm confirm) {
         // 1. receiverId 이용해서 받을 member의 토큰 값 가져오기
         Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
         String token = foundMember.getFcmToken();
@@ -94,8 +85,8 @@ public class NoticeService {
                 .message(FcmMessageDTO.Message.builder()
                         .token(token)
                         .notification(FcmMessageDTO.Notification.builder()
-                                .title(notice.getTitle())
-                                .body(notice.getContent())
+                                .title(confirm.getTitle())
+                                .body(confirm.getContent())
                                 .build()
                         ).build()).validateOnly(false).build();
         try {
@@ -115,4 +106,5 @@ public class NoticeService {
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
     }
+
 }

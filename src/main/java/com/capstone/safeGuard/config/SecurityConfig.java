@@ -5,7 +5,6 @@ import com.capstone.safeGuard.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,13 +26,14 @@ public class SecurityConfig {
 
     private final String[] permitAllList = {
             "/", "/home", "/login", "/signup",
-            "/childsignup", "/check-auth", "/member-logout",
+            "/childsignup", "/check-auth", "/member-logout", "/update-coordinate",
             "/find-member-id", "/find-child-id-list",
             "/verification-email-request", "/verification-email",
             "/reset-member-password", "/chose-child-form", "/chose-child",
-            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas",
-            "/childremove", "/addhelper", "/helperremove",
-            "/duplicate-check-child", "/duplicate-check-member"
+            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas","/area-detail",
+            "/childremove", "/addhelper", "/helperremove", "/memberremove",
+            "/duplicate-check-child", "/duplicate-check-member",
+            "/send-confirm", "/fatal",
     };
 
     @Bean

@@ -7,9 +7,6 @@ import com.capstone.safeGuard.dto.request.emergency.FcmMessageDTO;
 import com.capstone.safeGuard.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.capstone.safeGuard.repository.ChildRepository;
-import com.capstone.safeGuard.repository.EmergencyRepository;
-import com.capstone.safeGuard.repository.MemberRepository;
 import com.google.auth.oauth2.GoogleCredentials;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -17,8 +14,12 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -90,7 +91,6 @@ public class EmergencyService {
         }
 
         HttpEntity entity = new HttpEntity<>(message, headers);
-        // TODO 여기 fcm 경로
         String API_URL = "https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send";
 
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
@@ -125,7 +125,7 @@ public class EmergencyService {
         if (foundChild == null) {
             throw new NoSuchElementException();
         }
-        // TODO Child에 추가 정보를 저장해 보여주는 정보 추가 논의
+
         String body = "아이 이름 : " + foundChild.getChildName();
 
         ObjectMapper om = new ObjectMapper();

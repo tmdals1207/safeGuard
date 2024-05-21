@@ -1,20 +1,19 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Coordinate;
-import com.capstone.safeGuard.domain.Notice;
-import com.capstone.safeGuard.domain.NoticeLevel;
-import com.capstone.safeGuard.repository.NoticeRepository;
-import com.capstone.safeGuard.service.FcmService;
+import com.capstone.safeGuard.domain.*;
+import com.capstone.safeGuard.dto.request.fatal.FatalRequest;
+import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.service.MemberService;
 import com.capstone.safeGuard.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -23,15 +22,12 @@ import java.util.Map;
 public class NoticeController {
     private final MemberService memberService;
     private final NoticeService noticeService;
-    private final FcmService fcmService;
-    private final NoticeRepository noticeRepository;
+    private final ChildRepository childRepository;
 
-    public ResponseEntity<Map<String, String>> sendNotice(String childName) {
-        Map<String, String> result = new HashMap<>();
+    public String sendNotice(String childName) {
         Child foundChild = memberService.findChildByChildName(childName);
         if (foundChild == null) {
-            result.put("message", "해당하는 아이가 없습니다.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            return "에러 : NoSuchChild";
         }
 
         double[] childPosition = {foundChild.getLatitude(), foundChild.getLongitude()};
@@ -69,27 +65,39 @@ public class NoticeController {
             }
         }
 
+        List<Parenting> childParentingList = foundChild.getParentingList();
         // 구역 변경 시 FCM 메시지 전송
         if (currentStatus.equals("위험구역") && !"위험구역".equals(foundChild.getLastStatus())) {
-            sendNoticeToMember("parentId", childName, NoticeLevel.WARN, "아이가 위험구역에 있습니다.");
+            if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.WARN)) {
+                return "에러 : 전송 실패";
+            }
+            // 마지막 상태 갱신
+            foundChild.setLastStatus(currentStatus);
+            return "전송 완료";
         } else if ((currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) && "위험구역".equals(foundChild.getLastStatus())) {
-            sendNoticeToMember("parentId", childName, NoticeLevel.INFO, "아이가 안전구역 또는 일반구역으로 이동했습니다.");
+            if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.INFO)) {
+                return "에러 : 전송 실패";
+            }
+            // 마지막 상태 갱신
+            foundChild.setLastStatus(currentStatus);
+            return "전송 완료";
         }
 
-        // 마지막 상태 갱신
-        foundChild.setLastStatus(currentStatus);
-
-        result.put("status", currentStatus);
-        result.put("message", currentStatus.equals("위험구역") ? "아이가 위험구역에 있습니다." : currentStatus.equals("안전구역") ? "아이가 안전 구역에 있습니다." : "아이가 일반 구역에 있습니다.");
-        return ResponseEntity.ok(result);
+        return null;
     }
 
-    private boolean sendNoticeToMember(String receiverId, String childName, NoticeLevel noticeLevel, String message) {
-        //TODO fcmsercive와 연동 필요
-        fcmService.sendFcm(receiverId, noticeLevel.name(), message);
+    public boolean sendNoticeToMember(List<Parenting> parentingList, Child child, NoticeLevel noticeLevel) {
+        for (Parenting parenting : parentingList) {
+            Notice notice = noticeService.createNotice(parenting.getParent().getMemberId(),
+                    child.getChildName(),
+                    noticeLevel);
+            if (notice == null){
+                return false;
+            }
+            return noticeService.sendNotificationTo(notice);
+        }
 
-        Boolean saveNotice = noticeService.createNotice(receiverId, childName, noticeLevel, message);
-        return saveNotice != null;
+        return true;
     }
 
     public static boolean isPointInPolygon(double[][] polygon, double[] point) {
@@ -112,6 +120,19 @@ public class NoticeController {
         return inside;
     }
 
+    @PostMapping("/fatal")
+    public ResponseEntity<Map<String, String>> fatal(@RequestBody FatalRequest dto) {
+        Map<String, String> result = new HashMap<>();
+        Child foundChild = childRepository.findBychildName(dto.getChildName());
+
+        List<Parenting> childParentingList = foundChild.getParentingList();
+        if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.FATAL)) {
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
         result.put("status", "200");
         return ResponseEntity.ok().body(result);
@@ -122,3 +143,4 @@ public class NoticeController {
         return ResponseEntity.status(400).body(result);
     }
 }
+
