@@ -6,6 +6,7 @@ import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.dto.TokenInfo;
 import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
+import com.capstone.safeGuard.dto.request.updatecoordinate.ReturnCoordinateDTO;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -238,6 +240,15 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    //로그인한 멤버의 자식(그룹)들을 찾아서 반환
+    @PostMapping("/group")
+    public List<Child> showChildList (@Validated @RequestBody Map<String, String> requestBody) {
+
+        String memberId = requestBody.get("memberId");
+
+        return memberService.getChildList(memberId);
+    }
+
     @GetMapping("/member-logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
         Map<String, String> result = new HashMap<>();
@@ -349,6 +360,25 @@ public class MemberController {
         return addErrorStatus(result);
     }
 
+    @PostMapping("/return-coordinate")
+    public ResponseEntity<Map<String, Double>> returnCoordinate(@RequestBody ReturnCoordinateDTO dto) {
+        Map<String, Double> coordinates;
+
+        if (dto.getType().equals("Member")) {
+            coordinates = memberService.getMemberCoordinate(dto.getId());
+            if (coordinates != null) {
+                return ResponseEntity.ok(coordinates);
+            }
+        } else if (dto.getType().equals("Child")) {
+            coordinates = memberService.getChildCoordinate(dto.getId());
+            if (coordinates != null) {
+                noticeController.sendNotice(dto.getId());
+                return ResponseEntity.ok(coordinates);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
     @PostMapping("/duplicate-check-member")
     public ResponseEntity<Map<String, String>> duplicateCheckMember(@RequestBody GetIdDTO dto){
         Map<String, String> result = new HashMap<>();
@@ -395,6 +425,17 @@ public class MemberController {
     private static ResponseEntity<Map<String, String>> addErrorStatus(Map<String, String> result) {
         result.put("status", "400");
         return ResponseEntity.status(400).body(result);
+    }
+
+    private ResponseEntity<Map<String, Object>> addOkStatusWithData(Map<String, Object> result, Map<String, Double> coordinates) {
+        result.put("status", "ok");
+        result.put("data", coordinates);
+        return ResponseEntity.ok(result);
+    }
+
+    private ResponseEntity<Map<String, Object>> addErrorStatusWithData(Map<String, Object> result) {
+        result.put("status", "error");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
 
     private static ResponseEntity<Map<String, String>> addBindingError(Map<String, String> result) {
