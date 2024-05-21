@@ -2,9 +2,11 @@ package com.capstone.safeGuard.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class ReadAreaResponseDTO {
+@Setter
+public class AreaDetailResponseDTO {
     private String isLiving;
     public Double XOfPointA;
     public Double YOfPointA;
@@ -16,7 +18,7 @@ public class ReadAreaResponseDTO {
     public Double YOfPointD;
 
     @Builder
-    public ReadAreaResponseDTO(String isLiving, Double XOfPointA, Double YOfPointA, Double XOfPointB, Double YOfPointB, Double XOfPointC, Double YOfPointC, Double XOfPointD, Double YOfPointD) {
+    public AreaDetailResponseDTO(String isLiving, Double XOfPointA, Double YOfPointA, Double XOfPointB, Double YOfPointB, Double XOfPointC, Double YOfPointC, Double XOfPointD, Double YOfPointD) {
         this.isLiving = isLiving;
         this.XOfPointA = XOfPointA;
         this.YOfPointA = YOfPointA;

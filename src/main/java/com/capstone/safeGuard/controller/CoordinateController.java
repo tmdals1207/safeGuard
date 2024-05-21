@@ -2,8 +2,10 @@ package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Coordinate;
 import com.capstone.safeGuard.dto.request.coordinate.AddAreaDTO;
+import com.capstone.safeGuard.dto.request.coordinate.AreaDetailRequestDTO;
 import com.capstone.safeGuard.dto.request.coordinate.DeleteAreaDTO;
 import com.capstone.safeGuard.dto.request.coordinate.GetChildNameDTO;
+import com.capstone.safeGuard.dto.response.AreaDetailResponseDTO;
 import com.capstone.safeGuard.dto.response.ReadAreaResponseDTO;
 import com.capstone.safeGuard.service.CoordinateService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +37,7 @@ public class CoordinateController {
         }
 
         log.info("add-safe 성공");
-        result.put("area id", areaId.toString());
+        result.put("areaId", areaId.toString());
         return addOkStatus(result);
     }
 
@@ -52,7 +54,7 @@ public class CoordinateController {
         }
 
         log.info("add-dangerous 성공");
-        result.put("area id", areaId.toString());
+        result.put("areaId", areaId.toString());
         return addOkStatus(result);
     }
 
@@ -79,17 +81,43 @@ public class CoordinateController {
             result.put(coordinate.getCoordinateId()+"",
                     ReadAreaResponseDTO.builder()
                             .isLiving(coordinate.isLivingArea() + "")
-                            .firstX(coordinate.getXOfNorthEast() + "")
-                            .firstY(coordinate.getYOfNorthEast() + "")
-                            .secondX(coordinate.getXOfNorthWest() + "")
-                            .secondY(coordinate.getYOfNorthWest() + "")
-                            .thirdX(coordinate.getXOfSouthWest() + "")
-                            .thirdY(coordinate.getYOfSouthWest() + "")
-                            .fourthX(coordinate.getXOfSouthEast() + "")
-                            .fourthY(coordinate.getYOfSouthEast() + "")
+                            .XOfPointA(coordinate.getXOfNorthEast())
+                            .YOfPointA(coordinate.getYOfNorthEast())
+                            .XOfPointB(coordinate.getXOfNorthWest())
+                            .YOfPointB(coordinate.getYOfNorthWest())
+                            .XOfPointC(coordinate.getXOfSouthWest())
+                            .YOfPointC(coordinate.getYOfSouthWest())
+                            .XOfPointD(coordinate.getXOfSouthEast())
+                            .YOfPointD(coordinate.getYOfSouthEast())
                             .build()
             );
         }
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/area-detail")
+    public ResponseEntity<Map<String, AreaDetailResponseDTO>> areaDetail(@RequestBody AreaDetailRequestDTO dto){
+        Map<String, AreaDetailResponseDTO> result = new HashMap<>();
+
+        Coordinate coordinate = coordinateService.findAreaById(dto.getAreaId());
+        if(coordinate == null){
+            return ResponseEntity.status(400).build();
+        }
+
+        result.put(coordinate.getCoordinateId()+"",
+                AreaDetailResponseDTO.builder()
+                        .isLiving(coordinate.isLivingArea() + "")
+                        .XOfPointA(coordinate.getXOfNorthEast())
+                        .YOfPointA(coordinate.getYOfNorthEast())
+                        .XOfPointB(coordinate.getXOfNorthWest())
+                        .YOfPointB(coordinate.getYOfNorthWest())
+                        .XOfPointC(coordinate.getXOfSouthWest())
+                        .YOfPointC(coordinate.getYOfSouthWest())
+                        .XOfPointD(coordinate.getXOfSouthEast())
+                        .YOfPointD(coordinate.getYOfSouthEast())
+                        .build()
+        );
 
         return ResponseEntity.ok().body(result);
     }

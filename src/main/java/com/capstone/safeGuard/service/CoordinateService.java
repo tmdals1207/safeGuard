@@ -84,4 +84,8 @@ public class CoordinateService {
         }
         return foundCoordinates;
     }
+
+    public Coordinate findAreaById(String areaId) {
+        return coordinateRepository.findById(Long.parseLong(areaId)).get();
+    }
 }

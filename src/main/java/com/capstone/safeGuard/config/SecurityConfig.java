@@ -26,11 +26,11 @@ public class SecurityConfig {
 
     private final String[] permitAllList = {
             "/", "/home", "/login", "/signup",
-            "/childsignup", "/check-auth", "/member-logout",
+            "/childsignup", "/check-auth", "/member-logout", "/update-coordinate",
             "/find-member-id", "/find-child-id-list",
             "/verification-email-request", "/verification-email",
             "/reset-member-password", "/chose-child-form", "/chose-child",
-            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas", "/update-coordinate",
+            "/add-safe", "/add-dangerous", "/delete-area", "/read-areas","/area-detail",
             "/childremove", "/addhelper", "/helperremove", "/memberremove",
             "/duplicate-check-child", "/duplicate-check-member",
             "/send-confirm", "/fatal",
