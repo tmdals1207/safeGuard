@@ -25,7 +25,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final String[] permitAllList = {
-            "/", "/home", "/login", "/signup",
+            "/", "/home", "/login", "/signup", "/group",
             "/childsignup", "/check-auth", "/member-logout", "/update-coordinate", "/return-coordinate",
             "/find-member-id", "/find-child-id-list",
             "/verification-email-request", "/verification-email",
@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests()
                 .requestMatchers(permitAllList).permitAll()
-                .requestMatchers("/group").hasRole("member")
+//                .requestMatchers("").hasRole("member")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
