@@ -46,7 +46,12 @@ public class EmergencyController {
     public boolean sendEmergencyToMembers(ArrayList<String> neighborMemberList, EmergencyRequestDTO dto){
         for (String memberId : neighborMemberList) {
             // 3. 알림을 전송 및 저장
-            if(! emergencyService.sendNotificationTo(memberId, dto)){
+            Emergency emergency = emergencyService.saveEmergency(memberId, dto);
+            if (emergency == null) {
+                return false;
+            }
+
+            if(! emergencyService.sendNotificationTo(memberId, emergency)){
                 return false;
             }
         }
