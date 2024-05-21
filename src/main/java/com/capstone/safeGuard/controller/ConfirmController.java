@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,6 +29,7 @@ public class ConfirmController {
     private final MemberRepository memberRepository;
     private final ConfirmService confirmService;
 
+    @Transactional
     @PostMapping("/send-confirm")
     public ResponseEntity<Map<String, String>> sendConfirm(@RequestBody SendConfirmRequest dto) {
         Map<String, String> result = new HashMap<>();
@@ -66,7 +68,8 @@ public class ConfirmController {
         return addOkStatus(result);
     }
 
-    private boolean sendConfirmToMember(String receiverId, Child child, Helping helping, String confirmType) {
+    @Transactional
+    public boolean sendConfirmToMember(String receiverId, Child child, Helping helping, String confirmType) {
         Confirm confirm = confirmService.saveConfirm(child, helping, confirmType);
         if(confirm == null){
             return false;

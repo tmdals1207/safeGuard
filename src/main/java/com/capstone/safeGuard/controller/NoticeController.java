@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -24,6 +25,7 @@ public class NoticeController {
     private final NoticeService noticeService;
     private final ChildRepository childRepository;
 
+    @Transactional
     public String sendNotice(String childName) {
         Child foundChild = memberService.findChildByChildName(childName);
         if (foundChild == null) {
@@ -68,14 +70,14 @@ public class NoticeController {
         List<Parenting> childParentingList = foundChild.getParentingList();
         // 구역 변경 시 FCM 메시지 전송
         if (currentStatus.equals("위험구역") && !"위험구역".equals(foundChild.getLastStatus())) {
-            if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.WARN)) {
+            if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.WARN)) {
                 return "에러 : 전송 실패";
             }
             // 마지막 상태 갱신
             foundChild.setLastStatus(currentStatus);
             return "전송 완료";
         } else if ((currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) && "위험구역".equals(foundChild.getLastStatus())) {
-            if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.INFO)) {
+            if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.INFO)) {
                 return "에러 : 전송 실패";
             }
             // 마지막 상태 갱신
@@ -86,12 +88,14 @@ public class NoticeController {
         return null;
     }
 
-    public boolean sendNoticeToMember(List<Parenting> parentingList, Child child, NoticeLevel noticeLevel) {
+    @Transactional
+    public boolean sendNoticeToMember(List<Parenting> parentingList, String childName, NoticeLevel noticeLevel) {
         for (Parenting parenting : parentingList) {
             Notice notice = noticeService.createNotice(parenting.getParent().getMemberId(),
-                    child.getChildName(),
+                    childName,
                     noticeLevel);
             if (notice == null){
+                log.info("No such notice");
                 return false;
             }
             return noticeService.sendNotificationTo(notice);
@@ -121,12 +125,14 @@ public class NoticeController {
     }
 
     @PostMapping("/fatal")
+    @Transactional
     public ResponseEntity<Map<String, String>> fatal(@RequestBody FatalRequest dto) {
         Map<String, String> result = new HashMap<>();
         Child foundChild = childRepository.findBychildName(dto.getChildName());
 
         List<Parenting> childParentingList = foundChild.getParentingList();
-        if (!sendNoticeToMember(childParentingList, foundChild, NoticeLevel.FATAL)) {
+        if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.FATAL)) {
+            log.info("send fatal 실패");
             return addErrorStatus(result);
         }
 

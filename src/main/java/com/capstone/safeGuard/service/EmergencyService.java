@@ -3,19 +3,12 @@ package com.capstone.safeGuard.service;
 import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
-import com.capstone.safeGuard.dto.request.emergency.FcmMessageDTO;
+import com.capstone.safeGuard.dto.request.notification.FCMNotificationDTO;
 import com.capstone.safeGuard.repository.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.auth.oauth2.GoogleCredentials;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,6 +23,7 @@ public class EmergencyService {
     private final MemberService memberService;
     private final CommentRepository commentRepository;
     private final EmergencyReceiverRepository emergencyReceiverRepository;
+    private final FCMService fcmService;
 
     public ArrayList<String> getNeighborMembers(EmergencyRequestDTO dto, int distance){
         ArrayList<String> memberIdList = new ArrayList<>();
@@ -63,12 +57,14 @@ public class EmergencyService {
         return Math.sqrt( (latitudeKm * latitudeKm) + (longitudeKm * longitudeKm) );
     }
 
-    public void saveEmergency(String sentMessage, String receiverId, EmergencyRequestDTO emergencyRequestDto) {
+    @Transactional
+    public Emergency saveEmergency(String receiverId, EmergencyRequestDTO dto) {
         // Emergency table에 저장
-        Member member = memberRepository.findById(emergencyRequestDto.getSenderId()).orElseThrow(NoSuchElementException::new);
-        Child child = childRepository.findBychildName(emergencyRequestDto.getChildName());
+        Member member = memberRepository.findById(dto.getSenderId()).orElseThrow(NoSuchElementException::new);
+        Child child = childRepository.findBychildName(dto.getChildName());
+        String content = "아이 이름 : " + dto.getChildName();
 
-        Emergency emergency = emergencyRequestDto.dtoToDomain(member, child, sentMessage);
+        Emergency emergency = dto.dtoToDomain(member, child, content);
         emergencyRepository.save(emergency);
 
         EmergencyReceiver emergencyReceiver = EmergencyReceiver.builder()
@@ -76,74 +72,90 @@ public class EmergencyService {
                 .emergencyReceiverId(receiverId)
                 .build();
         emergencyReceiverRepository.save(emergencyReceiver);
+
+        return emergency;
     }
 
-    public boolean sendNotificationTo(String receiverId, EmergencyRequestDTO dto) {
-        String message = makeMessage(receiverId, dto);
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        try {
-            headers.set("Authorization", "Bearer " + getAccessToken());
-        } catch (IOException e) {
-            return false;
-        }
-
-        HttpEntity entity = new HttpEntity<>(message, headers);
-        String API_URL = "https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send";
-
-        ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
-
-        if(response.getStatusCode() != HttpStatus.OK){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        saveEmergency(message, receiverId, dto);
-        return true;
+    @Transactional
+    public boolean sendNotificationTo(String receiverId, Emergency emergency){
+        FCMNotificationDTO message = makeMessage(receiverId, emergency);
+        return fcmService.SendNotificationByToken(message) != null;
     }
 
-    private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase/safeguard-2f704-firebase-adminsdk-pmiwx-0bced8bb31.json";
-//        String firebaseConfigPath = "auth_fcm.json";
-
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
-
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
+    private FCMNotificationDTO makeMessage(String receiverId, Emergency emergency) {
+        return FCMNotificationDTO.builder()
+                .title(emergency.getTitle())
+                .body(emergency.getContent())
+                .receiverId(receiverId)
+                .build();
     }
 
-    private String makeMessage(String receiverId, EmergencyRequestDTO dto) {
-        // 1. receiverId 이용해서 받을 member의 토큰 값 가져오기
-        Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
-        String token = foundMember.getFcmToken();
-
-        // 2. dto의 childName을 이용해서 보내는 child의 정보를 가져오기
-        Child foundChild = childRepository.findBychildName(dto.getChildName());
-        if (foundChild == null) {
-            throw new NoSuchElementException();
-        }
-
-        String body = "아이 이름 : " + foundChild.getChildName();
-
-        ObjectMapper om = new ObjectMapper();
-        FcmMessageDTO fcmMessageDto = FcmMessageDTO.builder()
-                .message(FcmMessageDTO.Message.builder()
-                        .token(token)
-                        .notification(FcmMessageDTO.Notification.builder()
-                                .title(dto.getTitle())
-                                .body(body)
-                                .build()
-                        ).build()).validateOnly(false).build();
-
-        try {
-            return om.writeValueAsString(fcmMessageDto);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-    }
+//    public boolean sendNotificationTo(String receiverId, EmergencyRequestDTO dto) {
+//        String message = makeMessage(receiverId, dto);
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        try {
+//            headers.set("Authorization", "Bearer " + getAccessToken());
+//        } catch (IOException e) {
+//            return false;
+//        }
+//
+//        HttpEntity entity = new HttpEntity<>(message, headers);
+//        String API_URL = "https://fcm.googleapis.com/v1/projects/safeguard-2f704/messages:send";
+//
+//        ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
+//
+//        if(response.getStatusCode() != HttpStatus.OK){
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+//        }
+//
+//        saveEmergency(message, receiverId, dto);
+//        return true;
+//    }
+//
+//    private String getAccessToken() throws IOException {
+//        String firebaseConfigPath = "firebase/safeguard-2f704-firebase-adminsdk-pmiwx-0bced8bb31.json";
+////        String firebaseConfigPath = "auth_fcm.json";
+//
+//        GoogleCredentials googleCredentials = GoogleCredentials
+//                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
+//                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+//
+//        googleCredentials.refreshIfExpired();
+//        return googleCredentials.getAccessToken().getTokenValue();
+//    }
+//
+//    private String makeMessage(String receiverId, EmergencyRequestDTO dto) {
+//        // 1. receiverId 이용해서 받을 member의 토큰 값 가져오기
+//        Member foundMember = memberRepository.findById(receiverId).orElseThrow(NoSuchElementException::new);
+//        String token = foundMember.getFcmToken();
+//
+//        // 2. dto의 childName을 이용해서 보내는 child의 정보를 가져오기
+//        Child foundChild = childRepository.findBychildName(dto.getChildName());
+//        if (foundChild == null) {
+//            throw new NoSuchElementException();
+//        }
+//
+//        String body = "아이 이름 : " + foundChild.getChildName();
+//
+//        ObjectMapper om = new ObjectMapper();
+//        FcmMessageDTO fcmMessageDto = FcmMessageDTO.builder()
+//                .message(FcmMessageDTO.Message.builder()
+//                        .token(token)
+//                        .notification(FcmMessageDTO.Notification.builder()
+//                                .title(dto.getTitle())
+//                                .body(body)
+//                                .build()
+//                        ).build()).validateOnly(false).build();
+//
+//        try {
+//            return om.writeValueAsString(fcmMessageDto);
+//        } catch (JsonProcessingException e) {
+//            return null;
+//        }
+//    }
 
     public List<Emergency> getSentEmergency(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);

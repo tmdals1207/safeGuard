@@ -10,6 +10,7 @@ import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -27,6 +28,7 @@ public class EmergencyController {
 
     private final EmergencyService emergencyService;
 
+    @Transactional
     @PostMapping("/emergency")
     public ResponseEntity<Map<String, String>> emergencyCall(@RequestBody EmergencyRequestDTO emergencyRequestDto) {
         Map<String, String> result = new HashMap<>();
@@ -43,10 +45,16 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
+    @Transactional
     public boolean sendEmergencyToMembers(ArrayList<String> neighborMemberList, EmergencyRequestDTO dto){
         for (String memberId : neighborMemberList) {
             // 3. 알림을 전송 및 저장
-            if(! emergencyService.sendNotificationTo(memberId, dto)){
+            Emergency emergency = emergencyService.saveEmergency(memberId, dto);
+            if (emergency == null) {
+                return false;
+            }
+
+            if(! emergencyService.sendNotificationTo(memberId, emergency)){
                 return false;
             }
         }
