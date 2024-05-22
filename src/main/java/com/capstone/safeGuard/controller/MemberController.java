@@ -245,8 +245,13 @@ public class MemberController {
     public List<Child> showChildList (@Validated @RequestBody Map<String, String> requestBody) {
 
         String memberId = requestBody.get("memberId");
+        log.info(memberId + "의 자식 리스트 반환 ");
+        List<Child> childList = memberService.getChildList(memberId);
+        if(childList == null) {
+            log.info("NULL");
+        }
 
-        return memberService.getChildList(memberId);
+        return childList;
     }
 
     @GetMapping("/member-logout")
@@ -363,6 +368,7 @@ public class MemberController {
     @PostMapping("/return-coordinate")
     public ResponseEntity<Map<String, Double>> returnCoordinate(@RequestBody ReturnCoordinateDTO dto) {
         Map<String, Double> coordinates;
+        log.info("위치 전송 시작");
 
         if (dto.getType().equals("Member")) {
             coordinates = memberService.getMemberCoordinate(dto.getId());
@@ -375,6 +381,8 @@ public class MemberController {
                 noticeController.sendNotice(dto.getId());
                 return ResponseEntity.ok(coordinates);
             }
+        } else {
+            return ResponseEntity.status(400).build();
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
