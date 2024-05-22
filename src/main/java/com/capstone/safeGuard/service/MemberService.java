@@ -341,16 +341,19 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public ArrayList<String> findChildList(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
-
         if(foundMember.isEmpty()){
-            throw new NoSuchElementException();
+            return null;
         }
 
         List<Parenting> parentingList = foundMember.get().getParentingList();
-        ArrayList<String> childNameList = new ArrayList<>();
+        if(parentingList.isEmpty()){
+            return null;
+        }
 
+        ArrayList<String> childNameList = new ArrayList<>();
         for (Parenting parenting : parentingList) {
             childNameList.add(parenting.getChild().getChildName());
         }

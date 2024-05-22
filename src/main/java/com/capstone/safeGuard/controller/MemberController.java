@@ -409,12 +409,11 @@ public class MemberController {
             return addErrorStatus(result);
         }
 
-        result.put("status", "200");
         for (int i = 0; i < childList.size(); i++) {
             result.put(String.valueOf(i+1), childList.get(i));
         }
 
-        return ResponseEntity.ok().body(result);
+        return addOkStatus(result);
     }
 
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
