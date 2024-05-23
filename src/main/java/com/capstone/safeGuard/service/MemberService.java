@@ -341,16 +341,19 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public ArrayList<String> findChildList(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
-
         if(foundMember.isEmpty()){
-            throw new NoSuchElementException();
+            return null;
         }
 
         List<Parenting> parentingList = foundMember.get().getParentingList();
-        ArrayList<String> childNameList = new ArrayList<>();
+        if(parentingList.isEmpty()){
+            return null;
+        }
 
+        ArrayList<String> childNameList = new ArrayList<>();
         for (Parenting parenting : parentingList) {
             childNameList.add(parenting.getChild().getChildName());
         }
@@ -450,5 +453,25 @@ public class MemberService {
                 .stream()
                 .findFirst()
                 .get().getParent();
+    }
+
+    @Transactional
+    public ArrayList<String> findHelpingList(String memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if(foundMember.isEmpty()){
+            return null;
+        }
+
+        List<Helping> helpingList = foundMember.get().getHelpingList();
+        if(helpingList.isEmpty()){
+            return null;
+        }
+
+        ArrayList<String> childNameList = new ArrayList<>();
+        for (Helping helping : helpingList) {
+            childNameList.add(helping.getChild().getChildName());
+        }
+
+        return childNameList;
     }
 }
