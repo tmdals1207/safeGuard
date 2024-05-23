@@ -169,11 +169,19 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public Boolean memberRemove(String memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
         if (member.isEmpty()) {
             return false;
         }
+
+        ArrayList<String> childNameList = findChildList(memberId);
+
+        for (String childName : childNameList) {
+            childRemove(childName);
+        }
+
         memberRepository.delete(member.get());
         return true;
     }
@@ -341,6 +349,7 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public ArrayList<String> findChildList(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
 

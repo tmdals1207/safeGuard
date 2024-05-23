@@ -30,15 +30,15 @@ public class Member {
 
     private String fcmToken;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Parenting> parentingList;
 
-    @OneToMany(mappedBy = "helper")
+    @OneToMany(mappedBy = "helper", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Helping> helpingList;
 
-    @OneToMany(mappedBy = "comment")
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Comment> commented;
 }
