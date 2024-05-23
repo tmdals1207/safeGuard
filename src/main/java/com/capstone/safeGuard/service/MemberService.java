@@ -117,6 +117,7 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(childDto.getChild_password());
         child.setChildPassword(encodedPassword);
         child.setAuthority(Authority.ROLE_CHILD);
+        child.setLastStatus("일반구역");
         childRepository.save(child);
 
         // member child 연결
@@ -169,11 +170,19 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public Boolean memberRemove(String memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
         if (member.isEmpty()) {
             return false;
         }
+
+        ArrayList<String> childNameList = findChildList(memberId);
+
+        for (String childName : childNameList) {
+            childRemove(childName);
+        }
+
         memberRepository.delete(member.get());
         return true;
     }
