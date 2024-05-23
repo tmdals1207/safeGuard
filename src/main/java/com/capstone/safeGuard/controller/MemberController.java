@@ -132,18 +132,17 @@ public class MemberController {
     }
 
     @PostMapping("/memberremove")
-    public ResponseEntity memberRemove(@Validated @RequestBody Map<String, String> requestBody,
-                                      BindingResult bindingResult) {
+    public ResponseEntity<?> memberRemove(@Validated @RequestBody DrawDTO dto, BindingResult bindingResult) {
 
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        String memberId = requestBody.get("memberId");
+        String memberId = dto.getMemberID();
 
-        Boolean RemoveSuccess = memberService.memberRemove(memberId);
-        if (!RemoveSuccess) {
+        Boolean removeSuccess = memberService.memberRemove(memberId);
+        if (!removeSuccess) {
             return ResponseEntity.status(400).build();
         }
 
