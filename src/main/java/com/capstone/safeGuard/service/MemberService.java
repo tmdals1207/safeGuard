@@ -454,4 +454,24 @@ public class MemberService {
                 .findFirst()
                 .get().getParent();
     }
+
+    @Transactional
+    public ArrayList<String> findHelpingList(String memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if(foundMember.isEmpty()){
+            return null;
+        }
+
+        List<Helping> helpingList = foundMember.get().getHelpingList();
+        if(helpingList.isEmpty()){
+            return null;
+        }
+
+        ArrayList<String> childNameList = new ArrayList<>();
+        for (Helping helping : helpingList) {
+            childNameList.add(helping.getChild().getChildName());
+        }
+
+        return childNameList;
+    }
 }

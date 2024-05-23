@@ -27,7 +27,7 @@ public class SecurityConfig {
     private final String[] permitAllList = {
             "/", "/home", "/login", "/signup", "/group",
             "/childsignup", "/check-auth", "/member-logout", "/update-coordinate", "/return-coordinate",
-            "/find-member-id", "/find-child-id-list", "/find-child-list",
+            "/find-member-id", "/find-child-id-list", "/find-child-list", "/find-parenting-helping-list",
             "/verification-email-request", "/verification-email",
             "/reset-member-password", "/chose-child-form", "/chose-child",
             "/add-safe", "/add-dangerous", "/delete-area", "/read-areas","/area-detail",
