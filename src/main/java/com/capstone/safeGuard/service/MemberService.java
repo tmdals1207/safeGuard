@@ -117,6 +117,7 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(childDto.getChild_password());
         child.setChildPassword(encodedPassword);
         child.setAuthority(Authority.ROLE_CHILD);
+        child.setLastStatus("일반구역");
         childRepository.save(child);
 
         // member child 연결
