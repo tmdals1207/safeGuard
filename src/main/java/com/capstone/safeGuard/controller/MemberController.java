@@ -420,6 +420,27 @@ public class MemberController {
         return addOkStatus(result);
     }
 
+    @PostMapping("/add-parent")
+    public ResponseEntity<Map<String, String>> addParent(@RequestBody AddMemberDto dto) {
+        Map<String, String> result = new HashMap<>();
+
+        Member foundMember = memberService.findMemberById(dto.getParentId());
+        if (foundMember == null) {
+            return addErrorStatus(result);
+        }
+
+        Child foundChild = memberService.findChildByChildName(dto.getChildName());
+        if (foundChild == null) {
+            return addErrorStatus(result);
+        }
+
+        if(! memberService.addParent(foundMember.getMemberId(), foundChild.getChildName())){
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
     private Map<String, String> getChildList(String memberId) {
         Map<String, String> result = new HashMap<>();
 
