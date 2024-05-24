@@ -1,8 +1,6 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.Authority;
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.TokenInfo;
 import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
@@ -24,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -199,6 +198,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    // TODO helper 중복 추가 불가 로직 추가
     @PostMapping("/addhelper")
     public ResponseEntity addHelper(@Validated @RequestBody AddMemberDto addMemberDto,
                                     BindingResult bindingResult) {
@@ -439,6 +439,39 @@ public class MemberController {
         }
 
         return addOkStatus(result);
+    }
+
+    @Transactional
+    @PostMapping("/find-member-by-child")
+    public ResponseEntity<Map<String, Map<String, String>>> findMemberByChild(@RequestBody GetIdDTO dto) {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        Child foundChild = memberService.findChildByChildName(dto.getId());
+        if(foundChild == null){
+            return ResponseEntity.status(400).build();
+        }
+
+        Map<String, String> memberMap1 = new HashMap<>();
+        List<Parenting> parentingList = foundChild.getParentingList();
+        if(parentingList != null){
+            for(int i = 0; i < parentingList.size(); i++){
+                memberMap1.put(String.valueOf(i+1),
+                        parentingList.get(i).getParent().getMemberId());
+            }
+        }
+        result.put("Parenting", memberMap1);
+
+
+        Map<String, String> memberMap2 = new HashMap<>();
+        List<Helping> helpingList = foundChild.getHelpingList();
+        if(helpingList != null){
+            for(int i = 0; i < helpingList.size(); i++){
+                memberMap2.put(String.valueOf(i+1),
+                        helpingList.get(i).getHelper().getMemberId());
+            }
+        }
+        result.put("Helping", memberMap2);
+
+        return ResponseEntity.ok().body(result);
     }
 
     private Map<String, String> getChildList(String memberId) {

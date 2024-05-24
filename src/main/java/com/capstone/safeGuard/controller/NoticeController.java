@@ -25,6 +25,8 @@ public class NoticeController {
     private final NoticeService noticeService;
     private final ChildRepository childRepository;
 
+    // TODO 멤버별 notice 리스트
+
     @Transactional
     public String sendNotice(String childName) {
         Child foundChild = memberService.findChildByChildName(childName);

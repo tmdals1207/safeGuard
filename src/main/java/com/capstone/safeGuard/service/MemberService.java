@@ -451,6 +451,7 @@ public class MemberService {
         return childRepository.findBychildName(id) != null;
     }
 
+    @Transactional
     public Child findChildByChildName(String childName) {
         return childRepository.findBychildName(childName);
     }

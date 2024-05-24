@@ -28,6 +28,8 @@ public class EmergencyController {
 
     private final EmergencyService emergencyService;
 
+    // TODO emergency 테스트
+
     @Transactional
     @PostMapping("/emergency")
     public ResponseEntity<Map<String, String>> emergencyCall(@RequestBody EmergencyRequestDTO emergencyRequestDto) {
