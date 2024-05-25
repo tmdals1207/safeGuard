@@ -220,7 +220,7 @@ public class MemberController {
     }
 
     @PostMapping("/helperremove")
-    public ResponseEntity helperRemove(@Validated @RequestBody Map<String, String> requestBody,
+    public ResponseEntity helperRemove(@Validated @RequestBody DrawHelperDTO dto,
                                       BindingResult bindingResult) {
 
         String errorMessage = memberService.validateBindingError(bindingResult);
@@ -228,9 +228,7 @@ public class MemberController {
             return ResponseEntity.badRequest().body(errorMessage);
         }
 
-        String helperName = requestBody.get("helperName");
-
-        Boolean RemoveSuccess = memberService.helperRemove(helperName);
+        Boolean RemoveSuccess = memberService.helperRemove(dto);
         if (!RemoveSuccess) {
             return ResponseEntity.status(400).build();
         }
