@@ -103,6 +103,7 @@ public class MemberService {
         return memberRepository.existsByEmail(email);
     }
 
+    @Transactional
     public Boolean childSignUp(ChildSignUpRequestDTO childDto) {
         Optional<Child> findChild = Optional.ofNullable(childRepository.findBychildName(childDto.getChildName()));
         if (findChild.isPresent()) {
@@ -131,6 +132,7 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public void saveParenting(String memberId, Child child) {
         // 부모와 자식 엔티티의 ID를 사용하여 엔티티 객체를 가져옴
         Optional<Member> parent = memberRepository.findById(memberId);
@@ -149,6 +151,7 @@ public class MemberService {
         parentingRepository.save(parenting);
     }
 
+    @Transactional
     public Boolean addHelper(AddMemberDto addMemberDto) {
         Helping helping = new Helping();
         String childName = addMemberDto.getChildName();
@@ -162,6 +165,14 @@ public class MemberService {
         if (findMember.isEmpty()) {
             return false;
         }
+
+        List<Helping> foundHelpingList = helpingRepository.findAllByHelper(findMember.get());
+        for (Helping foundHelping : foundHelpingList) {
+            if(foundHelping.getChild().equals(selectedChild)){
+                return false;
+            }
+        }
+
         helping.setHelper(findMember.get());
         helping.setChild(selectedChild);
 
@@ -187,6 +198,7 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public Boolean childRemove(String childName) {
         Child selectedChild = childRepository.findBychildName(childName);
         if (selectedChild == null) {
@@ -196,6 +208,7 @@ public class MemberService {
         return true;
     }
 
+    @Transactional
     public Boolean helperRemove(DrawHelperDTO dto) {
         Helping helper = helpingRepository.findByHelper_MemberIdAndChild_ChildName(dto.getMemberId(), dto.getChildName());
         if (helper == null) {
@@ -451,6 +464,7 @@ public class MemberService {
         return childRepository.findBychildName(id) != null;
     }
 
+    @Transactional
     public Child findChildByChildName(String childName) {
         return childRepository.findBychildName(childName);
     }
@@ -487,6 +501,7 @@ public class MemberService {
         return memberRepository.findById(memberId).orElse(null);
     }
 
+    @Transactional
     public boolean addParent(String memberId, String childName) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
         if (foundMember.isEmpty()) {
@@ -498,8 +513,29 @@ public class MemberService {
             return false;
         }
 
+        List<Parenting> foundParentingList = parentingRepository.findAllByParent(foundMember.get());
+        for (Parenting foundParenting : foundParentingList) {
+            if(foundParenting.getChild().equals(foundChild)){
+                return false;
+            }
+        }
+
         saveParenting(memberId, foundChild);
 
         return true;
+    }
+
+    public ArrayList<Member> findAllParentByChild(Child foundChild) {
+        List<Parenting> parentingList = foundChild.getParentingList().stream().toList();
+        if(parentingList.isEmpty()){
+            return null;
+        }
+
+        ArrayList<Member> memberList = new ArrayList<>();
+        for (Parenting parenting : parentingList) {
+            memberList.add(parenting.getParent());
+        }
+
+        return memberList;
     }
 }

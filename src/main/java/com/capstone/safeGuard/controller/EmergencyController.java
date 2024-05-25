@@ -6,6 +6,7 @@ import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyIdDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.MemberIdDTO;
+import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,8 @@ public class EmergencyController {
     static public final int DISTANCE = 1;
 
     private final EmergencyService emergencyService;
+
+    // TODO emergency 테스트
 
     @Transactional
     @PostMapping("/emergency")
@@ -72,27 +75,27 @@ public class EmergencyController {
     }
 
     @PostMapping("/sent-emergency")
-    public ResponseEntity<Map<String, String>> showSentEmergency(@RequestBody MemberIdDTO dto){
+    public ResponseEntity<Map<String, FindNotificationResponse>> showSentEmergency(@RequestBody MemberIdDTO dto){
         List<Emergency> sentEmergencyList = emergencyService.getSentEmergency(dto.getMemberId());
 
-        HashMap<String, String> result = addEmergencyList(sentEmergencyList);
+        HashMap<String, FindNotificationResponse> result = addEmergencyList(sentEmergencyList);
         if (result == null) {
-            return addErrorStatus(new HashMap<String, String>());
+            return ResponseEntity.status(400).body(result);
         }
 
-        return addOkStatus(result);
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping("/received-emergency")
-    public ResponseEntity<Map<String, String>> showReceivedEmergency(@RequestBody MemberIdDTO dto){
+    public ResponseEntity<Map<String, FindNotificationResponse>> showReceivedEmergency(@RequestBody MemberIdDTO dto){
         List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
 
-        HashMap<String, String> result = addEmergencyList(sentEmergencyList);
+        HashMap<String, FindNotificationResponse> result = addEmergencyList(sentEmergencyList);
         if (result == null) {
-            return addErrorStatus(new HashMap<String, String>());
+            return ResponseEntity.status(400).body(result);
         }
 
-        return addOkStatus(result);
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping("/write-comment")
@@ -128,14 +131,22 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
-    private static HashMap<String, String> addEmergencyList(List<Emergency> sentEmergencyList) {
-        HashMap<String, String> result = new HashMap<>();
+    private static HashMap<String, FindNotificationResponse> addEmergencyList(List<Emergency> sentEmergencyList) {
+        HashMap<String, FindNotificationResponse> result = new HashMap<>();
 
         if (sentEmergencyList == null){
             return null;
         }
         for (Emergency emergency : sentEmergencyList) {
-            result.put(emergency.getEmergencyId() + "", emergency.getTitle());
+            result.put(emergency.getEmergencyId() + "",
+                    FindNotificationResponse.builder()
+                            .title(emergency.getTitle())
+                            .type("EMERGENCY")
+                            .content(emergency.getContent())
+                            .child(emergency.getChild().getChildName())
+                            .date(emergency.getCreatedAt().toString())
+                            .build()
+                    );
         }
 
         return result;

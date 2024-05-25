@@ -2,6 +2,8 @@ package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.fatal.FatalRequest;
+import com.capstone.safeGuard.dto.request.signupandlogin.GetIdDTO;
+import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.repository.ChildRepository;
 import com.capstone.safeGuard.service.MemberService;
 import com.capstone.safeGuard.service.NoticeService;
@@ -24,6 +26,29 @@ public class NoticeController {
     private final MemberService memberService;
     private final NoticeService noticeService;
     private final ChildRepository childRepository;
+
+    @PostMapping("/received-notice")
+    public ResponseEntity<Map<String, FindNotificationResponse>> receivedNotice(@RequestBody GetIdDTO dto) {
+        HashMap<String, FindNotificationResponse> result = new HashMap<>();
+
+        List<Notice> noticeList = noticeService.findNoticeByMember(dto.getId());
+        if(noticeList == null || noticeList.isEmpty()) {
+            return ResponseEntity.status(400).body(result);
+        }
+        for (Notice notice : noticeList) {
+            result.put(notice.getNoticeId() + "",
+                    FindNotificationResponse.builder()
+                            .type(notice.getNoticeLevel()+"")
+                            .child(notice.getChild().getChildName())
+                            .title(notice.getTitle())
+                            .content(notice.getContent())
+                            .date(notice.getCreatedAt().toString())
+                            .build()
+            );
+        }
+
+        return ResponseEntity.ok().body(result);
+    }
 
     @Transactional
     public String sendNotice(String childName) {

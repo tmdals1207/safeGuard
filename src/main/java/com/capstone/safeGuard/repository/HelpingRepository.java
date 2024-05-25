@@ -5,6 +5,8 @@ import com.capstone.safeGuard.domain.Helping;
 import com.capstone.safeGuard.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface HelpingRepository extends JpaRepository<Helping, Long> {
     
     void delete(Helping helping);
@@ -12,4 +14,6 @@ public interface HelpingRepository extends JpaRepository<Helping, Long> {
     Helping findByHelper(Member helper);
 
     Helping findByHelper_MemberIdAndChild_ChildName(String memberId, String childName);
+
+    List<Helping> findAllByHelper(Member foundMember);
 }

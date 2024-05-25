@@ -23,7 +23,7 @@ public class Confirm  {
     private ConfirmType confirmType;
 
     @ManyToOne
-    private Helping helping_id;
+    private Helping helpingId;
 
     @ManyToOne
     private Child child;

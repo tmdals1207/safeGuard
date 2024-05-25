@@ -1,6 +1,7 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
+import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.domain.Notice;
 import com.capstone.safeGuard.domain.NoticeLevel;
 import com.capstone.safeGuard.dto.request.notification.FCMNotificationDTO;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class NoticeService {
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
     private final FCMService fcmService;
+    private final MemberService memberService;
 
     @Transactional
     public Notice createNotice(String receiverId, String childName, NoticeLevel noticeLevel) {
@@ -61,5 +64,19 @@ public class NoticeService {
                 .body(notice.getContent())
                 .receiverId(notice.getReceiverId())
                 .build();
+    }
+
+    public List<Notice> findNoticeByMember(String memberId) {
+        if(memberService.findMemberById(memberId) == null) {
+            log.info("No such member!!");
+            return null;
+        }
+
+        List<Notice> foundNoticeList = noticeRepository.findAllByReceiverId(memberId);
+        if(foundNoticeList.isEmpty()){
+            log.info("Notice doesn't exist!!");
+            return null;
+        }
+        return foundNoticeList;
     }
 }
