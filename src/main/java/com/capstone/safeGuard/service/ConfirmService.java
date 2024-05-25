@@ -1,17 +1,17 @@
 package com.capstone.safeGuard.service;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Confirm;
-import com.capstone.safeGuard.domain.ConfirmType;
-import com.capstone.safeGuard.domain.Helping;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.notification.FCMNotificationDTO;
 import com.capstone.safeGuard.repository.ConfirmRepository;
+import com.capstone.safeGuard.repository.HelpingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 public class ConfirmService {
     private final ConfirmRepository confirmRepository;
     private final FCMService fcmService;
+    private final MemberService memberService;
+    private final HelpingRepository helpingRepository;
 
     @Transactional
     public Confirm saveConfirm(Child child, Helping helping, String confirmType) {
@@ -35,7 +37,7 @@ public class ConfirmService {
         confirm.setTitle(confirmType);
         confirm.setContent("아이 이름 : " + child.getChildName());
         confirm.setCreatedAt(LocalDateTime.now());
-        confirm.setHelping_id(helping);
+        confirm.setHelpingId(helping);
         confirmRepository.save(confirm);
 
         return confirm;
@@ -52,5 +54,32 @@ public class ConfirmService {
                 .body(confirm.getContent())
                 .receiverId(receiverId)
                 .build();
+    }
+
+    public List<Confirm> findReceivedConfirmByMember(String id) {
+        // TODO 받은 confirm
+        return null;
+    }
+
+    public ArrayList<Confirm> findSentConfirmByMember(String id) {
+        Member foundMember = memberService.findMemberById(id);
+        if(foundMember == null){
+            log.info("No member found for id : " + id);
+            return null;
+        }
+
+        List<Helping> helpingList = helpingRepository.findAllByHelper(foundMember);
+        if(helpingList == null || helpingList.isEmpty()){
+            log.info("No helping found for id : " + id);
+            return null;
+        }
+
+        ArrayList<Confirm> confirmList = new ArrayList<>();
+        for (Helping helping : helpingList) {
+            ArrayList<Confirm> tmp = confirmRepository.findAllByHelpingId(helping);
+            confirmList.addAll(tmp);
+        }
+
+        return confirmList;
     }
 }

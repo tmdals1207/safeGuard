@@ -33,7 +33,8 @@ public class SecurityConfig {
             "/add-safe", "/add-dangerous", "/delete-area", "/read-areas","/area-detail",
             "/childremove", "/addhelper", "/helperremove", "/memberremove",
             "/duplicate-check-child", "/duplicate-check-member",
-            "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child"
+            "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child",
+            "/received-notice", "/received-confirm", "/sent-confirm"
     };
 
     @Bean

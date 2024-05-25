@@ -1,10 +1,9 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Confirm;
-import com.capstone.safeGuard.domain.Helping;
-import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.confirm.SendConfirmRequest;
+import com.capstone.safeGuard.dto.request.signupandlogin.GetIdDTO;
+import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.repository.MemberRepository;
 import com.capstone.safeGuard.service.ConfirmService;
 import com.capstone.safeGuard.service.MemberService;
@@ -76,6 +75,52 @@ public class ConfirmController {
         }
 
         return confirmService.sendNotificationTo(receiverId, confirm);
+    }
+
+    @PostMapping("/received-confirm")
+    public ResponseEntity<Map<String, FindNotificationResponse>> receivedConfirm(@RequestBody GetIdDTO dto) {
+        HashMap<String, FindNotificationResponse> result = new HashMap<>();
+
+        List<Confirm> confirmList = confirmService.findReceivedConfirmByMember(dto.getId());
+        if(confirmList == null || confirmList.isEmpty()) {
+            return ResponseEntity.status(400).body(result);
+        }
+        for (Confirm confirm : confirmList) {
+            result.put(confirm.getConfirmId() + "",
+                    FindNotificationResponse.builder()
+                            .type(confirm.getConfirmType()+"")
+                            .childId(confirm.getChild().getChildName())
+                            .title(confirm.getTitle())
+                            .content(confirm.getContent())
+                            .date(confirm.getCreatedAt().toString())
+                            .build()
+            );
+        }
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/sent-confirm")
+    public ResponseEntity<Map<String, FindNotificationResponse>> sentConfirm(@RequestBody GetIdDTO dto) {
+        HashMap<String, FindNotificationResponse> result = new HashMap<>();
+
+        List<Confirm> confirmList = confirmService.findSentConfirmByMember(dto.getId());
+        if(confirmList == null || confirmList.isEmpty()) {
+            return ResponseEntity.status(400).body(result);
+        }
+        for (Confirm confirm : confirmList) {
+            result.put(confirm.getConfirmType() + "",
+                    FindNotificationResponse.builder()
+                            .type(confirm.getConfirmType()+"")
+                            .childId(confirm.getChild().getChildName())
+                            .title(confirm.getTitle())
+                            .content(confirm.getContent())
+                            .date(confirm.getCreatedAt().toString())
+                            .build()
+            );
+        }
+
+        return ResponseEntity.ok().body(result);
     }
 
     private static ResponseEntity<Map<String, String>> addOkStatus(Map<String, String> result) {
