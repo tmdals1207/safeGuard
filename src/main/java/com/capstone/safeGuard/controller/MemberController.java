@@ -198,12 +198,9 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO helper 중복 추가 불가 로직 추가
     @PostMapping("/addhelper")
     public ResponseEntity addHelper(@Validated @RequestBody AddMemberDto addMemberDto,
                                     BindingResult bindingResult) {
-
-
         String errorMessage = memberService.validateBindingError(bindingResult);
         if (errorMessage != null) {
             return ResponseEntity.badRequest().body(errorMessage);

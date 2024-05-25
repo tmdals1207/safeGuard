@@ -149,6 +149,7 @@ public class MemberService {
         parentingRepository.save(parenting);
     }
 
+    @Transactional
     public Boolean addHelper(AddMemberDto addMemberDto) {
         Helping helping = new Helping();
         String childName = addMemberDto.getChildName();
@@ -162,6 +163,14 @@ public class MemberService {
         if (findMember.isEmpty()) {
             return false;
         }
+
+        List<Helping> foundHelpingList = helpingRepository.findAllByHelper(findMember.get());
+        for (Helping foundHelping : foundHelpingList) {
+            if(foundHelping.getChild().equals(selectedChild)){
+                return false;
+            }
+        }
+
         helping.setHelper(findMember.get());
         helping.setChild(selectedChild);
 
@@ -488,6 +497,7 @@ public class MemberService {
         return memberRepository.findById(memberId).orElse(null);
     }
 
+    @Transactional
     public boolean addParent(String memberId, String childName) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
         if (foundMember.isEmpty()) {
@@ -497,6 +507,13 @@ public class MemberService {
         Child foundChild = childRepository.findBychildName(childName);
         if (foundChild == null) {
             return false;
+        }
+
+        List<Parenting> foundParentingList = parentingRepository.findAllByParent(foundMember.get());
+        for (Parenting foundParenting : foundParentingList) {
+            if(foundParenting.getChild().equals(foundChild)){
+                return false;
+            }
         }
 
         saveParenting(memberId, foundChild);
