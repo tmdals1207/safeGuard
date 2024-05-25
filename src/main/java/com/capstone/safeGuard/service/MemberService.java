@@ -30,19 +30,19 @@ public class MemberService {
     private final MailService mailService;
     private final EmailAuthCodeRepository emailAuthCodeRepository;
 
-    private static final int emailAuthCodeDuration =  1800; // 30 * 60 * 1000 == 30분
+    private static final int emailAuthCodeDuration = 1800; // 30 * 60 * 1000 == 30분
 
     @Transactional
     public Member memberLogin(LoginRequestDTO dto) {
         // 존재하는 멤버인가
         Optional<Member> foundMember = memberRepository.findById(dto.getEditTextID());
-        if(foundMember.isEmpty()){
+        if (foundMember.isEmpty()) {
             return null;
         }
 
         // ID와 PW가 일치하는가
         Member member = findMemberWithAuthenticate(foundMember.get(), dto.getEditTextPW());
-        if(member == null){
+        if (member == null) {
             return null;
         }
 
@@ -81,7 +81,7 @@ public class MemberService {
         }
 
         String email = dto.getInputEmail();
-        if(checkEmailDuplicate(email)) {
+        if (checkEmailDuplicate(email)) {
             log.info("Email Duplicate");
             return false;
         }
@@ -135,7 +135,7 @@ public class MemberService {
         // 부모와 자식 엔티티의 ID를 사용하여 엔티티 객체를 가져옴
         Optional<Member> parent = memberRepository.findById(memberId);
 
-        if (parent.isEmpty() || child==null) {
+        if (parent.isEmpty() || child == null) {
             // 부모나 자식이 존재하지 않는 경우 처리
             return;
         }
@@ -246,7 +246,7 @@ public class MemberService {
     public String findMemberId(FindMemberIdDTO dto) {
         Member foundMember = memberRepository.findByEmail(dto.getEmail());
 
-        if (foundMember == null || (! foundMember.getName().equals(dto.getName()) ) ) {
+        if (foundMember == null || (!foundMember.getName().equals(dto.getName()))) {
             return null;
         }
 
@@ -260,7 +260,7 @@ public class MemberService {
         }
 
         List<Parenting> parentingList = foundParent.get().getParentingList();
-        if(parentingList.isEmpty()){
+        if (parentingList.isEmpty()) {
             return null;
         }
 
@@ -274,12 +274,12 @@ public class MemberService {
         childNames.append("{");
         for (Parenting parenting : parentingList) {
             childNames.append("\"ChildName")
-                    .append(index+1)
+                    .append(index + 1)
                     .append("\" : \"")
                     .append(parenting.getChild().getChildName())
                     .append("\"");
 
-            if(index < parentingList.size() - 1){
+            if (index < parentingList.size() - 1) {
                 childNames.append(",");
             }
         }
@@ -290,7 +290,7 @@ public class MemberService {
 
     public boolean sendCodeToEmail(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
-        if (foundMember.isEmpty()){
+        if (foundMember.isEmpty()) {
             return false;
         }
 
@@ -300,7 +300,7 @@ public class MemberService {
 
         mailService.sendEmail(address, title, authCode);
         Optional<EmailAuthCode> foundCode = emailAuthCodeRepository.findById(memberId);
-        if(foundCode.isPresent()){
+        if (foundCode.isPresent()) {
             emailAuthCodeRepository.delete(foundCode.get());
         }
         emailAuthCodeRepository.save(new EmailAuthCode(address, authCode, LocalDateTime.now()));
@@ -321,17 +321,17 @@ public class MemberService {
 
     public boolean verifiedCode(String memberId, String authCode) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
-        if (foundMember.isEmpty()){
+        if (foundMember.isEmpty()) {
             return false;
         }
 
         Optional<EmailAuthCode> foundCode = emailAuthCodeRepository.findById(foundMember.get().getEmail());
-        if (foundCode.isEmpty()){
+        if (foundCode.isEmpty()) {
             return false;
         }
 
         if (Duration.between(foundCode.get().getCreatedAt(), LocalDateTime.now()).getSeconds()
-                > emailAuthCodeDuration){
+                > emailAuthCodeDuration) {
             return false;
         }
 
@@ -339,10 +339,10 @@ public class MemberService {
     }
 
     @Transactional
-    public boolean resetMemberPassword(ResetPasswordDTO dto){
+    public boolean resetMemberPassword(ResetPasswordDTO dto) {
         Optional<Member> foundMember = memberRepository.findById(dto.getId());
 
-        if(foundMember.isEmpty()){
+        if (foundMember.isEmpty()) {
             return false;
         }
 
@@ -353,14 +353,16 @@ public class MemberService {
     @Transactional
     public ArrayList<String> findChildList(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
-
-        if(foundMember.isEmpty()){
-            throw new NoSuchElementException();
+        if (foundMember.isEmpty()) {
+            return null;
         }
 
         List<Parenting> parentingList = foundMember.get().getParentingList();
-        ArrayList<String> childNameList = new ArrayList<>();
+        if (parentingList.isEmpty()) {
+            return null;
+        }
 
+        ArrayList<String> childNameList = new ArrayList<>();
         for (Parenting parenting : parentingList) {
             childNameList.add(parenting.getChild().getChildName());
         }
@@ -372,7 +374,7 @@ public class MemberService {
     public boolean resetChildPassword(ResetPasswordDTO dto) {
         Child foundChild = childRepository.findBychildName(dto.getId());
 
-        if (foundChild == null){
+        if (foundChild == null) {
             return false;
         }
 
@@ -387,7 +389,7 @@ public class MemberService {
     @Transactional
     public boolean updateMemberCoordinate(String id, double latitude, double longitude) {
         Optional<Member> foundMember = memberRepository.findById(id);
-        if(foundMember.isEmpty()){
+        if (foundMember.isEmpty()) {
             return false;
         }
 
@@ -401,7 +403,7 @@ public class MemberService {
     @Transactional
     public boolean updateChildCoordinate(String id, double latitude, double longitude) {
         Child foundChild = childRepository.findBychildName(id);
-        if(foundChild == null){
+        if (foundChild == null) {
             return false;
         }
 
@@ -441,10 +443,9 @@ public class MemberService {
     }
 
 
-
     public boolean isPresent(String id, boolean flag) {
-        if(flag){
-           return memberRepository.findById(id).isPresent();
+        if (flag) {
+            return memberRepository.findById(id).isPresent();
         }
 
         return childRepository.findBychildName(id) != null;
@@ -460,5 +461,45 @@ public class MemberService {
                 .stream()
                 .findFirst()
                 .get().getParent();
+    }
+
+    @Transactional
+    public ArrayList<String> findHelpingList(String memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty()) {
+            return null;
+        }
+
+        List<Helping> helpingList = foundMember.get().getHelpingList();
+        if (helpingList.isEmpty()) {
+            return null;
+        }
+
+        ArrayList<String> childNameList = new ArrayList<>();
+        for (Helping helping : helpingList) {
+            childNameList.add(helping.getChild().getChildName());
+        }
+
+        return childNameList;
+    }
+
+    public Member findMemberById(String memberId) {
+        return memberRepository.findById(memberId).orElse(null);
+    }
+
+    public boolean addParent(String memberId, String childName) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty()) {
+            return false;
+        }
+
+        Child foundChild = childRepository.findBychildName(childName);
+        if (foundChild == null) {
+            return false;
+        }
+
+        saveParenting(memberId, foundChild);
+
+        return true;
     }
 }

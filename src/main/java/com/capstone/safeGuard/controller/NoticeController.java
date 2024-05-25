@@ -104,19 +104,37 @@ public class NoticeController {
         return true;
     }
 
+//    public static boolean isPointInPolygon(double[][] polygon, double[] point) {
+//        int n = polygon.length;
+//        double x = point[0];
+//        double y = point[1];
+//
+//        boolean inside = false;
+//        for (int i = 0, j = n - 1; i < n; j = i++) {
+//            double xi = polygon[i][0], yi = polygon[i][1];
+//            double xj = polygon[j][0], yj = polygon[j][1];
+//
+//            boolean intersect = ((yi > y) != (yj > y)) &&
+//                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+//            if (intersect) {
+//                inside = !inside;
+//            }
+//        }
+//
+//        return inside;
+//    }
+
     public static boolean isPointInPolygon(double[][] polygon, double[] point) {
         int n = polygon.length;
-        double x = point[0];
-        double y = point[1];
-
+        double px = point[0], py = point[1];
         boolean inside = false;
-        for (int i = 0, j = n - 1; i < n; j = i++) {
-            double xi = polygon[i][0], yi = polygon[i][1];
-            double xj = polygon[j][0], yj = polygon[j][1];
 
-            boolean intersect = ((yi > y) != (yj > y)) &&
-                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-            if (intersect) {
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            double ix = polygon[i][0], iy = polygon[i][1];
+            double jx = polygon[j][0], jy = polygon[j][1];
+
+            if ((iy > py) != (jy > py) &&
+                    (px < (jx - ix) * (py - iy) / (jy - iy) + ix)) {
                 inside = !inside;
             }
         }
