@@ -39,7 +39,7 @@ public class NoticeController {
             result.put(notice.getNoticeId() + "",
                     FindNotificationResponse.builder()
                             .type(notice.getNoticeLevel()+"")
-                            .childId(notice.getChild().getChildName())
+                            .child(notice.getChild().getChildName())
                             .title(notice.getTitle())
                             .content(notice.getContent())
                             .date(notice.getCreatedAt().toString())

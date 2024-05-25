@@ -89,7 +89,7 @@ public class ConfirmController {
             result.put(confirm.getConfirmId() + "",
                     FindNotificationResponse.builder()
                             .type(confirm.getConfirmType()+"")
-                            .childId(confirm.getChild().getChildName())
+                            .child(confirm.getChild().getChildName())
                             .title(confirm.getTitle())
                             .content(confirm.getContent())
                             .date(confirm.getCreatedAt().toString())
@@ -112,7 +112,7 @@ public class ConfirmController {
             result.put(confirm.getConfirmType() + "",
                     FindNotificationResponse.builder()
                             .type(confirm.getConfirmType()+"")
-                            .childId(confirm.getChild().getChildName())
+                            .child(confirm.getChild().getChildName())
                             .title(confirm.getTitle())
                             .content(confirm.getContent())
                             .date(confirm.getCreatedAt().toString())
