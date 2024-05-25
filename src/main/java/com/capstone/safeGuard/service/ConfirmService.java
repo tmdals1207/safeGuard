@@ -56,9 +56,27 @@ public class ConfirmService {
                 .build();
     }
 
+    @Transactional
     public List<Confirm> findReceivedConfirmByMember(String id) {
-        // TODO 받은 confirm
-        return null;
+        Member foundMember = memberService.findMemberById(id);
+        if(foundMember == null){
+            log.info("No member found for id : " + id);
+            return null;
+        }
+
+        List<Parenting> parentingList = foundMember.getParentingList();
+        if(parentingList == null || parentingList.isEmpty()){
+            log.info("No parenting found for id : " + id);
+            return null;
+        }
+
+        ArrayList<Confirm> confirmList = new ArrayList<>();
+        for (Parenting parenting : parentingList) {
+            confirmList.addAll(confirmRepository
+                    .findAllByChild( parenting.getChild() ));
+        }
+
+        return confirmList;
     }
 
     public ArrayList<Confirm> findSentConfirmByMember(String id) {
@@ -76,8 +94,7 @@ public class ConfirmService {
 
         ArrayList<Confirm> confirmList = new ArrayList<>();
         for (Helping helping : helpingList) {
-            ArrayList<Confirm> tmp = confirmRepository.findAllByHelpingId(helping);
-            confirmList.addAll(tmp);
+            confirmList.addAll(confirmRepository.findAllByHelpingId(helping));
         }
 
         return confirmList;
