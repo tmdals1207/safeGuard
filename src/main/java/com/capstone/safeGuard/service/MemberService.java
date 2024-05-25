@@ -205,8 +205,8 @@ public class MemberService {
         return true;
     }
 
-    public Boolean helperRemove(String helperName) {
-        Helping helper = helpingRepository.findByHelperName(helperName);
+    public Boolean helperRemove(DrawHelperDTO dto) {
+        Helping helper = helpingRepository.findByHelper_MemberIdAndChild_ChildName(dto.getMemberId(), dto.getChildName());
         if (helper == null) {
             return false;
         }
