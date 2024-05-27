@@ -109,6 +109,7 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
+    @Transactional
     @PostMapping("/emergency-detail")
     public ResponseEntity<Map<String, String>> emergencyDetail(@RequestBody EmergencyIdDTO dto){
         HashMap<String, String> result = new HashMap<>();

@@ -138,6 +138,7 @@ public class EmergencyService {
     }
 
 
+    @Transactional
     public Emergency getEmergencyDetail(String emergencyId) {
         Optional<Emergency> foundEmergency = emergencyRepository.findById(Long.valueOf(emergencyId));
         return foundEmergency.orElse(null);
