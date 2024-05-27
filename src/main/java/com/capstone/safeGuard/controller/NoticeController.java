@@ -60,12 +60,13 @@ public class NoticeController {
         }
 
         String currentStatus = getCurrentStatus(foundChild);
-        log.warn("{}의 currentStatus : {} | lastStatus : {} ",childName , currentStatus, foundChild.getLastStatus());
-
+        String lastStatus = foundChild.getLastStatus();
+        log.warn("{}의 currentStatus : {} | lastStatus : {} ", childName, currentStatus, lastStatus);
 
         List<Parenting> childParentingList = foundChild.getParentingList();
+
         // 구역 변경 시 FCM 메시지 전송
-        if (currentStatus.equals("위험구역") && !"위험구역".equals(foundChild.getLastStatus())) {
+        if (currentStatus.equals("위험구역") && !"위험구역".equals(lastStatus)) {
             if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.WARN)) {
                 log.warn("에러 : 전송 실패");
                 return;
@@ -73,7 +74,7 @@ public class NoticeController {
             // 마지막 상태 갱신
             foundChild.setLastStatus(currentStatus);
             log.warn("warn 전송 완료");
-        } else if ((currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) && "위험구역".equals(foundChild.getLastStatus())) {
+        } else if (!currentStatus.equals("위험구역") && "위험구역".equals(lastStatus)) {
             if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.INFO)) {
                 log.warn("에러 : 전송 실패");
                 return;
