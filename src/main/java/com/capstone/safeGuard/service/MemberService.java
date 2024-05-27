@@ -32,6 +32,7 @@ public class MemberService {
     private final EmailAuthCodeRepository emailAuthCodeRepository;
 
     private static final int emailAuthCodeDuration = 1800; // 30 * 60 * 1000 == 30분
+    private final ConfirmRepository confirmRepository;
 
     @Transactional
     public Member memberLogin(LoginRequestDTO dto) {
@@ -211,11 +212,15 @@ public class MemberService {
 
     @Transactional
     public Boolean helperRemove(DrawHelperDTO dto) {
-        Helping helper = helpingRepository.findByHelper_MemberIdAndChild_ChildName(dto.getMemberId(), dto.getChildName());
-        if (helper == null) {
+        Helping helping = helpingRepository.findByHelper_MemberIdAndChild_ChildName(dto.getMemberId(), dto.getChildName());
+        if (helping == null) {
             return false;
         }
-        helpingRepository.delete(helper);
+
+        ArrayList<Confirm> confirmList = confirmRepository.findAllByHelpingId(helping);
+        confirmRepository.deleteAll(confirmList);
+
+        helpingRepository.delete(helping);
         return true;
     }
 
