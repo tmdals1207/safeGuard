@@ -1,7 +1,6 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Member;
 import com.capstone.safeGuard.domain.Notice;
 import com.capstone.safeGuard.domain.NoticeLevel;
 import com.capstone.safeGuard.dto.request.notification.FCMNotificationDTO;
