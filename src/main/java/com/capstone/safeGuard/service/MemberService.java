@@ -1,7 +1,8 @@
 package com.capstone.safeGuard.service;
 
 import com.capstone.safeGuard.domain.*;
-import com.capstone.safeGuard.dto.request.findidandresetpw.*;
+import com.capstone.safeGuard.dto.request.findidandresetpw.FindMemberIdDTO;
+import com.capstone.safeGuard.dto.request.findidandresetpw.ResetPasswordDTO;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
 import com.capstone.safeGuard.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -469,13 +470,6 @@ public class MemberService {
         return childRepository.findBychildName(childName);
     }
 
-    public Member findParentByChild(Child foundChild) {
-        return foundChild
-                .getParentingList()
-                .stream()
-                .findFirst()
-                .get().getParent();
-    }
 
     @Transactional
     public ArrayList<String> findHelpingList(String memberId) {
