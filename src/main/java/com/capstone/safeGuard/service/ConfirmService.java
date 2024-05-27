@@ -37,7 +37,7 @@ public class ConfirmService {
         confirm.setTitle(confirmType);
         confirm.setContent("아이 이름 : " + child.getChildName());
         confirm.setCreatedAt(LocalDateTime.now());
-        confirm.setHelpingId(helping);
+        confirm.setHelping(helping);
         confirmRepository.save(confirm);
 
         return confirm;
