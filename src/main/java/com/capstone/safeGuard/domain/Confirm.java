@@ -23,7 +23,8 @@ public class Confirm  {
     private ConfirmType confirmType;
 
     @ManyToOne
-    private Helping helpingId;
+    @JoinColumn(name = "helping_id")
+    private Helping helping;
 
     @ManyToOne
     private Child child;
