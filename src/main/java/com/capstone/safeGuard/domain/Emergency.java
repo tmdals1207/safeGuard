@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity @Getter @RequiredArgsConstructor
+@Entity @Getter @RequiredArgsConstructor @Setter
 public class Emergency {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class Emergency {
 
     @OneToMany(mappedBy = "comment")
     @JsonIgnore
-    private List<Comment> commentList;
+    public List<Comment> commentList;
 
     @Builder
     public Emergency(String title, String content, Member senderId, Child child, LocalDateTime createdAt) {

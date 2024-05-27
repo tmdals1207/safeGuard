@@ -119,7 +119,8 @@ public class EmergencyService {
         return result;
     }
 
-    public boolean writeEmergency(CommentRequestDTO commentRequestDTO) {
+    @Transactional
+    public boolean writeComment(CommentRequestDTO commentRequestDTO) {
         Optional<Member> foundMember = memberRepository.findById(commentRequestDTO.getCommentatorId());
         Optional<Emergency> foundEmergency = emergencyRepository.findById(Long.valueOf(commentRequestDTO.getEmergencyId()));
         if(foundMember.isEmpty() || foundEmergency.isEmpty()){
@@ -133,6 +134,7 @@ public class EmergencyService {
                 .build();
 
         commentRepository.save(comment);
+        foundEmergency.get().commentList.add(comment);
 
         return true;
     }
@@ -142,5 +144,12 @@ public class EmergencyService {
     public Emergency getEmergencyDetail(String emergencyId) {
         Optional<Emergency> foundEmergency = emergencyRepository.findById(Long.valueOf(emergencyId));
         return foundEmergency.orElse(null);
+    }
+
+    @Transactional
+    public List<Comment> getCommentOfEmergency(String emergencyId) {
+        Emergency emergencyDetail = getEmergencyDetail(emergencyId);
+
+        return commentRepository.findAllByEmergency(emergencyDetail);
     }
 }

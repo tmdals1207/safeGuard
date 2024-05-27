@@ -6,6 +6,8 @@ import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyIdDTO;
 import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.dto.request.emergency.MemberIdDTO;
+import com.capstone.safeGuard.dto.response.CommentResponseDTO;
+import com.capstone.safeGuard.dto.response.EmergencyResponseDTO;
 import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +43,7 @@ public class EmergencyController {
                 = emergencyService.getNeighborMembers(emergencyRequestDto, DISTANCE);
 
         // 2. 반경 []km 내의 member 들에게 알림을 보냄
-        if (! sendEmergencyToMembers(neighborMemberList, emergencyRequestDto)){
+        if (!sendEmergencyToMembers(neighborMemberList, emergencyRequestDto)) {
             return addErrorStatus(result);
         }
 
@@ -49,7 +51,7 @@ public class EmergencyController {
     }
 
     @Transactional
-    public boolean sendEmergencyToMembers(ArrayList<String> neighborMemberList, EmergencyRequestDTO dto){
+    public boolean sendEmergencyToMembers(ArrayList<String> neighborMemberList, EmergencyRequestDTO dto) {
         for (String memberId : neighborMemberList) {
             // 3. 알림을 전송 및 저장
             Emergency emergency = emergencyService.saveEmergency(memberId, dto);
@@ -57,7 +59,7 @@ public class EmergencyController {
                 return false;
             }
 
-            if(! emergencyService.sendNotificationTo(memberId, emergency)){
+            if (!emergencyService.sendNotificationTo(memberId, emergency)) {
                 return false;
             }
         }
@@ -75,7 +77,7 @@ public class EmergencyController {
     }
 
     @PostMapping("/sent-emergency")
-    public ResponseEntity<Map<String, FindNotificationResponse>> showSentEmergency(@RequestBody MemberIdDTO dto){
+    public ResponseEntity<Map<String, FindNotificationResponse>> showSentEmergency(@RequestBody MemberIdDTO dto) {
         List<Emergency> sentEmergencyList = emergencyService.getSentEmergency(dto.getMemberId());
 
         HashMap<String, FindNotificationResponse> result = addEmergencyList(sentEmergencyList);
@@ -87,7 +89,7 @@ public class EmergencyController {
     }
 
     @PostMapping("/received-emergency")
-    public ResponseEntity<Map<String, FindNotificationResponse>> showReceivedEmergency(@RequestBody MemberIdDTO dto){
+    public ResponseEntity<Map<String, FindNotificationResponse>> showReceivedEmergency(@RequestBody MemberIdDTO dto) {
         List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
 
         HashMap<String, FindNotificationResponse> result = addEmergencyList(sentEmergencyList);
@@ -99,10 +101,10 @@ public class EmergencyController {
     }
 
     @PostMapping("/write-comment")
-    public ResponseEntity<Map<String, String>> writeComment(@RequestBody CommentRequestDTO commentRequestDTO){
+    public ResponseEntity<Map<String, String>> writeComment(@RequestBody CommentRequestDTO commentRequestDTO) {
         HashMap<String, String> result = new HashMap<>();
 
-        if (! emergencyService.writeEmergency(commentRequestDTO)){
+        if (!emergencyService.writeComment(commentRequestDTO)) {
             return addErrorStatus(result);
         }
 
@@ -111,31 +113,52 @@ public class EmergencyController {
 
     @Transactional
     @PostMapping("/emergency-detail")
-    public ResponseEntity<Map<String, String>> emergencyDetail(@RequestBody EmergencyIdDTO dto){
-        HashMap<String, String> result = new HashMap<>();
+    public ResponseEntity<Map<String, EmergencyResponseDTO>> emergencyDetail(@RequestBody EmergencyIdDTO dto) {
+        HashMap<String, EmergencyResponseDTO> result = new HashMap<>();
 
-        Emergency emergency  = emergencyService.getEmergencyDetail(dto.getEmergencyId());
-        if(emergency == null){
-            return addErrorStatus(result);
+        Emergency emergency = emergencyService.getEmergencyDetail(dto.getEmergencyId());
+        if (emergency == null) {
+            return ResponseEntity.status(400).body(result);
         }
 
-        result.put("Title", emergency.getTitle());
-        result.put("Content", emergency.getContent());
+        List<Comment> commentList = emergencyService.getCommentOfEmergency(dto.getEmergencyId());
+        if(commentList == null) {
+            result.put("Emergecny", EmergencyResponseDTO.builder()
+                    .emergencyTitle(emergency.getTitle())
+                    .emergencyContent(emergency.getContent())
+                    .emergencyDate(emergency.getCreatedAt().toString())
+                    .build()
+            );
+            return ResponseEntity.ok().body(result);
+        }
 
-        List<Comment> commentList = emergency.getCommentList();
+        List<CommentResponseDTO> dtoList = new ArrayList<>();
         for (Comment comment : commentList) {
-            result.put("writer", comment.getCommentator().getName());
-            result.put("comment", comment.getComment());
-            result.put("written at", comment.getCreatedAt().toString());
+            dtoList.add(
+                    CommentResponseDTO.builder()
+                            .commentId(comment.getCommentId())
+                            .commentator(comment.getCommentator().getMemberId())
+                            .commentDate(comment.getCreatedAt().toString())
+                            .content(comment.getComment())
+                            .build()
+            );
         }
 
-        return addOkStatus(result);
+        result.put("Emergecny", EmergencyResponseDTO.builder()
+                .emergencyTitle(emergency.getTitle())
+                .emergencyContent(emergency.getContent())
+                .emergencyDate(emergency.getCreatedAt().toString())
+                .emergencyCommentList(dtoList)
+                .build()
+        );
+
+        return ResponseEntity.ok().body(result);
     }
 
     private static HashMap<String, FindNotificationResponse> addEmergencyList(List<Emergency> sentEmergencyList) {
         HashMap<String, FindNotificationResponse> result = new HashMap<>();
 
-        if (sentEmergencyList == null){
+        if (sentEmergencyList == null) {
             return null;
         }
         for (Emergency emergency : sentEmergencyList) {
@@ -147,7 +170,7 @@ public class EmergencyController {
                             .child(emergency.getChild().getChildName())
                             .date(emergency.getCreatedAt().toString())
                             .build()
-                    );
+            );
         }
 
         return result;
