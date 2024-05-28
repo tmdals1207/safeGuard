@@ -2,12 +2,8 @@ package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Comment;
 import com.capstone.safeGuard.domain.Emergency;
-import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
-import com.capstone.safeGuard.dto.request.emergency.EmergencyIdDTO;
-import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
-import com.capstone.safeGuard.dto.request.emergency.MemberIdDTO;
+import com.capstone.safeGuard.dto.request.emergency.*;
 import com.capstone.safeGuard.dto.response.CommentResponseDTO;
-import com.capstone.safeGuard.dto.response.EmergencyResponseDTO;
 import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
@@ -104,6 +100,17 @@ public class EmergencyController {
         HashMap<String, String> result = new HashMap<>();
 
         if (!emergencyService.writeComment(commentRequestDTO)) {
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
+    @PostMapping("/delete-comment")
+    public ResponseEntity<Map<String, String>> deleteComment(@RequestBody CommentIdDTO dto) {
+        HashMap<String, String> result = new HashMap<>();
+
+        if(!emergencyService.deleteComment(dto.getCommentId())){
             return addErrorStatus(result);
         }
 

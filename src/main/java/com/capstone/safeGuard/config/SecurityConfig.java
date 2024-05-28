@@ -35,7 +35,8 @@ public class SecurityConfig {
             "/duplicate-check-child", "/duplicate-check-member",
             "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child",
             "/received-notice", "/received-confirm", "/sent-confirm",
-            "/sent-emergency", "/received-emergency", "/emergency", "/write-comment", "/emergency-detail"
+            "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
+            "/delete-comment", "/write-comment"
     };
 
     @Bean
