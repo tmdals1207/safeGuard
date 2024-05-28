@@ -2,12 +2,8 @@ package com.capstone.safeGuard.controller;
 
 import com.capstone.safeGuard.domain.Comment;
 import com.capstone.safeGuard.domain.Emergency;
-import com.capstone.safeGuard.dto.request.emergency.CommentRequestDTO;
-import com.capstone.safeGuard.dto.request.emergency.EmergencyIdDTO;
-import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
-import com.capstone.safeGuard.dto.request.emergency.MemberIdDTO;
+import com.capstone.safeGuard.dto.request.emergency.*;
 import com.capstone.safeGuard.dto.response.CommentResponseDTO;
-import com.capstone.safeGuard.dto.response.EmergencyResponseDTO;
 import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,9 +85,9 @@ public class EmergencyController {
 
     @PostMapping("/received-emergency")
     public ResponseEntity<Map<String, FindNotificationResponse>> showReceivedEmergency(@RequestBody MemberIdDTO dto) {
-        List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
+        List<Emergency> receivedEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
 
-        HashMap<String, FindNotificationResponse> result = addEmergencyList(sentEmergencyList);
+        HashMap<String, FindNotificationResponse> result = addEmergencyList(receivedEmergencyList);
         if (result == null) {
             return ResponseEntity.status(400).body(result);
         }
@@ -109,10 +106,21 @@ public class EmergencyController {
         return addOkStatus(result);
     }
 
+    @PostMapping("/delete-comment")
+    public ResponseEntity<Map<String, String>> deleteComment(@RequestBody CommentIdDTO dto) {
+        HashMap<String, String> result = new HashMap<>();
+
+        if(!emergencyService.deleteComment(dto.getCommentId())){
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
     @Transactional
     @PostMapping("/emergency-detail")
-    public ResponseEntity<Map<String, EmergencyResponseDTO>> emergencyDetail(@RequestBody EmergencyIdDTO dto) {
-        HashMap<String, EmergencyResponseDTO> result = new HashMap<>();
+    public ResponseEntity<Map<String, CommentResponseDTO>> emergencyDetail(@RequestBody EmergencyIdDTO dto) {
+        HashMap<String, CommentResponseDTO> result = new HashMap<>();
 
         Emergency emergency = emergencyService.getEmergencyDetail(dto.getEmergencyId());
         if (emergency == null) {
@@ -120,35 +128,17 @@ public class EmergencyController {
         }
 
         List<Comment> commentList = emergencyService.getCommentOfEmergency(dto.getEmergencyId());
-        if(commentList == null) {
-            result.put("Emergecny", EmergencyResponseDTO.builder()
-                    .emergencyTitle(emergency.getTitle())
-                    .emergencyContent(emergency.getContent())
-                    .emergencyDate(emergency.getCreatedAt().toString())
-                    .build()
-            );
-            return ResponseEntity.ok().body(result);
-        }
-
-        List<CommentResponseDTO> dtoList = new ArrayList<>();
         for (Comment comment : commentList) {
-            dtoList.add(
+            String format = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
+            result.put(comment.getCommentId().toString(),
                     CommentResponseDTO.builder()
-                            .commentId(comment.getCommentId())
                             .commentator(comment.getCommentator().getMemberId())
-                            .commentDate(comment.getCreatedAt().toString())
+                            .commentDate(format)
                             .content(comment.getComment())
                             .build()
             );
         }
-
-        result.put("Emergecny", EmergencyResponseDTO.builder()
-                .emergencyTitle(emergency.getTitle())
-                .emergencyContent(emergency.getContent())
-                .emergencyDate(emergency.getCreatedAt().toString())
-                .emergencyCommentList(dtoList)
-                .build()
-        );
 
         return ResponseEntity.ok().body(result);
     }
@@ -159,14 +149,17 @@ public class EmergencyController {
         if (sentEmergencyList == null) {
             return null;
         }
+
         for (Emergency emergency : sentEmergencyList) {
+            String format = emergency.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             result.put(emergency.getEmergencyId() + "",
                     FindNotificationResponse.builder()
-                            .title(emergency.getTitle())
-                            .type("EMERGENCY")
+                            .title("도움 요청")
                             .content(emergency.getContent())
                             .child(emergency.getChild().getChildName())
-                            .date(emergency.getCreatedAt().toString())
+                            .date(format)
+                            .senderId(emergency.getSenderId().getMemberId())
                             .build()
             );
         }

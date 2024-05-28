@@ -5,6 +5,7 @@ import com.capstone.safeGuard.dto.request.fatal.FatalRequest;
 import com.capstone.safeGuard.dto.request.signupandlogin.GetIdDTO;
 import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.repository.ChildRepository;
+import com.capstone.safeGuard.repository.CoordinateRepository;
 import com.capstone.safeGuard.service.MemberService;
 import com.capstone.safeGuard.service.NoticeService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ public class NoticeController {
     private final MemberService memberService;
     private final NoticeService noticeService;
     private final ChildRepository childRepository;
+    private final CoordinateRepository coordinateRepository;
 
     @PostMapping("/received-notice")
     public ResponseEntity<Map<String, FindNotificationResponse>> receivedNotice(@RequestBody GetIdDTO dto) {
@@ -36,13 +40,22 @@ public class NoticeController {
             return ResponseEntity.status(400).body(result);
         }
         for (Notice notice : noticeList) {
+            String tmpId;
+            if(notice.getNoticeLevel().equals(NoticeLevel.WARN)){
+                tmpId = "위험구역";
+            } else if (notice.getNoticeLevel().equals(NoticeLevel.INFO)) {
+                tmpId = "구역이동";
+            } else {
+                tmpId = "위험신호알림";
+            }
+            String format = notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             result.put(notice.getNoticeId() + "",
                     FindNotificationResponse.builder()
-                            .type(notice.getNoticeLevel() + "")
                             .child(notice.getChild().getChildName())
-                            .title(notice.getTitle())
+                            .title(tmpId)
                             .content(notice.getContent())
-                            .date(notice.getCreatedAt().toString())
+                            .date(format)
                             .build()
             );
         }
@@ -61,12 +74,12 @@ public class NoticeController {
 
         String currentStatus = getCurrentStatus(foundChild);
         String lastStatus = foundChild.getLastStatus();
-        log.warn("{}의 currentStatus : {} | lastStatus : {} ",childName , currentStatus, foundChild.getLastStatus());
+        log.warn("{}의 currentStatus : {} | lastStatus : {} ", childName, currentStatus, foundChild.getLastStatus());
 
 
         List<Parenting> childParentingList = foundChild.getParentingList();
         // 구역 변경 시 FCM 메시지 전송
-        if (currentStatus.equals("위험구역") && !"위험구역".equals(lastStatus) ){
+        if (currentStatus.equals("위험구역") && (!lastStatus.equals("위험구역"))) {
             if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.WARN)) {
                 log.warn("에러 : 전송 실패");
                 return;
@@ -74,7 +87,9 @@ public class NoticeController {
             // 마지막 상태 갱신
             foundChild.setLastStatus(currentStatus);
             log.warn("warn 전송 완료");
-        } else if ((currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) && "위험구역".equals(lastStatus)) {
+            return;
+        } //else if ( lastStatus.equals("위험구역") && (currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) ) {
+        else if ( !lastStatus.equals(currentStatus) ) {
             if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.INFO)) {
                 log.warn("에러 : 전송 실패");
                 return;
@@ -90,6 +105,28 @@ public class NoticeController {
         log.warn("getCurrentStatus");
         double[] childPosition = {foundChild.getLatitude(), foundChild.getLongitude()};
 
+        ArrayList<Coordinate> coordinateArrayList = coordinateRepository.findAllByChild(foundChild);
+        for (Coordinate coordinate : coordinateArrayList) {
+            double[][] polygon = {
+                    {coordinate.getYOfNorthWest(), coordinate.getXOfNorthWest()},
+                    {coordinate.getYOfNorthEast(), coordinate.getXOfNorthEast()},
+                    {coordinate.getYOfSouthEast(), coordinate.getXOfSouthEast()},
+                    {coordinate.getYOfSouthWest(), coordinate.getXOfSouthWest()}
+            };
+
+            if(coordinate.isLivingArea()){
+                if(isPointInPolygon(polygon, childPosition)){
+                    return "안전구역";
+                }
+            } else {
+                if(isPointInPolygon(polygon, childPosition)){
+                    return "위험구역";
+                }
+            }
+        }
+
+        return "일반구역";
+/*
         // 위험 구역 점검
         for (Coordinate forbiddenArea : foundChild.getForbiddenAreas()) {
             double[][] polygon = {
@@ -119,6 +156,7 @@ public class NoticeController {
         }
 
         return "일반구역";
+ */
     }
 
     @Transactional

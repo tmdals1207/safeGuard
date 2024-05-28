@@ -337,6 +337,14 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
+    @PostMapping("/find-helping-list")
+    public ResponseEntity<Map<String, Map<String, String>>> findHelpingList(@Validated @RequestBody GetMemberIdDTO dto) {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        result.put("Helping", getHelpingList(dto.getMemberId()));
+
+        return ResponseEntity.ok().body(result);
+    }
+
     @PostMapping("/chose-child-form")
     public ResponseEntity<Map<String, String>> choseChildForm(@RequestBody GetMemberIdDTO dto) {
         Map<String, String> childList = getChildList(dto.getMemberId());
