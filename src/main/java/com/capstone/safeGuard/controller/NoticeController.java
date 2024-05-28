@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,13 +40,22 @@ public class NoticeController {
             return ResponseEntity.status(400).body(result);
         }
         for (Notice notice : noticeList) {
+            String tmpId;
+            if(notice.getNoticeLevel().equals(NoticeLevel.WARN)){
+                tmpId = "위험구역";
+            } else if (notice.getNoticeLevel().equals(NoticeLevel.INFO)) {
+                tmpId = "구역이동";
+            } else {
+                tmpId = "위험신호알림";
+            }
+            String format = notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             result.put(notice.getNoticeId() + "",
                     FindNotificationResponse.builder()
-                            .type(notice.getNoticeLevel() + "")
                             .child(notice.getChild().getChildName())
-                            .title(notice.getTitle())
+                            .title(tmpId)
                             .content(notice.getContent())
-                            .date(notice.getCreatedAt().toString())
+                            .date(format)
                             .build()
             );
         }

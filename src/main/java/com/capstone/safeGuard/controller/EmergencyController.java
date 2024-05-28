@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,14 +160,16 @@ public class EmergencyController {
         if (sentEmergencyList == null) {
             return null;
         }
+
         for (Emergency emergency : sentEmergencyList) {
+            String format = emergency.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             result.put(emergency.getEmergencyId() + "",
                     FindNotificationResponse.builder()
-                            .title(emergency.getTitle())
-                            .type("EMERGENCY")
+                            .title("도움 요청")
                             .content(emergency.getContent())
                             .child(emergency.getChild().getChildName())
-                            .date(emergency.getCreatedAt().toString())
+                            .date(format)
                             .build()
             );
         }

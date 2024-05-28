@@ -1,9 +1,6 @@
 package com.capstone.safeGuard.controller;
 
-import com.capstone.safeGuard.domain.Child;
-import com.capstone.safeGuard.domain.Confirm;
-import com.capstone.safeGuard.domain.Helping;
-import com.capstone.safeGuard.domain.Member;
+import com.capstone.safeGuard.domain.*;
 import com.capstone.safeGuard.dto.request.confirm.SendConfirmRequest;
 import com.capstone.safeGuard.dto.request.signupandlogin.GetIdDTO;
 import com.capstone.safeGuard.dto.response.FindNotificationResponse;
@@ -18,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
@@ -99,13 +98,23 @@ public class ConfirmController {
             return ResponseEntity.status(400).body(result);
         }
         for (Confirm confirm : confirmList) {
+            String tmpId;
+            if(confirm.getConfirmType().equals(ConfirmType.ARRIVED)){
+                tmpId = "도착";
+            } else if (confirm.getConfirmType().equals(ConfirmType.DEPART)) {
+                tmpId = "출발";
+            } else {
+                tmpId = "미확인";
+            }
+
+            String format = confirm.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             result.put(confirm.getConfirmId() + "",
                     FindNotificationResponse.builder()
-                            .type(confirm.getConfirmType()+"")
                             .child(confirm.getChild().getChildName())
-                            .title(confirm.getTitle())
+                            .title(tmpId)
                             .content(confirm.getContent())
-                            .date(confirm.getCreatedAt().toString())
+                            .date(format)
                             .build()
             );
         }
@@ -122,13 +131,23 @@ public class ConfirmController {
             return ResponseEntity.status(400).body(result);
         }
         for (Confirm confirm : confirmList) {
+            String tmpId;
+            if(confirm.getConfirmType().equals(ConfirmType.ARRIVED)){
+                tmpId = "도착";
+            } else if (confirm.getConfirmType().equals(ConfirmType.DEPART)) {
+                tmpId = "출발";
+            } else {
+                tmpId = "미확인";
+            }
+
+            String format = confirm.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             result.put(confirm.getConfirmType() + "",
                     FindNotificationResponse.builder()
-                            .type(confirm.getConfirmType()+"")
                             .child(confirm.getChild().getChildName())
-                            .title(confirm.getTitle())
+                            .title(tmpId)
                             .content(confirm.getContent())
-                            .date(confirm.getCreatedAt().toString())
+                            .date(format)
                             .build()
             );
         }
