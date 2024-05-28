@@ -89,9 +89,9 @@ public class EmergencyController {
 
     @PostMapping("/received-emergency")
     public ResponseEntity<Map<String, FindNotificationResponse>> showReceivedEmergency(@RequestBody MemberIdDTO dto) {
-        List<Emergency> sentEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
+        List<Emergency> receivedEmergencyList = emergencyService.getReceivedEmergency(dto.getMemberId());
 
-        HashMap<String, FindNotificationResponse> result = addEmergencyList(sentEmergencyList);
+        HashMap<String, FindNotificationResponse> result = addEmergencyList(receivedEmergencyList);
         if (result == null) {
             return ResponseEntity.status(400).body(result);
         }
@@ -112,8 +112,8 @@ public class EmergencyController {
 
     @Transactional
     @PostMapping("/emergency-detail")
-    public ResponseEntity<Map<String, EmergencyResponseDTO>> emergencyDetail(@RequestBody EmergencyIdDTO dto) {
-        HashMap<String, EmergencyResponseDTO> result = new HashMap<>();
+    public ResponseEntity<Map<String, CommentResponseDTO>> emergencyDetail(@RequestBody EmergencyIdDTO dto) {
+        HashMap<String, CommentResponseDTO> result = new HashMap<>();
 
         Emergency emergency = emergencyService.getEmergencyDetail(dto.getEmergencyId());
         if (emergency == null) {
@@ -121,35 +121,17 @@ public class EmergencyController {
         }
 
         List<Comment> commentList = emergencyService.getCommentOfEmergency(dto.getEmergencyId());
-        if(commentList == null) {
-            result.put("Emergecny", EmergencyResponseDTO.builder()
-                    .emergencyTitle(emergency.getTitle())
-                    .emergencyContent(emergency.getContent())
-                    .emergencyDate(emergency.getCreatedAt().toString())
-                    .build()
-            );
-            return ResponseEntity.ok().body(result);
-        }
-
-        List<CommentResponseDTO> dtoList = new ArrayList<>();
         for (Comment comment : commentList) {
-            dtoList.add(
+            String format = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
+            result.put(comment.getCommentId().toString(),
                     CommentResponseDTO.builder()
-                            .commentId(comment.getCommentId())
                             .commentator(comment.getCommentator().getMemberId())
-                            .commentDate(comment.getCreatedAt().toString())
+                            .commentDate(format)
                             .content(comment.getComment())
                             .build()
             );
         }
-
-        result.put("Emergecny", EmergencyResponseDTO.builder()
-                .emergencyTitle(emergency.getTitle())
-                .emergencyContent(emergency.getContent())
-                .emergencyDate(emergency.getCreatedAt().toString())
-                .emergencyCommentList(dtoList)
-                .build()
-        );
 
         return ResponseEntity.ok().body(result);
     }
