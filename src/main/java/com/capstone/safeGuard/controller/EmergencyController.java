@@ -159,6 +159,7 @@ public class EmergencyController {
                             .content(emergency.getContent())
                             .child(emergency.getChild().getChildName())
                             .date(format)
+                            .senderId(emergency.getSenderId().getMemberId())
                             .build()
             );
         }

@@ -115,6 +115,7 @@ public class ConfirmController {
                             .title(tmpId)
                             .content(confirm.getContent())
                             .date(format)
+                            .senderId(confirm.getHelpingId().getHelper().getMemberId())
                             .build()
             );
         }
@@ -148,6 +149,7 @@ public class ConfirmController {
                             .title(tmpId)
                             .content(confirm.getContent())
                             .date(format)
+                            .senderId(confirm.getHelpingId().getHelper().getMemberId())
                             .build()
             );
         }
