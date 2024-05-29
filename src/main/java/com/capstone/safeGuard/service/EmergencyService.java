@@ -152,4 +152,14 @@ public class EmergencyService {
 
         return commentRepository.findAllByEmergency(emergencyDetail);
     }
+
+    @Transactional
+    public boolean deleteComment(String commentId) {
+        Optional<Comment> foundComment = commentRepository.findById(Long.valueOf(commentId));
+        if (foundComment.isEmpty()){
+            return false;
+        }
+        commentRepository.delete(foundComment.get());
+        return true;
+    }
 }

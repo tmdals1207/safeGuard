@@ -27,7 +27,8 @@ public class SecurityConfig {
     private final String[] permitAllList = {
             "/", "/home", "/login", "/signup", "/group",
             "/childsignup", "/check-auth", "/member-logout", "/update-coordinate", "/return-coordinate",
-            "/find-member-id", "/find-child-id-list", "/find-child-list", "/find-parenting-helping-list",
+            "/find-member-id", "/find-child-id-list", "/find-child-list",
+            "/find-parenting-helping-list", "/find-helping-list",
             "/verification-email-request", "/verification-email",
             "/reset-member-password", "/chose-child-form", "/chose-child",
             "/add-safe", "/add-dangerous", "/delete-area", "/read-areas","/area-detail",
@@ -35,7 +36,8 @@ public class SecurityConfig {
             "/duplicate-check-child", "/duplicate-check-member",
             "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child",
             "/received-notice", "/received-confirm", "/sent-confirm",
-            "/sent-emergency", "/received-emergency", "/emergency", "/write-comment", "/emergency-detail"
+            "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
+            "/delete-comment", "/write-comment"
     };
 
     @Bean
