@@ -129,7 +129,7 @@ public class EmergencyController {
 
         List<Comment> commentList = emergencyService.getCommentOfEmergency(dto.getEmergencyId());
         for (Comment comment : commentList) {
-            String format = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            String format = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             result.put(comment.getCommentId().toString(),
                     CommentResponseDTO.builder()
@@ -151,7 +151,7 @@ public class EmergencyController {
         }
 
         for (Emergency emergency : sentEmergencyList) {
-            String format = emergency.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            String format = emergency.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             result.put(emergency.getEmergencyId() + "",
                     FindNotificationResponse.builder()

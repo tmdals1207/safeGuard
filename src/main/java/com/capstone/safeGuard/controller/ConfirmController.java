@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -107,7 +106,7 @@ public class ConfirmController {
                 tmpId = "미확인";
             }
 
-            String format = confirm.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            String format = confirm.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             result.put(confirm.getConfirmId() + "",
                     FindNotificationResponse.builder()
@@ -141,7 +140,7 @@ public class ConfirmController {
                 tmpId = "미확인";
             }
 
-            String format = confirm.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            String format = confirm.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             result.put(confirm.getConfirmType() + "",
                     FindNotificationResponse.builder()

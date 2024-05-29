@@ -48,7 +48,7 @@ public class NoticeController {
             } else {
                 tmpId = "위험신호알림";
             }
-            String format = notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            String format = notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             result.put(notice.getNoticeId() + "",
                     FindNotificationResponse.builder()

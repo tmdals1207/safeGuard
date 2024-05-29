@@ -477,6 +477,17 @@ public class MemberController {
         return ResponseEntity.ok().body(result);
     }
 
+    @PostMapping("/update-nickname")
+    public ResponseEntity<Map<String, String>> updateNickName(@RequestBody UpdateMemberNameDTO dto){
+        Map<String, String> result = new HashMap<>();
+
+        if(! memberService.updateMemberName(dto)){
+            return addErrorStatus(result);
+        }
+
+        return addOkStatus(result);
+    }
+
     private Map<String, String> getChildList(String memberId) {
         Map<String, String> result = new HashMap<>();
 
