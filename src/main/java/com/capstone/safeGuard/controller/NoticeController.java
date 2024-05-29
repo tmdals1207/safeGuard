@@ -41,14 +41,14 @@ public class NoticeController {
         }
         for (Notice notice : noticeList) {
             String tmpId;
-            if(notice.getNoticeLevel().equals(NoticeLevel.WARN)){
+            if (notice.getNoticeLevel().equals(NoticeLevel.WARN)) {
                 tmpId = "위험구역";
             } else if (notice.getNoticeLevel().equals(NoticeLevel.INFO)) {
                 tmpId = "구역이동";
             } else {
                 tmpId = "위험신호알림";
             }
-            String format = notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            String format = notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             result.put(notice.getNoticeId() + "",
                     FindNotificationResponse.builder()
@@ -73,7 +73,10 @@ public class NoticeController {
         }
 
         String currentStatus = getCurrentStatus(foundChild);
-        String lastStatus = foundChild.getLastStatus();
+        String lastStatus = "일반구역";
+        if(foundChild.getLastStatus() != null){
+            lastStatus = foundChild.getLastStatus();
+        }
         log.warn("{}의 currentStatus : {} | lastStatus : {} ", childName, currentStatus, foundChild.getLastStatus());
 
 
@@ -89,7 +92,7 @@ public class NoticeController {
             log.warn("warn 전송 완료");
             return;
         } //else if ( lastStatus.equals("위험구역") && (currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) ) {
-        else if ( !lastStatus.equals(currentStatus) ) {
+        else if (!lastStatus.equals(currentStatus)) {
             if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.INFO)) {
                 log.warn("에러 : 전송 실패");
                 return;
@@ -102,7 +105,6 @@ public class NoticeController {
 
     @Transactional
     public String getCurrentStatus(Child foundChild) {
-        log.warn("getCurrentStatus");
         double[] childPosition = {foundChild.getLatitude(), foundChild.getLongitude()};
 
         ArrayList<Coordinate> coordinateArrayList = coordinateRepository.findAllByChild(foundChild);
@@ -114,12 +116,12 @@ public class NoticeController {
                     {coordinate.getYOfSouthWest(), coordinate.getXOfSouthWest()}
             };
 
-            if(coordinate.isLivingArea()){
-                if(isPointInPolygon(polygon, childPosition)){
+            if (coordinate.isLivingArea()) {
+                if (isPointInPolygon(polygon, childPosition)) {
                     return "안전구역";
                 }
             } else {
-                if(isPointInPolygon(polygon, childPosition)){
+                if (isPointInPolygon(polygon, childPosition)) {
                     return "위험구역";
                 }
             }
@@ -162,9 +164,12 @@ public class NoticeController {
     @Transactional
     public boolean sendNoticeToMember(List<Parenting> parentingList, String childName, NoticeLevel noticeLevel) {
         for (Parenting parenting : parentingList) {
-            Notice notice = noticeService.createNotice(parenting.getParent().getMemberId(),
-                    childName,
-                    noticeLevel);
+            Notice notice = noticeService
+                    .createNotice(
+                            parenting.getParent().getMemberId(),
+                            childName,
+                            noticeLevel)
+                    ;
             if (notice == null) {
                 log.info("No such notice");
                 return false;

@@ -538,6 +538,17 @@ public class MemberService {
         return memberList;
     }
 
+    @Transactional
+    public boolean updateMemberName(UpdateMemberNameDTO dto) {
+        Member foundMember = findMemberById(dto.getUserID());
+        if (foundMember == null) {
+            return false;
+        }
+
+        foundMember.setName(dto.getNickname());
+        return true;
+    }
+
     public String getNicknameById(String memberId) {
         Optional<Member> foundMember = memberRepository.findById(memberId);
         if (foundMember.isEmpty()) {
