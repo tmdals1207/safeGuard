@@ -64,6 +64,12 @@ dependencies {
 	// firebase
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 	//implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
+
+	// stt
+	implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+	implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+	implementation 'com.google.code.gson:gson:2.8.8'
+
 }
 
 tasks.named('test') {
