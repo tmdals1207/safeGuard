@@ -73,7 +73,10 @@ public class NoticeController {
         }
 
         String currentStatus = getCurrentStatus(foundChild);
-        String lastStatus = foundChild.getLastStatus();
+        String lastStatus = "일반구역";
+        if(foundChild.getLastStatus() != null){
+            lastStatus = foundChild.getLastStatus();
+        }
         log.warn("{}의 currentStatus : {} | lastStatus : {} ", childName, currentStatus, foundChild.getLastStatus());
 
 
@@ -102,7 +105,6 @@ public class NoticeController {
 
     @Transactional
     public String getCurrentStatus(Child foundChild) {
-        log.warn("getCurrentStatus");
         double[] childPosition = {foundChild.getLatitude(), foundChild.getLongitude()};
 
         ArrayList<Coordinate> coordinateArrayList = coordinateRepository.findAllByChild(foundChild);
