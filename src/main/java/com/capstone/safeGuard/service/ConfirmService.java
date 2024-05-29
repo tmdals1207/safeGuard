@@ -49,8 +49,16 @@ public class ConfirmService {
     }
 
     private FCMNotificationDTO makeMessage(String receiverId, Confirm confirm) {
+
+        String tmpTitle = "아이의 도착이 확인되지 않습니다.";
+        if(confirm.getConfirmType().equals(ConfirmType.ARRIVED)) {
+            tmpTitle = "아이가 도착 완료했습니다.";
+        } else if(confirm.getConfirmType().equals(ConfirmType.DEPART)) {
+            tmpTitle = "아이가 출발했습니다.";
+        }
+
         return FCMNotificationDTO.builder()
-                .title(confirm.getTitle())
+                .title(tmpTitle)
                 .body(confirm.getContent())
                 .receiverId(receiverId)
                 .build();

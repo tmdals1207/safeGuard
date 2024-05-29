@@ -41,7 +41,7 @@ public class NoticeController {
         }
         for (Notice notice : noticeList) {
             String tmpId;
-            if(notice.getNoticeLevel().equals(NoticeLevel.WARN)){
+            if (notice.getNoticeLevel().equals(NoticeLevel.WARN)) {
                 tmpId = "위험구역";
             } else if (notice.getNoticeLevel().equals(NoticeLevel.INFO)) {
                 tmpId = "구역이동";
@@ -89,7 +89,7 @@ public class NoticeController {
             log.warn("warn 전송 완료");
             return;
         } //else if ( lastStatus.equals("위험구역") && (currentStatus.equals("일반구역") || currentStatus.equals("안전구역")) ) {
-        else if ( !lastStatus.equals(currentStatus) ) {
+        else if (!lastStatus.equals(currentStatus)) {
             if (!sendNoticeToMember(childParentingList, foundChild.getChildName(), NoticeLevel.INFO)) {
                 log.warn("에러 : 전송 실패");
                 return;
@@ -114,12 +114,12 @@ public class NoticeController {
                     {coordinate.getYOfSouthWest(), coordinate.getXOfSouthWest()}
             };
 
-            if(coordinate.isLivingArea()){
-                if(isPointInPolygon(polygon, childPosition)){
+            if (coordinate.isLivingArea()) {
+                if (isPointInPolygon(polygon, childPosition)) {
                     return "안전구역";
                 }
             } else {
-                if(isPointInPolygon(polygon, childPosition)){
+                if (isPointInPolygon(polygon, childPosition)) {
                     return "위험구역";
                 }
             }
@@ -162,9 +162,12 @@ public class NoticeController {
     @Transactional
     public boolean sendNoticeToMember(List<Parenting> parentingList, String childName, NoticeLevel noticeLevel) {
         for (Parenting parenting : parentingList) {
-            Notice notice = noticeService.createNotice(parenting.getParent().getMemberId(),
-                    childName,
-                    noticeLevel);
+            Notice notice = noticeService
+                    .createNotice(
+                            parenting.getParent().getMemberId(),
+                            childName,
+                            noticeLevel)
+                    ;
             if (notice == null) {
                 log.info("No such notice");
                 return false;

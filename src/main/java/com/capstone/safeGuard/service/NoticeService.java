@@ -58,8 +58,19 @@ public class NoticeService {
     }
 
     private FCMNotificationDTO makeMessage(Notice notice) {
+        if(notice == null) {
+            return null;
+        }
+
+        String tmpTitle = "아이가 위험 신호를 보냈습니다!";
+        if(notice.getNoticeLevel().equals(NoticeLevel.INFO)) {
+            tmpTitle = "아이의 구역이 변경되었습니다.";
+        } else if (notice.getNoticeLevel().equals(NoticeLevel.WARN)){
+            tmpTitle = "아이가 위험 구역에 진입하였습니다.";
+        }
+
         return FCMNotificationDTO.builder()
-                .title(notice.getTitle())
+                .title(tmpTitle)
                 .body(notice.getContent())
                 .receiverId(notice.getReceiverId())
                 .build();
