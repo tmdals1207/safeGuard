@@ -537,4 +537,12 @@ public class MemberService {
 
         return memberList;
     }
+
+    public String getNicknameById(String memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty()) {
+            return null;
+        }
+        return foundMember.get().getName();
+    }
 }

@@ -216,6 +216,23 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/return-nickname")
+    public ResponseEntity<String> returnNickname(@Validated @RequestBody GetIdDTO dto,
+                                                 BindingResult bindingResult) {
+        String errorMessage = memberService.validateBindingError(bindingResult);
+        if (errorMessage != null) {
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
+        String nickname = memberService.getNicknameById(dto.getId());
+        if (nickname != null) {
+            return ResponseEntity.ok().body(nickname);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("닉네임을 찾을 수 없습니다.");
+        }
+    }
+
+
     @PostMapping("/helperremove")
     public ResponseEntity helperRemove(@Validated @RequestBody DrawHelperDTO dto,
                                       BindingResult bindingResult) {
@@ -248,6 +265,8 @@ public class MemberController {
 
         return childList;
     }
+
+
 
     @GetMapping("/member-logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
@@ -476,6 +495,7 @@ public class MemberController {
 
         return ResponseEntity.ok().body(result);
     }
+
 
     private Map<String, String> getChildList(String memberId) {
         Map<String, String> result = new HashMap<>();
