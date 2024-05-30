@@ -8,19 +8,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/speech")
+@RequestMapping("/speech")
 public class SpeechController {
 
     @Autowired
     private NaverSpeechService naverSpeechService;
 
-    @PostMapping("/transcribe")
-    public String transcribe(@RequestParam("file") MultipartFile file) {
+    @PostMapping("/transcribe-and-compare")
+    public String transcribeAndCompare(@RequestParam("file") MultipartFile file) {
         try {
-            return naverSpeechService.transcribe(file);
+            return naverSpeechService.transcribeAndCompare(file);
         } catch (IOException e) {
             e.printStackTrace();
-            return "Failed to transcribe audio.";
+            return "오디오 변환 및 비교에 실패했습니다.";
         }
     }
 }
