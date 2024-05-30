@@ -38,7 +38,8 @@ public class SecurityConfig {
             "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child",
             "/received-notice", "/received-confirm", "/sent-confirm",
             "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
-            "/delete-comment", "/write-comment"
+            "/delete-comment", "/write-comment",
+            "/speech","/transcribe-and-compare"
     };
 
     @Bean
