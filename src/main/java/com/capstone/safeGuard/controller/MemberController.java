@@ -6,6 +6,7 @@ import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
 import com.capstone.safeGuard.dto.request.updatecoordinate.ReturnCoordinateDTO;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
+import com.capstone.safeGuard.service.BatteryService;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
@@ -40,6 +41,7 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
     private final NoticeController noticeController;
+    private final BatteryService batteryService;
 
     @GetMapping("/login")
     public String showLoginForm() {
@@ -394,6 +396,9 @@ public class MemberController {
             return addErrorStatus(result);
         }
         if (memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())) {
+            if(! batteryService.setBattery(dto.getId(), dto.getBattery())){
+                return addErrorStatus(result);
+            }
             noticeController.sendNotice(dto.getId());
             return addOkStatus(result);
         }
@@ -402,7 +407,7 @@ public class MemberController {
 
     @PostMapping("/return-coordinate")
     public ResponseEntity<Map<String, Double>> returnCoordinate(@RequestBody ReturnCoordinateDTO dto) {
-        Map<String, Double> coordinates;
+        Map<String, Double> coordinates = new HashMap<>();
         log.info("위치 전송 시작");
 
         if (dto.getType().equals("Member")) {
@@ -411,7 +416,12 @@ public class MemberController {
                 return ResponseEntity.ok(coordinates);
             }
         } else if (dto.getType().equals("Child")) {
+            ChildBattery childBattery = batteryService.getBattery(dto.getId());
             coordinates = memberService.getChildCoordinate(dto.getId());
+
+            if(childBattery != null) {
+                coordinates.put("battery", (childBattery.getBatteryValue() * 1.0) );
+            }
             if (coordinates != null) {
                 noticeController.sendNotice(dto.getId());
                 return ResponseEntity.ok(coordinates);
