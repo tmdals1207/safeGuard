@@ -391,12 +391,17 @@ public class MemberController {
 
         if (dto.getType().equals("Member")) {
             if (memberService.updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())) {
+                boolean b = batteryService.setMemberBattery(dto.getId(), dto.getBattery());
+                if(! b){
+                    return addErrorStatus(result);
+                }
                 return addOkStatus(result);
             }
             return addErrorStatus(result);
         }
         if (memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())) {
-            if(! batteryService.setBattery(dto.getId(), dto.getBattery())){
+            boolean b = batteryService.setChildBattery(dto.getId(), dto.getBattery());
+            if(! b){
                 return addErrorStatus(result);
             }
             noticeController.sendNotice(dto.getId());
@@ -407,16 +412,20 @@ public class MemberController {
 
     @PostMapping("/return-coordinate")
     public ResponseEntity<Map<String, Double>> returnCoordinate(@RequestBody ReturnCoordinateDTO dto) {
-        Map<String, Double> coordinates = new HashMap<>();
-        log.info("위치 전송 시작");
+        Map<String, Double> coordinates;
 
         if (dto.getType().equals("Member")) {
+            MemberBattery memberBattery = batteryService.getMemberBattery(dto.getId());
             coordinates = memberService.getMemberCoordinate(dto.getId());
+
+            if (memberBattery != null) {
+                coordinates.put("battery", (memberBattery.getBatteryValue() * 1.0) );
+            }
             if (coordinates != null) {
                 return ResponseEntity.ok(coordinates);
             }
         } else if (dto.getType().equals("Child")) {
-            ChildBattery childBattery = batteryService.getBattery(dto.getId());
+            ChildBattery childBattery = batteryService.getChildBattery(dto.getId());
             coordinates = memberService.getChildCoordinate(dto.getId());
 
             if(childBattery != null) {
