@@ -49,7 +49,16 @@ public class MemberService {
             return null;
         }
 
-        member.setFcmToken(dto.getFcmToken());
+        String fcmToken = dto.getFcmToken();
+
+        List<Member> existFcmList = memberRepository.findAllByFcmToken(fcmToken);
+        if (! existFcmList.isEmpty()){
+            for (Member existFcm : existFcmList) {
+                existFcm.setFcmToken(null);
+            }
+        }
+
+        member.setFcmToken(fcmToken);
 
         return member;
     }

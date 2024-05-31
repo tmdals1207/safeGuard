@@ -53,8 +53,7 @@ public class MemberController {
                                                      BindingResult bindingResult,
                                                      HttpServletResponse response,
                                                      HttpServletRequest request) {
-        log.info(dto.getEditTextID());
-        log.info(dto.getLoginType());
+        log.info(dto.getEditTextID(), dto.getLoginType());
 
         Map<String, String> result = new HashMap<>();
 
