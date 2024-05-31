@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     private final String[] permitAllList = {
             "/", "/home", "/login", "/signup", "/group",
-            "/childsignup", "/check-auth", "/member-logout", "/update-nickname", "/return-nickname",
+            "/childsignup", "/check-auth", "/member-logout", "/update-nickname",
             "/update-coordinate", "/return-coordinate",
             "/find-member-id", "/find-child-id-list", "/find-child-list",
             "/find-parenting-helping-list", "/find-helping-list",
@@ -38,6 +38,17 @@ public class SecurityConfig {
             "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child",
             "/received-notice", "/received-confirm", "/sent-confirm",
             "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
+            "/delete-comment", "/write-comment", "/return-nickname",
+            "/upload-file", "/get-file",
+            "/speech","/transcribe-and-compare"
+    };
+
+    private final String[] memberPermitList = {
+
+    };
+
+    private final String[] childPermitList = {
+
             "/delete-comment", "/write-comment",
             "/speech","/transcribe-and-compare"
     };
@@ -50,7 +61,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests()
                 .requestMatchers(permitAllList).permitAll()
-//                .requestMatchers("").hasRole("member")
+//                .requestMatchers(memberPermitList).hasRole(Authority.ROLE_MEMBER.toString())
+//                .requestMatchers(childPermitList).hasRole(Authority.ROLE_CHILD.toString())
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

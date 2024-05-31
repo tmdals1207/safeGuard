@@ -29,7 +29,7 @@ public class NoticeService {
     public Notice createNotice(String receiverId, String childName, NoticeLevel noticeLevel) {
         Notice notice = new Notice();
         notice.setTitle(noticeLevel.name());
-        notice.setContent("아이 이름 : " + childName);
+        notice.setContent("피보호자 이름 : " + childName);
         notice.setReceiverId(receiverId);
 
         if(! memberRepository.existsByMemberId(receiverId)) {
@@ -62,11 +62,11 @@ public class NoticeService {
             return null;
         }
 
-        String tmpTitle = "아이가 위험 신호를 보냈습니다!";
+        String tmpTitle = "피보호자가 위험 신호를 보냈습니다!";
         if(notice.getNoticeLevel().equals(NoticeLevel.INFO)) {
-            tmpTitle = "아이의 구역이 변경되었습니다.";
+            tmpTitle = "피보호자의 구역이 변경되었습니다.";
         } else if (notice.getNoticeLevel().equals(NoticeLevel.WARN)){
-            tmpTitle = "아이가 위험 구역에 진입하였습니다.";
+            tmpTitle = "피보호자가 위험 구역에 진입하였습니다.";
         }
 
         return FCMNotificationDTO.builder()

@@ -8,4 +8,5 @@ public class UpdateCoordinateDTO {
     private String id;
     private double latitude;
     private double longitude;
+    private int battery;
 }

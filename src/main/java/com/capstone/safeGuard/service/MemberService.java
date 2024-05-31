@@ -33,6 +33,7 @@ public class MemberService {
 
     private static final int emailAuthCodeDuration = 1800; // 30 * 60 * 1000 == 30분
     private final ConfirmRepository confirmRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public Member memberLogin(LoginRequestDTO dto) {
@@ -48,7 +49,16 @@ public class MemberService {
             return null;
         }
 
-        member.setFcmToken(dto.getFcmToken());
+        String fcmToken = dto.getFcmToken();
+
+        List<Member> existFcmList = memberRepository.findAllByFcmToken(fcmToken);
+        if (! existFcmList.isEmpty()){
+            for (Member existFcm : existFcmList) {
+                existFcm.setFcmToken(null);
+            }
+        }
+
+        member.setFcmToken(fcmToken);
 
         return member;
     }
@@ -191,6 +201,11 @@ public class MemberService {
         }
 
         ArrayList<String> childNameList = findChildList(memberId);
+        List<Comment> commented = member.get().getCommented();
+        commentRepository.deleteAll(commented);
+
+        List<Helping> helpingList = member.get().getHelpingList();
+        helpingRepository.deleteAll(helpingList);
 
         for (String childName : childNameList) {
             childRemove(childName);

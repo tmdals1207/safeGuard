@@ -35,7 +35,7 @@ public class ConfirmService {
 
         confirm.setChild(child);
         confirm.setTitle(confirmType);
-        confirm.setContent("아이 이름 : " + child.getChildName());
+        confirm.setContent("피보호자 이름 : " + child.getChildName());
         confirm.setCreatedAt(LocalDateTime.now());
         confirm.setHelpingId(helping);
         confirmRepository.save(confirm);
@@ -50,11 +50,11 @@ public class ConfirmService {
 
     private FCMNotificationDTO makeMessage(String receiverId, Confirm confirm) {
 
-        String tmpTitle = "아이의 도착이 확인되지 않습니다.";
+        String tmpTitle = "피보호자의 도착이 확인되지 않습니다.";
         if(confirm.getConfirmType().equals(ConfirmType.ARRIVED)) {
-            tmpTitle = "아이가 도착 완료했습니다.";
+            tmpTitle = "피보호자가 도착 완료했습니다.";
         } else if(confirm.getConfirmType().equals(ConfirmType.DEPART)) {
-            tmpTitle = "아이가 출발했습니다.";
+            tmpTitle = "피보호자가 출발했습니다.";
         }
 
         return FCMNotificationDTO.builder()

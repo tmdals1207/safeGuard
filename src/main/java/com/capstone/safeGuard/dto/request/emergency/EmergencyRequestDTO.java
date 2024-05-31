@@ -14,7 +14,7 @@ public class EmergencyRequestDTO {
     private double latitude;
     private double longitude;
 
-    private final String title = "주변 아이에게 도움이 필요합니다.";
+    private final String title = "주변 피보호자에게 도움이 필요합니다.";
 
     public Emergency dtoToDomain(Member member, Child child, String content){
         return Emergency
