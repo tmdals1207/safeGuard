@@ -29,7 +29,7 @@ public class FCMService {
 
         if (foundMember.get().getFcmToken() == null) {
             log.info("FCM 토큰이 없음");
-            return null;
+            return "";
         }
 
         Notification notification = Notification.builder()
