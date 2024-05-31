@@ -7,6 +7,8 @@ import com.capstone.safeGuard.dto.response.CommentResponseDTO;
 import com.capstone.safeGuard.dto.response.FindNotificationResponse;
 import com.capstone.safeGuard.service.EmergencyService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class EmergencyController {
 
     // 몇 km 이내의 사람들에게 알림을 보낼 것인지
     static public final int DISTANCE = 1;
+    private static final Logger log = LoggerFactory.getLogger(EmergencyController.class);
 
     private final EmergencyService emergencyService;
 
@@ -36,6 +39,11 @@ public class EmergencyController {
         // 1. 반경 [] km내의 member들만 리스트업
         ArrayList<String> neighborMemberList
                 = emergencyService.getNeighborMembers(emergencyRequestDto, DISTANCE);
+
+        if(neighborMemberList.size() <= 0){
+            log.info("주변 맴버 없음");
+            return addOkStatus(result);
+        }
 
         // 2. 반경 []km 내의 member 들에게 알림을 보냄
         if (!sendEmergencyToMembers(neighborMemberList, emergencyRequestDto)) {
@@ -54,7 +62,7 @@ public class EmergencyController {
                 return false;
             }
 
-            if (!emergencyService.sendNotificationTo(memberId, emergency)) {
+            if (! emergencyService.sendNotificationTo(memberId, emergency)) {
                 return false;
             }
         }

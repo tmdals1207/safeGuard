@@ -6,6 +6,7 @@ import com.capstone.safeGuard.dto.request.emergency.EmergencyRequestDTO;
 import com.capstone.safeGuard.dto.request.notification.FCMNotificationDTO;
 import com.capstone.safeGuard.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmergencyService {
     private final EmergencyRepository emergencyRepository;
     private final MemberRepository memberRepository;
@@ -28,9 +30,10 @@ public class EmergencyService {
     public ArrayList<String> getNeighborMembers(EmergencyRequestDTO dto, int distance){
         ArrayList<String> memberIdList = new ArrayList<>();
         ArrayList<Member> allMember = memberService.findAllMember();
+        Child foundChild = childRepository.findByChildName(dto.getChildName());
 
         for (Member member : allMember) {
-            if (isNeighbor(dto.getLatitude(), dto.getLongitude(), member.getLatitude(), member.getLongitude(), distance)){
+            if (isNeighbor(foundChild.getLatitude(), foundChild.getLongitude(), member.getLatitude(), member.getLongitude(), distance)){
                 memberIdList.add(member.getMemberId());
             }
         }
