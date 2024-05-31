@@ -65,7 +65,7 @@ public class EmergencyService {
         // Emergency table에 저장
         Member member = memberRepository.findById(dto.getSenderId()).orElseThrow(NoSuchElementException::new);
         Child child = childRepository.findBychildName(dto.getChildName());
-        String content = "아이 이름 : " + dto.getChildName();
+        String content = "피보호자 이름 : " + dto.getChildName();
 
         Emergency emergency = dto.dtoToDomain(member, child, content);
         emergencyRepository.save(emergency);
