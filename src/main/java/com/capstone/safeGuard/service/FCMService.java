@@ -28,6 +28,7 @@ public class FCMService {
         }
 
         if (foundMember.get().getFcmToken() == null) {
+            log.info("FCM 토큰이 없음");
             return null;
         }
 
@@ -43,9 +44,11 @@ public class FCMService {
 
         try {
             firebaseMessaging.send(message);
-            log.info("Sent notification Success!!");
+            log.info("Sent notification 성공!!");
             return "성공";
         } catch (FirebaseMessagingException e) {
+            log.info(e.getMessage());
+            log.info("FIREBASE 문제");
             return null;
         }
     }

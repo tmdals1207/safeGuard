@@ -6,6 +6,7 @@ import com.capstone.safeGuard.dto.request.findidandresetpw.*;
 import com.capstone.safeGuard.dto.request.signupandlogin.*;
 import com.capstone.safeGuard.dto.request.updatecoordinate.ReturnCoordinateDTO;
 import com.capstone.safeGuard.dto.request.updatecoordinate.UpdateCoordinateDTO;
+import com.capstone.safeGuard.service.BatteryService;
 import com.capstone.safeGuard.service.JwtService;
 import com.capstone.safeGuard.service.LoginType;
 import com.capstone.safeGuard.service.MemberService;
@@ -40,6 +41,7 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
     private final NoticeController noticeController;
+    private final BatteryService batteryService;
 
     @GetMapping("/login")
     public String showLoginForm() {
@@ -51,8 +53,7 @@ public class MemberController {
                                                      BindingResult bindingResult,
                                                      HttpServletResponse response,
                                                      HttpServletRequest request) {
-        log.info(dto.getEditTextID());
-        log.info(dto.getLoginType());
+        log.info(dto.getEditTextID(), dto.getLoginType());
 
         Map<String, String> result = new HashMap<>();
 
@@ -389,11 +390,19 @@ public class MemberController {
 
         if (dto.getType().equals("Member")) {
             if (memberService.updateMemberCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())) {
+                boolean b = batteryService.setMemberBattery(dto.getId(), dto.getBattery());
+                if(! b){
+                    return addErrorStatus(result);
+                }
                 return addOkStatus(result);
             }
             return addErrorStatus(result);
         }
         if (memberService.updateChildCoordinate(dto.getId(), dto.getLatitude(), dto.getLongitude())) {
+            boolean b = batteryService.setChildBattery(dto.getId(), dto.getBattery());
+            if(! b){
+                return addErrorStatus(result);
+            }
             noticeController.sendNotice(dto.getId());
             return addOkStatus(result);
         }
@@ -403,15 +412,24 @@ public class MemberController {
     @PostMapping("/return-coordinate")
     public ResponseEntity<Map<String, Double>> returnCoordinate(@RequestBody ReturnCoordinateDTO dto) {
         Map<String, Double> coordinates;
-        log.info("위치 전송 시작");
 
         if (dto.getType().equals("Member")) {
+            MemberBattery memberBattery = batteryService.getMemberBattery(dto.getId());
             coordinates = memberService.getMemberCoordinate(dto.getId());
+
+            if (memberBattery != null) {
+                coordinates.put("battery", (memberBattery.getBatteryValue() * 1.0) );
+            }
             if (coordinates != null) {
                 return ResponseEntity.ok(coordinates);
             }
         } else if (dto.getType().equals("Child")) {
+            ChildBattery childBattery = batteryService.getChildBattery(dto.getId());
             coordinates = memberService.getChildCoordinate(dto.getId());
+
+            if(childBattery != null) {
+                coordinates.put("battery", (childBattery.getBatteryValue() * 1.0) );
+            }
             if (coordinates != null) {
                 noticeController.sendNotice(dto.getId());
                 return ResponseEntity.ok(coordinates);

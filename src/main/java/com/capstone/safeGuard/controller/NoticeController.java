@@ -65,7 +65,6 @@ public class NoticeController {
 
     @Transactional
     public void sendNotice(String childName) {
-        log.warn("sendNotice 호출: {}", childName);
         Child foundChild = memberService.findChildByChildName(childName);
         if (foundChild == null) {
             log.warn("에러 : foundChild is null!!");
