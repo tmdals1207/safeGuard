@@ -38,7 +38,16 @@ public class SecurityConfig {
             "/send-confirm", "/fatal", "/add-parent", "/find-member-by-child",
             "/received-notice", "/received-confirm", "/sent-confirm",
             "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
-            "/delete-comment", "/write-comment", "/return-nickname"
+            "/delete-comment", "/write-comment", "/return-nickname",
+            "/upload-file", "/get-file"
+    };
+
+    private final String[] memberPermitList = {
+
+    };
+
+    private final String[] childPermitList = {
+
     };
 
     @Bean
@@ -49,7 +58,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests()
                 .requestMatchers(permitAllList).permitAll()
-//                .requestMatchers("").hasRole("member")
+//                .requestMatchers(memberPermitList).hasRole(Authority.ROLE_MEMBER.toString())
+//                .requestMatchers(childPermitList).hasRole(Authority.ROLE_CHILD.toString())
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
