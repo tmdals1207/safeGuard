@@ -39,7 +39,7 @@ public class SecurityConfig {
             "/received-notice", "/received-confirm", "/sent-confirm",
             "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
             "/delete-comment", "/write-comment", "/return-nickname",
-            "/upload-file", "/get-file"
+            "/upload-file", "/get-file", "/imagePath/**"
     };
 
     private final String[] memberPermitList = {
