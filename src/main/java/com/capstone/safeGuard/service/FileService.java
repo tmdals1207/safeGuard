@@ -33,7 +33,8 @@ public class FileService {
     public String saveMemberFile(MultipartFile file, String memberId) {
         String originalFilename = file.getOriginalFilename();
         UUID uuid = UUID.randomUUID();
-        String filePath = SAVEPATH + uuid + "-" + originalFilename;
+        String fileName = uuid + "-" + originalFilename;
+        String filePath = SAVEPATH + fileName;
 
         Optional<Member> foundMember = memberRepository.findById(memberId);
         if (foundMember.isEmpty()) {
@@ -55,14 +56,15 @@ public class FileService {
         } catch (IOException e) {
             return null;
         }
-        return filePath;
+        return fileName;
     }
 
     @Transactional
     public String saveChildFile(MultipartFile file, String childName) {
         String originalFilename = file.getOriginalFilename();
         UUID uuid = UUID.randomUUID();
-        String filePath = SAVEPATH + uuid + "-" + originalFilename;
+        String fileName = uuid + "-" + originalFilename;
+        String filePath = SAVEPATH + fileName;
 
         Child foundChild = childRepository.findByChildName(childName);
         if (foundChild == null) {
@@ -84,7 +86,7 @@ public class FileService {
         } catch (IOException e) {
             return null;
         }
-        return filePath;
+        return fileName;
     }
 
     @Transactional

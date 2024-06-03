@@ -70,7 +70,7 @@ public class FileController {
             return addErrorStatus(result);
         }
 
-        result.put("filePath", filePath);
+        result.put("filePath", filePath.substring(filePath.lastIndexOf("/") + 1));
         return addOkStatus(result);
     }
 
