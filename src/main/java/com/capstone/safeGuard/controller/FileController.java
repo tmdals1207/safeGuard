@@ -10,31 +10,37 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller@RequiredArgsConstructor @Slf4j
+@Controller
+@RequiredArgsConstructor
+@Slf4j
 public class FileController {
     private final MemberService memberService;
     private final FileService fileService;
 
 
     @PostMapping("/upload-file")
-    public ResponseEntity<Map<String, String>> uploadFile(@RequestBody FileUploadRequestDTO dto) {
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestPart(value = "dto", required = false) FileUploadRequestDTO dto,
+                                                          @RequestPart(value = "file") MultipartFile file) {
         Map<String, String> result = new HashMap<>();
         String uploaderType = dto.getUploaderType();
+        log.info("uploader type: " + uploaderType);
 
         String filePath;
 
-        if(uploaderType.equalsIgnoreCase("Member")){
-            filePath = fileService.saveMemberFile(dto.getFile(), dto.getUploaderId());
-            if(filePath == null || filePath.isEmpty()){
+        if (uploaderType.equalsIgnoreCase("Member")) {
+            filePath = fileService.saveMemberFile(file, dto.getUploaderId());
+            if (filePath == null || filePath.isEmpty()) {
                 return addErrorStatus(result);
             }
         } else if (uploaderType.equalsIgnoreCase("Child")) {
-            filePath = fileService.saveChildFile(dto.getFile(), dto.getUploaderId());
-            if(filePath == null || filePath.isEmpty()){
+            filePath = fileService.saveChildFile(file, dto.getUploaderId());
+            if (filePath == null || filePath.isEmpty()) {
                 return addErrorStatus(result);
             }
         } else {
@@ -50,21 +56,21 @@ public class FileController {
 
         String userType = dto.getUserType();
         String filePath;
-        if(userType.equalsIgnoreCase("Member")){
+        if (userType.equalsIgnoreCase("Member")) {
             filePath = fileService.findMemberFile(dto.getUserId());
-            if(filePath == null || filePath.isEmpty()){
+            if (filePath == null || filePath.isEmpty()) {
                 return addErrorStatus(result);
             }
         } else if (userType.equalsIgnoreCase("Child")) {
             filePath = fileService.findChildFile(dto.getUserId());
-            if(filePath == null || filePath.isEmpty()){
+            if (filePath == null || filePath.isEmpty()) {
                 return addErrorStatus(result);
             }
         } else {
             return addErrorStatus(result);
         }
 
-        result.put("filePath", filePath);
+        result.put("filePath", filePath.substring(filePath.lastIndexOf("/") + 1));
         return addOkStatus(result);
     }
 
