@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class FileService {
-    public static final String SAVEPATH = "/Users/snhng/Documents/testing/";
+    public static final String SAVEPATH = "/root/capstone/photos/";
     private final MemberFileRepository memberFileRepository;
     private final MemberRepository memberRepository;
     private final ChildRepository childRepository;
