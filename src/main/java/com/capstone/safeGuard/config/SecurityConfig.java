@@ -39,8 +39,7 @@ public class SecurityConfig {
             "/received-notice", "/received-confirm", "/sent-confirm",
             "/sent-emergency", "/received-emergency", "/emergency", "/emergency-detail",
             "/delete-comment", "/write-comment", "/return-nickname",
-            "/upload-file", "/get-file",
-            "/speech","/transcribe-and-compare"
+            "/upload-file", "/get-file", "/imagePath/**"
     };
 
     private final String[] memberPermitList = {
@@ -49,8 +48,6 @@ public class SecurityConfig {
 
     private final String[] childPermitList = {
 
-            "/delete-comment", "/write-comment",
-            "/speech","/transcribe-and-compare"
     };
 
     @Bean

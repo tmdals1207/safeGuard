@@ -75,6 +75,8 @@ public class NoticeController {
         String lastStatus = "일반구역";
         if(foundChild.getLastStatus() != null){
             lastStatus = foundChild.getLastStatus();
+        } else {
+            foundChild.setLastStatus(lastStatus);
         }
         log.warn("{}의 currentStatus : {} | lastStatus : {} ", childName, currentStatus, foundChild.getLastStatus());
 
