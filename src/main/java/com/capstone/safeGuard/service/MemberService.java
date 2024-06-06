@@ -201,14 +201,20 @@ public class MemberService {
         }
 
         ArrayList<String> childNameList = findChildList(memberId);
+        if( ! (childNameList == null) ){
+            for (String childName : childNameList) {
+                childRemove(childName);
+            }
+        }
+
         List<Comment> commented = member.get().getCommented();
-        commentRepository.deleteAll(commented);
+        if( !(commented == null) ){
+            commentRepository.deleteAll(commented);
+        }
 
         List<Helping> helpingList = member.get().getHelpingList();
-        helpingRepository.deleteAll(helpingList);
-
-        for (String childName : childNameList) {
-            childRemove(childName);
+        if( !(helpingList == null) ){
+            helpingRepository.deleteAll(helpingList);
         }
 
         memberRepository.delete(member.get());
