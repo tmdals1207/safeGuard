@@ -21,6 +21,7 @@ public class FCMService {
     private final MemberRepository memberRepository;
 
     public String SendNotificationByToken(FCMNotificationDTO dto) {
+        log.info("Sending notification to FCM");
         Optional<Member> foundMember = memberRepository.findById(dto.getReceiverId());
 
         if (foundMember.isEmpty()) {

@@ -71,7 +71,7 @@ public class ConfirmController {
     @Transactional
     public boolean sendConfirmToAllMember(ArrayList<Member> foundMemberList, Child foundChild, Helping helping, String confirmType) {
         for (Member member : foundMemberList) {
-            if(! sendConfirmToMember(member.getMemberId(), foundChild, helping, confirmType)){
+            if(! sendConfirmToMember(member, foundChild, helping, confirmType)){
                 return false;
             }
         }
@@ -79,13 +79,14 @@ public class ConfirmController {
     }
 
     @Transactional
-    public boolean sendConfirmToMember(String receiverId, Child child, Helping helping, String confirmType) {
-        Confirm confirm = confirmService.saveConfirm(child, helping, confirmType);
+    public boolean sendConfirmToMember(Member receiverId, Child child, Helping helping, String confirmType) {
+        Confirm confirm = confirmService.saveConfirm(receiverId, child, helping, confirmType);
+        log.info("Confirm save to member " + receiverId.getMemberId());
         if(confirm == null){
             return false;
         }
 
-        return confirmService.sendNotificationTo(receiverId, confirm);
+        return confirmService.sendNotificationTo(receiverId.getMemberId(), confirm);
     }
 
     @PostMapping("/received-confirm")
