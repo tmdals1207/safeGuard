@@ -41,6 +41,8 @@ public class MemberService {
     private final CoordinateRepository coordinateRepository;
     private final MemberFileRepository memberFileRepository;
     private final ChildFileRepository childFileRepository;
+    private final EmergencyReceiverRepository emergencyReceiverRepository;
+    private final NoticeRepository noticeRepository;
 
     @Transactional
     public Member memberLogin(LoginRequestDTO dto) {
@@ -59,7 +61,7 @@ public class MemberService {
         String fcmToken = dto.getFcmToken();
 
         List<Member> existFcmList = memberRepository.findAllByFcmToken(fcmToken);
-        if (! existFcmList.isEmpty()){
+        if (!existFcmList.isEmpty()) {
             for (Member existFcm : existFcmList) {
                 existFcm.setFcmToken(null);
             }
@@ -187,7 +189,7 @@ public class MemberService {
 
         List<Helping> foundHelpingList = helpingRepository.findAllByHelper(findMember.get());
         for (Helping foundHelping : foundHelpingList) {
-            if(foundHelping.getChild().equals(selectedChild)){
+            if (foundHelping.getChild().equals(selectedChild)) {
                 return false;
             }
         }
@@ -208,29 +210,38 @@ public class MemberService {
         }
 
         ArrayList<String> childNameList = findChildList(memberId);
-        if( ! (childNameList == null) ){
+        if (!(childNameList == null)) {
             for (String childName : childNameList) {
                 childRemove(childName);
             }
         }
 
         List<Comment> commented = member.get().getCommented();
-        if( !(commented == null) ){
+        if (!(commented == null)) {
             commentRepository.deleteAll(commented);
         }
 
         List<Helping> helpingList = member.get().getHelpingList();
-        if( !(helpingList == null) ){
+        if (!(helpingList == null)) {
             helpingRepository.deleteAll(helpingList);
         }
 
         List<Parenting> parentingList = member.get().getParentingList();
-        if( !(parentingList == null) ){
+        if (!(parentingList == null)) {
             parentingRepository.deleteAll(parentingList);
         }
 
         memberFileRepository.findByMember(member.get())
                 .ifPresent(memberFileRepository::delete);
+
+        List<Emergency> emergencyList = emergencyRepository.findAllBySenderId(member.get());
+        if (!(emergencyList == null)) {
+            for (Emergency emergency : emergencyList) {
+                List<EmergencyReceiver> emergencyReceiverList = emergencyReceiverRepository.findAllByEmergency(emergency);
+                emergencyReceiverRepository.deleteAll(emergencyReceiverList);
+            }
+            emergencyRepository.deleteAll(emergencyList);
+        }
 
         Optional<MemberBattery> memberBattery = memberBatteryRepository.findByMemberId(member.get());
         memberBattery.ifPresent(battery -> memberBatteryRepository.deleteById(battery.getMemberBatteryId()));
@@ -247,27 +258,36 @@ public class MemberService {
         }
 
         List<Emergency> emergencyList = emergencyRepository.findAllByChild(selectedChild);
-        if( !(emergencyList == null) ){
+        if (!(emergencyList == null)) {
+            for (Emergency emergency : emergencyList) {
+                List<EmergencyReceiver> emergencyReceiverList = emergencyReceiverRepository.findAllByEmergency(emergency);
+                emergencyReceiverRepository.deleteAll(emergencyReceiverList);
+            }
             emergencyRepository.deleteAll(emergencyList);
         }
 
         ArrayList<Coordinate> coordinateArrayList = coordinateRepository.findAllByChild(selectedChild);
-        if( !(coordinateArrayList == null) ){
+        if (!(coordinateArrayList == null)) {
             coordinateRepository.deleteAll(coordinateArrayList);
         }
 
+        ArrayList<Notice> noticeArrayList = noticeRepository.findAllByChild(selectedChild);
+        if (!(noticeArrayList == null)) {
+            noticeRepository.deleteAll(noticeArrayList);
+        }
+
         ArrayList<Confirm> confirmArrayList = confirmRepository.findAllByChild(selectedChild);
-        if( !(confirmArrayList == null) ){
+        if (!(confirmArrayList == null)) {
             confirmRepository.deleteAll(confirmArrayList);
         }
 
         List<Parenting> parentingList = selectedChild.getParentingList();
-        if( !(parentingList == null) ){
+        if (!(parentingList == null)) {
             parentingRepository.deleteAll(parentingList);
         }
 
         List<Helping> helpingList = selectedChild.getHelpingList();
-        if( !(helpingList == null) ){
+        if (!(helpingList == null)) {
             helpingRepository.deleteAll(helpingList);
         }
 
@@ -585,7 +605,7 @@ public class MemberService {
 
         List<Parenting> foundParentingList = parentingRepository.findAllByParent(foundMember.get());
         for (Parenting foundParenting : foundParentingList) {
-            if(foundParenting.getChild().equals(foundChild)){
+            if (foundParenting.getChild().equals(foundChild)) {
                 return false;
             }
         }
@@ -597,7 +617,7 @@ public class MemberService {
 
     public ArrayList<Member> findAllParentByChild(Child foundChild) {
         List<Parenting> parentingList = foundChild.getParentingList().stream().toList();
-        if(parentingList.isEmpty()){
+        if (parentingList.isEmpty()) {
             return null;
         }
 
