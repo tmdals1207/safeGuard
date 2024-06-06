@@ -23,7 +23,7 @@ public class ConfirmService {
     private final HelpingRepository helpingRepository;
 
     @Transactional
-    public Confirm saveConfirm(Child child, Helping helping, String confirmType) {
+    public Confirm saveConfirm(Member receiverId,  Child child, Helping helping, String confirmType) {
         Confirm confirm = new Confirm();
         if( confirmType.equals("ARRIVED") ){
             confirm.setConfirmType(ConfirmType.ARRIVED);
@@ -38,12 +38,15 @@ public class ConfirmService {
         confirm.setContent("피보호자 이름 : " + child.getChildName());
         confirm.setCreatedAt(LocalDateTime.now());
         confirm.setHelpingId(helping);
+        confirm.setReceiverId(receiverId);
+        log.info("Confirm save : " + confirm.getConfirmId());
         confirmRepository.save(confirm);
 
         return confirm;
     }
 
     public boolean sendNotificationTo(String receiverId, Confirm confirm){
+        log.info("Confirm send : " + confirm.getConfirmId());
         FCMNotificationDTO message = makeMessage(receiverId, confirm);
         return fcmService.SendNotificationByToken(message) != null;
     }
@@ -81,7 +84,7 @@ public class ConfirmService {
         ArrayList<Confirm> confirmList = new ArrayList<>();
         for (Parenting parenting : parentingList) {
             confirmList.addAll(confirmRepository
-                    .findAllByChild( parenting.getChild() ));
+                    .findAllByReceiverId( parenting.getParent()) );
         }
 
         return confirmList;

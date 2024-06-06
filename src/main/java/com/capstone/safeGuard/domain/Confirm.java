@@ -26,6 +26,9 @@ public class Confirm  {
     private Helping helpingId;
 
     @ManyToOne
+    private Member receiverId;
+
+    @ManyToOne
     private Child child;
 
     private LocalDateTime createdAt;
