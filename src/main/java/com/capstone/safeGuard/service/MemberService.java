@@ -34,6 +34,13 @@ public class MemberService {
     private static final int emailAuthCodeDuration = 1800; // 30 * 60 * 1000 == 30분
     private final ConfirmRepository confirmRepository;
     private final CommentRepository commentRepository;
+    private final BatteryService batteryService;
+    private final MemberBatteryRepository memberBatteryRepository;
+    private final ChildBatteryRepository childBatteryRepository;
+    private final EmergencyRepository emergencyRepository;
+    private final CoordinateRepository coordinateRepository;
+    private final MemberFileRepository memberFileRepository;
+    private final ChildFileRepository childFileRepository;
 
     @Transactional
     public Member memberLogin(LoginRequestDTO dto) {
@@ -201,15 +208,32 @@ public class MemberService {
         }
 
         ArrayList<String> childNameList = findChildList(memberId);
+        if( ! (childNameList == null) ){
+            for (String childName : childNameList) {
+                childRemove(childName);
+            }
+        }
+
         List<Comment> commented = member.get().getCommented();
-        commentRepository.deleteAll(commented);
+        if( !(commented == null) ){
+            commentRepository.deleteAll(commented);
+        }
 
         List<Helping> helpingList = member.get().getHelpingList();
-        helpingRepository.deleteAll(helpingList);
-
-        for (String childName : childNameList) {
-            childRemove(childName);
+        if( !(helpingList == null) ){
+            helpingRepository.deleteAll(helpingList);
         }
+
+        List<Parenting> parentingList = member.get().getParentingList();
+        if( !(parentingList == null) ){
+            parentingRepository.deleteAll(parentingList);
+        }
+
+        memberFileRepository.findByMember(member.get())
+                .ifPresent(memberFileRepository::delete);
+
+        Optional<MemberBattery> memberBattery = memberBatteryRepository.findByMemberId(member.get());
+        memberBattery.ifPresent(battery -> memberBatteryRepository.deleteById(battery.getMemberBatteryId()));
 
         memberRepository.delete(member.get());
         return true;
@@ -221,6 +245,38 @@ public class MemberService {
         if (selectedChild == null) {
             return false;
         }
+
+        List<Emergency> emergencyList = emergencyRepository.findAllByChild(selectedChild);
+        if( !(emergencyList == null) ){
+            emergencyRepository.deleteAll(emergencyList);
+        }
+
+        ArrayList<Coordinate> coordinateArrayList = coordinateRepository.findAllByChild(selectedChild);
+        if( !(coordinateArrayList == null) ){
+            coordinateRepository.deleteAll(coordinateArrayList);
+        }
+
+        ArrayList<Confirm> confirmArrayList = confirmRepository.findAllByChild(selectedChild);
+        if( !(confirmArrayList == null) ){
+            confirmRepository.deleteAll(confirmArrayList);
+        }
+
+        List<Parenting> parentingList = selectedChild.getParentingList();
+        if( !(parentingList == null) ){
+            parentingRepository.deleteAll(parentingList);
+        }
+
+        List<Helping> helpingList = selectedChild.getHelpingList();
+        if( !(helpingList == null) ){
+            helpingRepository.deleteAll(helpingList);
+        }
+
+        childFileRepository.findByChild(selectedChild)
+                .ifPresent(childFileRepository::delete);
+
+        Optional<ChildBattery> childBattery = childBatteryRepository.findByChildName(selectedChild);
+        childBattery.ifPresent(battery -> childBatteryRepository.deleteById(battery.getChildBatteryId()));
+
         childRepository.delete(selectedChild);
         return true;
     }

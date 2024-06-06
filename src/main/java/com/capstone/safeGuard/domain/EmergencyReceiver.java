@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name = "emergency-receiver")
+@Table(name = "emergency_receiver")
 public class EmergencyReceiver {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
