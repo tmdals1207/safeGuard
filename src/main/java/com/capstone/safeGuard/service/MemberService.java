@@ -223,6 +223,12 @@ public class MemberService {
 
         List<Helping> helpingList = member.get().getHelpingList();
         if (!(helpingList == null)) {
+            for (Helping helping : helpingList) {
+                ArrayList<Confirm> confirmArrayList = confirmRepository.findAllByHelpingId(helping);
+                if (!confirmArrayList.isEmpty()) {
+                    confirmRepository.deleteAll(confirmArrayList);
+                }
+            }
             helpingRepository.deleteAll(helpingList);
         }
 
@@ -238,7 +244,9 @@ public class MemberService {
         if (!(emergencyList == null)) {
             for (Emergency emergency : emergencyList) {
                 List<EmergencyReceiver> emergencyReceiverList = emergencyReceiverRepository.findAllByEmergency(emergency);
-                emergencyReceiverRepository.deleteAll(emergencyReceiverList);
+                if (!emergencyReceiverList.isEmpty()) {
+                    emergencyReceiverRepository.deleteAll(emergencyReceiverList);
+                }
             }
             emergencyRepository.deleteAll(emergencyList);
         }
@@ -261,7 +269,9 @@ public class MemberService {
         if (!(emergencyList == null)) {
             for (Emergency emergency : emergencyList) {
                 List<EmergencyReceiver> emergencyReceiverList = emergencyReceiverRepository.findAllByEmergency(emergency);
-                emergencyReceiverRepository.deleteAll(emergencyReceiverList);
+                if (!emergencyReceiverList.isEmpty()) {
+                    emergencyReceiverRepository.deleteAll(emergencyReceiverList);
+                }
             }
             emergencyRepository.deleteAll(emergencyList);
         }
