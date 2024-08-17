@@ -1,7 +1,7 @@
 <div align="center">
 
   <img src="https://github.com/2024-KGU-Advanced-Capstone-Design/safeGuardApp/blob/main/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp" alt="logo" width="100" height="auto" />
-  <h1>SafeGuard</h1>
+  <h1>SafeGuard (노약자 미아 방지 프로그램)</h1>
   
   <p>
     본 프로젝트는 경기대학교 2024학년도 1학기<br>컴퓨터공학심화캡스톤디자인 수업을 통해 수행한 팀프로젝트입니다.
